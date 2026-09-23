@@ -1,54 +1,53 @@
-# LegalGPT (DhaaraAI) - Minor Project
+# DhaaraAI - Legal Intelligence Platform
 
-Welcome to **LegalGPT**, an AI-powered legal assistant designed to help the common Indian citizen (Aam Bhartiya Nagrik) easily search and understand Indian statutory laws (like IPC, BNS, Consumer Protection Act, Constitution) in simple Hindi and English.
+DhaaraAI is an AI-powered legal assistant designed to help Indian citizens navigate and understand statutory laws, including the Bharatiya Nyaya Sanhita (BNS 2023), Indian Penal Code (IPC), and the Consumer Protection Act. The application provides legal information in accessible English and Hindi.
 
-This project uses a modern web architecture separated into a fast **React/Vite Frontend** and a powerful **FastAPI Backend**.
+## Architecture
 
----
+The project employs a modern, decoupled web architecture:
+- **Frontend (`/frontend`)**: A React and Vite-based web application featuring a premium light theme with glassmorphism UI elements and responsive design.
+- **Backend (`/backend`)**: A Python API powered by FastAPI. It utilizes a Retrieval-Augmented Generation (RAG) engine, integrating the Groq API for Large Language Model capabilities and ChromaDB for vector storage and semantic search.
 
-## 🛠️ Folder Structure
+## Setup and Installation
 
-- `/frontend` - The beautiful web application built with React, Vite, and Vanilla CSS (Glassmorphism & Light Theme).
-- `/backend` - The Python API built with FastAPI that runs the RAG (Retrieval-Augmented Generation) engine utilizing the `Groq` API and ChromaDB.
+### 1. Prerequisites
+- Node.js (v18 or higher recommended)
+- Python 3.9 or higher
 
----
+### 2. Backend Configuration
+The backend requires a Groq API key to process AI-driven legal queries.
 
-## 🚀 How to Setup and Run
-
-### 1. Configure the AI (Groq API Key)
-To enable the AI to generate answers, you need to add your Groq API key:
-1. Open the file located at `backend/.env` (I have already created it for you).
-2. Paste your API key in that file like this:
+1. Navigate to the `backend` directory.
+2. Create or open the `.env` file.
+3. Define your API key:
    ```env
-   GROQ_API_KEY="your_actual_api_key_here"
+   GROQ_API_KEY="your_api_key"
    ```
 
-### 2. Start the Backend API
-The backend serves the legal RAG engine to the frontend.
-Open a terminal and run:
+### 3. Running the Backend Service
+Start the FastAPI server to serve the legal RAG engine:
+
 ```bash
 cd backend
-pip install fastapi uvicorn
+pip install -r requirements.txt # Ensure dependencies like fastapi, uvicorn, groq, chromadb are installed
 uvicorn main:app --reload --port 8000
 ```
-*The backend will be running at http://localhost:8000*
+The backend API will be available at http://localhost:8000.
 
-### 3. Start the Web App (Frontend)
-The frontend is the beautifully designed user interface.
-Open a **new, separate terminal** and run:
+### 4. Running the Frontend Application
+Start the Vite development server in a separate terminal session:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*The frontend will be running at http://localhost:5173*
+The frontend UI will be accessible at http://localhost:5173.
 
-### 4. Use the App
-Open your browser and navigate to [http://localhost:5173](http://localhost:5173). You can now ask questions in English or Hindi!
+## Project Structure Guidelines
+- **Modularity**: Code files are strictly kept under 400 lines to ensure maintainability. Large monolithic files are split into logic modules and UI sub-components.
+- **Data Layer**: Legal databases, including CSVs and JSON files, are structured within the `backend/data` directory.
+- **Prompts**: LLM system prompts and formatting templates are isolated in `backend/src/prompts.py` for clarity.
 
----
-
-## 👨‍💻 Project Guidelines & Features
-- **UI Design**: A premium light theme utilizing glassmorphism and dynamic animations.
-- **Modularity**: Code files are strictly kept concise (200-400 lines max) to ensure readability and maintainability.
-- **Database**: All legal databases (CSVs, JSONs) are neatly arranged within the `backend/data` directory.
+## Disclaimer
+DhaaraAI provides general legal information and is not a substitute for professional legal counsel. Always consult a qualified advocate for legal matters.

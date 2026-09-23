@@ -29,87 +29,15 @@ DEFAULT_MODEL = "openai/gpt-oss-120b"
 FALLBACK_MODEL = "qwen/qwen3.8-27b"
 SIMILARITY_THRESHOLD = 0.30
 
-# Mandatory statutory disclaimers
-LEGAL_DISCLAIMER_EN = "This is general legal information, not a substitute for professional legal advice. Please consult an advocate."
-LEGAL_DISCLAIMER_HI = "यह केवल सामान्य कानूनी जानकारी है, पेशेवर कानूनी सलाह का विकल्प नहीं है। किसी योग्य अधिवक्ता से परामर्श अवश्य लें।"
-
-SYSTEM_PROMPT_EN = """You are DhaaraAI, a fast, precise Indian Legal Intelligence Assistant.
-Your goal is to give common Indian citizens a quick, direct, and complete legal solution in under 30 seconds of reading.
-
-CRITICAL RULES:
-1. HIGH IMPACT & CONCISE: DO NOT write walls of text, repetitive introductions, or huge complex tables. Use clean bullet points and short cards.
-2. CITATION (BNS 2023 FIRST): For criminal offenses, always cite the ACTIVE Bharatiya Nyaya Sanhita, 2023 (BNS) section first, followed by the legacy Indian Penal Code, 1860 (IPC) section as cross-reference. (Note: incidents after 1 July 2024 fall under BNS 2023).
-3. MANDATORY FORMAT:
-### ⚡ Quick Summary (Direct Answer)
-- 2-3 crisp bullet points: exactly what happened, what law applies, whether bailable, and the immediate outcome.
-
-### ⚖️ Applicable Legal Sections (BNS 2023 & IPC)
-- **Active Law (BNS 2023)**: Section [BNS Section] — [Offense Title]
-- **Legacy Law (IPC 1860)**: Section [IPC Section] (for historical cross-reference)
-- **Punishment & Fine**: [Imprisonment term / Fine amount / Community Service]
-
-### 📌 Key Legal Points (Bail & Police Action)
-- **Offense Nature**: Cognizable (Police can file FIR & investigate) OR Non-Cognizable
-- **Bail Status**: Bailable (Bail available at police station as a matter of right) OR Non-Bailable (Court discretion)
-- **Court**: Triable by [Magistrate / Sessions Court]
-
-### 📋 Immediate Action Plan (Step-by-Step)
-- **For Complainant / Victim**: 3 practical immediate actions (FIR/Zero FIR, evidence to preserve, medical/photo).
-- **For Accused / Other Party**: 2 protective safeguards (Notice under Sec 35(3) BNSS - no automatic arrest for offenses <= 7 yrs; Anticipatory Bail rights).
-
-### 📞 Emergency Helplines
-- Police: 112 | Cyber Financial Fraud: 1930 | Women Helpline: 181 | Free Legal Aid: 1516
-
-*{disclaimer}*
-
---- VERIFIED STATUTORY CONCORDANCE ---
-{concordance_context}
----------------------------------------
---- RETRIEVED STATUTORY TEXTS ---
-{retrieved_context}
----------------------------------
-"""
-
-SYSTEM_PROMPT_HI = """आप DhaaraAI हैं, एक त्वरित, सटीक और विश्वसनीय भारतीय कानूनी सहायक (Legal Intelligence Assistant)।
-आपका उद्देश्य आम नागरिक को उनकी कानूनी स्थिति, लागू धाराएं और अधिकार केवल 30 सेकंड में बिल्कुल स्पष्ट व सरल रूप से समझाना है।
-
-अनिवार्य भाषा व प्रारूप नियम:
-1. शत-प्रतिशत शुद्ध व सरल हिंदी: आपका पूरा उत्तर केवल और केवल हिंदी (देवनागरी लिपि) में होना चाहिए। कोई भी हेडिंग, बिंदु या सलाह अंग्रेजी में न लिखें।
-2. संक्षिप्त व सटीक: अनावश्यक लंबे पैराग्राफ या बड़ी थकाऊ टेबल न बनाएं। उत्तर को साफ-सुथरे बुलेट पॉइंट्स में रखें ताकि कोई भी व्यक्ति तुरंत समझ सके।
-3. BNS 2023 प्राथमिकता: 1 जुलाई 2024 के बाद की घटनाओं के लिए नई 'भारतीय न्याय संहिता, 2023 (BNS)' की मुख्य धारा पहले लिखें, और पुराने संदर्भ के लिए 'IPC 1860' की धारा साथ में बताएं।
-
-अनिवार्य उत्तर प्रारूप (Strict Hindi Format):
-### ⚡ त्वरित फैसला / समाधान (Quick Summary)
-- 2-3 बुलेट पॉइंट्स: क्या हुआ, कौन सी मुख्य धारा लगेगी, क्या यह जमानती है और तुरंत क्या स्थिति बनेगी।
-
-### ⚖️ लागू कानूनी धाराएं (BNS 2023 व IPC)
-- **लागू कानून (BNS 2023)**: धारा [BNS Section] — [अपराध का शीर्षक]
-- **पुराना कानून (IPC 1860)**: धारा [IPC Section] (पुराने रिकॉर्ड की तुलना हेतु)
-- **सजा व जुर्माना**: [अधिकतम सजा / जुर्माना / सामुदायिक सेवा]
-
-### 📌 कानूनी स्थिति (जमानत व पुलिस अधिकार)
-- **अपराध की प्रकृति**: संज्ञेय (Cognizable - पुलिस सीधे FIR दर्ज कर सकती है) या असंज्ञेय
-- **जमानत की स्थिति**: जमानती (Bailable - थाने से ही मुचलके पर जमानत मिल सकती है) या गैर-जमानती
-- **अदालत**: [संबंधित मजिस्ट्रेट / सत्र न्यायालय]
-
-### 📋 तुरंत क्या करें (कदम-दर-कदम कार्रवाई)
-- **यदि आप पीड़ित / शिकायतकर्ता हैं**: 3 आवश्यक कदम (FIR दर्ज कराना, घटनास्थल के फोटो/सबूत, मेडिकल रिपोर्ट)।
-- **यदि आप पर आरोप है / दूसरी पार्टी हैं**: 2 कानूनी सुरक्षा (धारा 35(3) BNSS नोटिस नियम - 7 साल से कम सजा में बिना उचित कारण सीधी गिरफ्तारी नहीं; जमानत अधिकार)।
-
-### 📞 आपातकालीन हेल्पलाइन
-- पुलिस सहायता: 112 | साइबर वित्तीय धोखाधड़ी: 1930 | महिला हेल्पलाइन: 181 | मुफ्त कानूनी सलाह: 1516
-
-*{disclaimer}*
-
---- सत्यापित कानूनी संदर्भ ---
-{concordance_context}
----------------------------
---- वैधानिक टेक्स्ट (IndiaCode) ---
-{retrieved_context}
-----------------------------------
-"""
-
-
+from prompts import (
+    LEGAL_DISCLAIMER_EN,
+    LEGAL_DISCLAIMER_HI,
+    SYSTEM_PROMPT_EN,
+    SYSTEM_PROMPT_HI,
+    DRAFTING_SYSTEM_PROMPT_EN,
+    DRAFTING_SYSTEM_PROMPT_HI,
+    CONTRACT_ANALYSIS_SYSTEM_PROMPT
+)
 class DhaaraRAGEngine:
     """
     Orchestrates semantic retrieval from ChromaDB, BNS 2023 concordance,
@@ -417,7 +345,422 @@ class DhaaraRAGEngine:
                 "language": language,
                 "concordance": diagnose_situation(question, user_role)
             }
+    def generate_legal_draft(
+        self,
+        document_type: str,
+        language: str,
+        complainant: Dict[str, str],
+        accused: Dict[str, str],
+        incident_category: str,
+        incident_datetime: str,
+        incident_location: str,
+        facts: str,
+        evidence: str,
+        relief_sought: str
+    ) -> Dict[str, Any]:
+        """
+        Generates a formal, legally grounded FIR Application or Legal Demand Notice.
+        """
+        is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
+        
+        # Diagnose incident to find relevant statutory sections
+        diagnosis = diagnose_situation(f"{incident_category} {facts}")
+        matched_crimes = diagnosis.get("matched_crimes", [])
+        sections_summary = []
+        for c in matched_crimes[:3]:
+            sections_summary.append(f"BNS Sec {c['bns_section']} ({c['bns_title']}) [Legacy IPC Sec {c['ipc_section']}]")
+        sections_str = ", ".join(sections_summary) if sections_summary else "Relevant sections of Bharatiya Nyaya Sanhita, 2023 (BNS)"
 
+        if is_hindi:
+            system_prompt = DRAFTING_SYSTEM_PROMPT_HI
+            user_prompt = f"""दस्तावेज़ का प्रकार: {document_type}
+आवेदक / परिवादी: {complainant.get('name', '')}, पिता/पति: {complainant.get('father_name', '')}, पता: {complainant.get('address', '')}, फोन: {complainant.get('phone', '')}
+थाना / शहर: {complainant.get('police_station', '')}
+आरोपी / प्रतिवादी: {accused.get('name', 'अज्ञात')}, पता/संपर्क: {accused.get('address', 'अज्ञात / डिजिटल')}
+अपराध की श्रेणी: {incident_category}
+घटना की तारीख व समय: {incident_datetime}
+घटना स्थल: {incident_location}
+घटना के मुख्य तथ्य: {facts}
+संलग्न साक्ष्य: {evidence}
+मांगी गई राहत / प्रार्थना: {relief_sought}
+पहचानी गई संभावित धाराएं: {sections_str}
+
+कृपया संपूर्ण, औपचारिक और प्रिंट करने योग्य विधिक ड्राफ्ट (FIR या लीगल नोटिस) तैयार करें।"""
+        else:
+            system_prompt = DRAFTING_SYSTEM_PROMPT_EN
+            user_prompt = f"""Document Type: {document_type}
+Complainant / Sender: {complainant.get('name', '')}, S/o or D/o or W/o: {complainant.get('father_name', '')}, Address: {complainant.get('address', '')}, Phone: {complainant.get('phone', '')}
+Jurisdictional Police Station / City: {complainant.get('police_station', '')}
+Accused / Respondent: {accused.get('name', 'Unknown')}, Address/Contact: {accused.get('address', 'Unknown / Digital')}
+Incident Category: {incident_category}
+Incident Date & Time: {incident_datetime}
+Incident Location: {incident_location}
+Statement of Facts: {facts}
+Attached Evidence / Documents: {evidence}
+Relief / Prayer Sought: {relief_sought}
+Suggested Governing Sections: {sections_str}
+
+Please produce a comprehensive, formal, print-ready legal draft adhering to Indian police/legal standards."""
+
+        if not self.client:
+            self._init_groq_client(self.api_key)
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                temperature=0.15,
+                max_tokens=1500,
+                stream=False
+            )
+            draft_text = response.choices[0].message.content.strip()
+            return {
+                "success": True,
+                "document_type": document_type,
+                "language": language,
+                "sections_referenced": sections_summary,
+                "draft": draft_text
+            }
+        except Exception as e:
+            print(f"[rag_engine] Drafting failed via primary model: {e}")
+            # Fallback to offline template
+            fallback_draft = self._generate_fallback_draft(
+                document_type=document_type,
+                is_hindi=is_hindi,
+                complainant=complainant,
+                accused=accused,
+                incident_datetime=incident_datetime,
+                incident_location=incident_location,
+                facts=facts,
+                evidence=evidence,
+                relief=relief_sought,
+                sections=sections_str
+            )
+            return {
+                "success": True,
+                "document_type": document_type,
+                "language": language,
+                "sections_referenced": sections_summary,
+                "draft": fallback_draft
+            }
+
+    def _generate_fallback_draft(
+        self,
+        document_type: str,
+        is_hindi: bool,
+        complainant: Dict[str, str],
+        accused: Dict[str, str],
+        incident_datetime: str,
+        incident_location: str,
+        facts: str,
+        evidence: str,
+        relief: str,
+        sections: str
+    ) -> str:
+        """Fallback template if Groq API is unreachable."""
+        is_notice = "notice" in str(document_type).lower()
+
+        if is_notice:
+            if is_hindi:
+                return f"""रजिस्टर्ड डाक / विधिक मांग नोटिस (LEGAL DEMAND NOTICE)
+
+दिनांक: {incident_datetime or 'आज का दिनांक'}
+स्थान: {incident_location or 'स्थान'}
+
+सेवा में (प्रतिवादी / प्राप्तकर्ता):
+श्रीमान/श्रीमती: {accused.get('name', 'प्रतिवादी का नाम')}
+पता / संपर्क: {accused.get('address', 'प्रतिवादी का पूर्ण पता')}
+
+प्रेषक (परिवादी / नोटिसकर्ता):
+{complainant.get('name', 'नोटिसकर्ता का नाम')},
+आत्मज/पत्नी: {complainant.get('father_name', 'पिता/पति का नाम')},
+निवासी: {complainant.get('address', 'नोटिसकर्ता का पता')},
+संपर्क सूत्र: {complainant.get('phone', '')}
+
+विषय: विधिक मांग नोटिस बाबत {facts[:60]}... 
+सुसंगत विधिक धाराएं: {sections}
+
+महोदय,
+मेरे मुवक्किल/नोटिसकर्ता की ओर से आपको यह कानूनी नोटिस निम्नलिखित तथ्यों पर प्रेषित किया जाता है:
+
+1. यह कि नोटिसकर्ता का विधिवत परिचय व अधिकार क्षेत्र उपरोक्त पते पर स्थित है।
+2. यह कि दिनांक {incident_datetime} को स्थान {incident_location} पर निम्नलिखित कृत्य/घटना घटित हुई:
+   {facts}
+3. यह कि आपके उक्त कृत्य के विरुद्ध निम्नलिखित साक्ष्य व दस्तावेज सुरक्षित हैं:
+   {evidence or 'उपलब्ध अभिलेख, बैंक लेनदेन एवं पत्राचार'}
+4. यह कि आपका यह कृत्य {sections} तथा भारतीय न्याय संहिता, 2023 (BNS) के सुसंगत प्रावधानों के अंतर्गत प्रत्यक्ष रूप से विधि विरुद्ध एवं दंडनीय है।
+
+अतः इस विधिक नोटिस के माध्यम से आपको निर्देशित किया जाता है कि:
+{relief or 'इस नोटिस की प्राप्ति के 15 (पंद्रह) दिनों के भीतर उक्त देय राशि/क्षतिपूर्ति का भुगतान करें अथवा विवादित कृत्य का तत्काल निवारण करें।'}
+
+चेतावनी: यदि आप इस नोटिस की प्राप्ति के 15 दिनों के भीतर उपरोक्त मांग की पूर्ति करने में विफल रहते हैं, तो नोटिसकर्ता आपके विरुद्ध सक्षम न्यायालय एवं पुलिस प्राधिकारियों के समक्ष दीवानी (Civil) एवं आपराधिक (Criminal) विधिक कार्यवाही संस्थित करने के लिए बाध्य होगा, जिसका संपूर्ण हर्ज़ा-खर्चा एवं परिणाम आपके व्यक्तिगत दायित्व पर होगा।
+
+नोटिसकर्ता के हस्ताक्षर: .......................................
+({complainant.get('name', 'नोटिसकर्ता')})"""
+            else:
+                return f"""LEGAL DEMAND NOTICE / STATUTORY NOTICE
+(Sent via Registered Post A.D. / Speed Post / Digital Mode)
+
+Date: {incident_datetime or 'CURRENT DATE'}
+Place: {incident_location or 'LOCATION'}
+
+TO (NOTICE RECIPIENT / RESPONDENT):
+Name: {accused.get('name', 'Name of the Accused / Respondent')}
+Address / Contact: {accused.get('address', 'Full Address / Contact Details')}
+
+FROM (COMPLAINANT / SENDER):
+{complainant.get('name', 'Complainant Full Name')},
+S/o, D/o, W/o: {complainant.get('father_name', 'Parent/Spouse Name')},
+Residing at: {complainant.get('address', 'Complete Address')},
+Contact: {complainant.get('phone', '')}
+
+SUBJECT: STATUTORY LEGAL DEMAND NOTICE UNDER INDIAN LAW
+GOVERNING STATUTES: {sections}
+
+Sir / Madam,
+
+Under instructions from and on behalf of my client / undersigned, I hereby serve upon you this formal Legal Demand Notice on the following grounds and facts:
+
+1. FACTUAL BACKGROUND:
+   On or around {incident_datetime} at {incident_location}, the following incident / dispute transpired:
+   {facts}
+
+2. SUPPORTING EVIDENCE & DOCUMENTATION:
+   The complainant holds conclusive documentation/evidence regarding the above matter, including:
+   {evidence or 'Bank transfer statements, electronic communications, and transaction slips'}
+
+3. STATUTORY INFRINGEMENT & BREACH:
+   Your aforesaid wrongful actions and default constitute serious civil wrongs as well as cognizable offenses under {sections} and governing Indian enactments.
+
+4. DEMAND & RELIEF SOUGHT:
+   You are hereby called upon to comply with the following demands:
+   {relief or 'Rectify the default / refund the aggrieved amount in full within 15 (fifteen) statutory days from receipt of this notice.'}
+
+NOTICE PERIOD & PENAL CONSEQUENCES:
+Take notice that if you fail to comply with the aforesaid statutory requisition within 15 (fifteen) calendar days from the receipt of this legal notice, the undersigned shall be constrained to initiate appropriate civil suits and criminal proceedings against you before the competent Courts of Law under the Bharatiya Nyaya Sanhita, 2023 (BNS) and Bharatiya Nagarik Suraksha Sanhita, 2023 (BNSS), holding you solely liable for all statutory costs, damages, interest, and legal consequences arising therefrom.
+
+Complainant / Notice Sender Signature: .......................................
+({complainant.get('name', 'Complainant / Sender')})"""
+
+        if is_hindi:
+            return f"""सेवा में,
+श्रीमान थाना प्रभारी (SHO) महोदय,
+थाना: {complainant.get('police_station', 'स्थानीय पुलिस थाना')},
+
+विषय: धारा 173 भारतीय नागरिक सुरक्षा संहिता, 2023 (BNSS) के तहत प्राथमिकी (FIR) दर्ज करने बाबत।
+संदर्भ धाराएं: {sections}
+
+महोदय,
+सविनय निवेदन है कि प्रार्थी/परिवादी का विवरण निम्नवत है:
+1. परिवादी का नाम: {complainant.get('name', '')}
+   पिता/पति का नाम: {complainant.get('father_name', '')}
+   निवासी: {complainant.get('address', '')}
+   मोबाइल नंबर: {complainant.get('phone', '')}
+
+2. आरोपी / संदिग्ध का विवरण:
+   नाम: {accused.get('name', 'अज्ञात')}
+   पता/विवरण: {accused.get('address', 'अज्ञात')}
+
+3. घटना का समय व स्थान:
+   दिनांक व समय: {incident_datetime}
+   स्थान: {incident_location}
+
+4. घटना का विवरण:
+   {facts}
+
+5. संलग्न साक्ष्य / दस्तावेज:
+   {evidence}
+
+6. प्रार्थना:
+   अतः श्रीमान जी से सादर प्रार्थना है कि प्रार्थी की उक्त शिकायत को तुरंत धारा 173 BNSS के अंतर्गत प्रथम सूचना रिपोर्ट (FIR) के रूप में दर्ज कर उचित कानूनी कार्रवाई करने की कृपा करें।
+
+सत्यापन:
+मैं सत्यनिष्ठा से प्रतिज्ञान करता/करती हूँ कि ऊपर लिखे तथ्य मेरी जानकारी और विश्वास में पूर्णतः सत्य हैं।
+
+दिनांक: ...............
+स्थान: ...............
+
+हस्ताक्षर / अंगूठा निशानी: ...................................
+({complainant.get('name', 'परिवादी')})"""
+        else:
+            return f"""TO,
+THE STATION HOUSE OFFICER (SHO),
+POLICE STATION: {complainant.get('police_station', '[Jurisdictional Police Station]')},
+
+SUBJECT: COMPLAINT UNDER SECTION 173 OF THE BHARATIYA NAGARIK SURAKSHA SANHITA, 2023 (BNSS) FOR REGISTRATION OF FIR.
+GOVERNING STATUTES: {sections}
+
+Sir/Madam,
+
+I, the undersigned Complainant, state the relevant facts of the case as under:
+
+1. COMPLAINANT PARTICULARS:
+   - Full Name: {complainant.get('name', '')}
+   - S/o, D/o, W/o: {complainant.get('father_name', '')}
+   - Address: {complainant.get('address', '')}
+   - Contact Number: {complainant.get('phone', '')}
+
+2. ACCUSED / RESPONDENT PARTICULARS:
+   - Name: {accused.get('name', 'Unknown person(s)')}
+   - Address/Details: {accused.get('address', 'Unknown')}
+
+3. INCIDENT TIMELINE & LOCATION:
+   - Date & Time: {incident_datetime}
+   - Location: {incident_location}
+
+4. STATEMENT OF FACTS:
+   {facts}
+
+5. ENCLOSURES & EVIDENCE:
+   {evidence}
+
+6. PRAYER:
+   It is therefore most respectfully prayed that an FIR may kindly be registered immediately under Section 173 of BNSS, 2023 read with applicable provisions of BNS 2023, and rigorous investigation be initiated against the accused person(s) in the interest of justice.
+
+VERIFICATION:
+Verified at on this day that the contents of the above complaint are true and correct to the best of my knowledge and belief.
+
+Date: .....................
+Place: ....................
+
+Signature of Complainant: .......................................
+({complainant.get('name', 'Complainant')})"""
+
+    def analyze_legal_document(
+        self,
+        document_text: str,
+        document_type: str = "General Contract",
+        language: str = "English"
+    ) -> Dict[str, Any]:
+        """
+        Analyzes a contract or legal document under Indian law.
+        Identifies red flags, one-sided clauses, statutory non-compliance,
+        and provides fair alternative wording and plain summaries.
+        """
+        is_hindi = "hindi" in str(language).lower()
+
+        # Attempt Groq LLM analysis first if client is available
+        if self.client:
+            prompt_lang = "HINDI (देवनागरी)" if is_hindi else "ENGLISH"
+            system_instruction = CONTRACT_ANALYSIS_SYSTEM_PROMPT.format(prompt_lang=prompt_lang)
+
+            user_msg = f"Document Type: {document_type}\n\nDocument Text:\n{document_text[:6000]}"
+
+            try:
+                chat_completion = self.client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": user_msg}
+                    ],
+                    model=DEFAULT_MODEL,
+                    temperature=0.2,
+                    response_format={"type": "json_object"}
+                )
+                import json
+                parsed = json.loads(chat_completion.choices[0].message.content)
+                parsed["success"] = True
+                parsed["source"] = "AI Legal Audit"
+                return parsed
+            except Exception as e:
+                print(f"Groq contract analysis failed: {e}. Falling back to rule-based engine.")
+
+        # Heuristic fallback analysis under Indian law
+        return self._heuristic_contract_analysis(document_text, document_type, is_hindi)
+
+    def _heuristic_contract_analysis(self, text: str, doc_type: str, is_hindi: bool) -> Dict[str, Any]:
+        """Rule-based Indian contract auditor detecting predatory clauses."""
+        text_lower = text.lower()
+        red_flags = []
+        missing = []
+        score = 20
+
+        # Check 1: Non-compete restraint of trade (Sec 27 Indian Contract Act)
+        if any(k in text_lower for k in ["non-compete", "not work for any competitor", "restraint of trade", "shall not engage in any other business", "प्रतिस्पर्धी"]):
+            score += 25
+            red_flags.append({
+                "clause": "Post-employment / post-service non-compete restriction",
+                "issue": "Blanket post-termination non-compete clauses are declared void as restraint of lawful profession under Indian law." if not is_hindi else "भारतीय कानून के तहत नौकरी के बाद किसी अन्य कंपनी में काम करने पर पूर्ण रोक गैर-कानूनी (शून्य) मानी जाती है।",
+                "statute": "Section 27, Indian Contract Act, 1872 (Restraint of trade void)",
+                "severity": "High",
+                "fair_alternative": "The restriction shall strictly apply only to safeguarding verified proprietary trade secrets and active customer solicitation during active service." if not is_hindi else "प्रतिबंध केवल सेवा अवधि के दौरान वास्तविक व्यावसायिक रहस्यों एवं ग्राहकों के अनुचित उपयोग तक सीमित रहेगा।"
+            })
+
+        # Check 2: Unilateral termination or unfair penalty (Sec 73, 74)
+        if any(k in text_lower for k in ["terminate at any time without notice", "sole discretion without cause", "forfeit the entire deposit", "non-refundable deposit", "जब्त"]):
+            score += 25
+            red_flags.append({
+                "clause": "Unilateral termination or blanket deposit forfeiture",
+                "issue": "Allows one party to terminate arbitrarily or confiscate deposits without genuine pre-estimated loss." if not is_hindi else "एकतरफा समाप्ति या बिना हिसाब-किताब के पूरी जमा राशि (सिक्योरिटी) जब्त करने का एकतरफा अधिकार।",
+                "statute": "Sections 73 & 74, Indian Contract Act, 1872 (Reasonable compensation vs penalty)",
+                "severity": "High",
+                "fair_alternative": "Either party may terminate by providing a minimum 30 days written notice. Security deposit must be refunded within 15 days of handover with itemized deductions only." if not is_hindi else "दोनों पक्षों को कम से कम 30 दिन का लिखित नोटिस देना होगा। कब्जा सौंपने के 15 दिनों में सिक्योरिटी का पूरा हिसाब देकर राशि लौटानी होगी।"
+            })
+
+        # Check 3: Uncapped indemnity or complete waiver of liability
+        if any(k in text_lower for k in ["indemnify and hold harmless", "unlimited liability", "not responsible for any damage or loss", "पूर्ण रूप से उत्तरदायी"]):
+            score += 20
+            red_flags.append({
+                "clause": "One-sided broad indemnity / complete waiver of owner liability",
+                "issue": "Exempts the stronger party from standard duty of care while placing open-ended risk on the signer." if not is_hindi else "मालिक या मुख्य संस्था को अपनी लापरवाही से मुक्त करना और आपके ऊपर असीमित देनदारी डालना।",
+                "statute": "Section 23 & 73, Indian Contract Act, 1872; Consumer Protection Act 2019",
+                "severity": "Medium",
+                "fair_alternative": "Indemnity shall be strictly mutual and capped at the total fee/rent paid under this agreement, excluding cases of gross negligence or willful misconduct." if not is_hindi else "क्षतिपूर्ति आपसी होगी तथा समझौते के तहत देय वास्तविक राशि तक सीमित रहेगी।"
+            })
+
+        # Check 4: Exclusive distant jurisdiction
+        if any(k in text_lower for k in ["exclusive jurisdiction of courts in", "exclusive jurisdiction", "अधिकार क्षेत्र"]):
+            red_flags.append({
+                "clause": "Exclusive distant court jurisdiction clause",
+                "issue": "May force disputes into inconvenient outstation courts far from where the service was actually rendered." if not is_hindi else "विवाद होने पर दूरस्थ शहर की अदालत में जाने की एकतरफा शर्त।",
+                "statute": "Section 28, Indian Contract Act & Section 20, CPC 1908",
+                "severity": "Low",
+                "fair_alternative": "Disputes shall be subject to the competent courts having jurisdiction over the location where the property is situated or service is rendered." if not is_hindi else "विवाद उसी स्थान की अदालत में सुना जाएगा जहां संपत्ति स्थित है अथवा सेवा प्रदान की गई है।"
+            })
+
+        # Check 5: Missing essential protections
+        if "rent" in text_lower or "tenant" in text_lower or "lease" in text_lower:
+            missing.append("Specific time-bound security deposit refund clause with interest if delayed (Model Tenancy Act)")
+            missing.append("Clear structural repair responsibility vs minor tenant maintenance demarcation")
+        elif "employ" in text_lower or "job" in text_lower or "service" in text_lower:
+            missing.append("Clear working hours, overtime policy, and statutory PF/ESI entitlement references")
+            missing.append("Objective dispute resolution and mediation before litigation")
+        else:
+            missing.append("Mutual termination clause with equal notice period for both parties")
+            missing.append("Force Majeure clause covering natural disasters and governmental orders")
+
+        score = min(score, 95)
+        risk_label = "Critical" if score >= 75 else "High" if score >= 50 else "Medium" if score >= 30 else "Low"
+
+        if is_hindi:
+            summary = f"यह {doc_type} प्रकृति का विधिक दस्तावेज है। विश्लेषण में {len(red_flags)} संभावित जोखिमपूर्ण या एकतरफा शर्तें पाई गई हैं।"
+            advice = [
+                "हस्ताक्षर करने से पूर्व एकतरफा शर्तों (विशेषकर सिक्योरिटी जब्ती व गैर-प्रतिस्पर्धा) पर लिखित संशोधन मांगें।",
+                "व्हाट्सएप या ईमेल पर समझौते से जुड़ी सभी सहमतियां लिखित रूप में सुरक्षित रखें।"
+            ]
+        else:
+            summary = f"This document appears to be a {doc_type}. The statutory review identified {len(red_flags)} potentially unfavorable or unenforceable provisions under Indian contract law."
+            advice = [
+                "Request written revisions for the flagged high-severity clauses before executing the contract.",
+                "Ensure all side agreements or verbal promises are incorporated into the written annexures."
+            ]
+
+        return {
+            "success": True,
+            "source": "Indian Statutory Heuristic Engine",
+            "summary": summary,
+            "risk_score": risk_label,
+            "risk_percentage": score,
+            "key_findings": [
+                f"{len(red_flags)} problematic provisions identified" if not is_hindi else f"{len(red_flags)} आपत्तिजनक शर्तें चिन्हित की गईं",
+                "Compliance examined under Indian Contract Act 1872" if not is_hindi else "भारतीय अनुबंध अधिनियम 1872 के आधार पर समीक्षा की गई"
+            ],
+            "red_flags": red_flags,
+            "missing_protections": missing,
+            "actionable_advice": advice
+        }
 
 if __name__ == "__main__":
     engine = DhaaraRAGEngine()

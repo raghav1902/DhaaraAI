@@ -161,3 +161,86 @@ body {
   font-style: italic;
   margin: 10px 0;
 }
+
+/* Voice and Audio Animations */
+@keyframes micPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.mic-recording-pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  animation: micPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes waveBar {
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
+
+.audio-wave-pulse {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background-color: #dc2626;
+  border-radius: 2px;
+  animation: waveBar 0.8s infinite ease-in-out;
+}
+
+/* Print Styles for Legal Drafts */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print, nav, button, .app-container > nav {
+    display: none !important;
+  }
+
+  .glass-panel {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .official-legal-document {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 20mm 15mm !important;
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+    color: #000000 !important;
+    page-break-inside: auto;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+}
+

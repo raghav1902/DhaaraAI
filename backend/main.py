@@ -64,9 +64,80 @@ def query_legal_gpt(req: QueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class DraftRequest(BaseModel):
+    document_type: str = "FIR Application"
+    language: str = "English"
+    complainant: dict = {}
+    accused: dict = {}
+    incident_category: str = "General"
+    incident_datetime: str = ""
+    incident_location: str = ""
+    facts: str = ""
+    evidence: str = ""
+    relief_sought: str = ""
+
+@app.post("/api/draft")
+def generate_draft(req: DraftRequest):
+    if not engine:
+        raise HTTPException(status_code=500, detail="Legal Engine is not initialized.")
+    try:
+        res = engine.generate_legal_draft(
+            document_type=req.document_type,
+            language=req.language,
+            complainant=req.complainant,
+            accused=req.accused,
+            incident_category=req.incident_category,
+            incident_datetime=req.incident_datetime,
+            incident_location=req.incident_location,
+            facts=req.facts,
+            evidence=req.evidence,
+            relief_sought=req.relief_sought
+        )
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class ContractAnalysisRequest(BaseModel):
+    document_text: str
+    document_type: str = "General Contract"
+    language: str = "English"
+
+@app.post("/api/analyze-contract")
+def analyze_contract(req: ContractAnalysisRequest):
+    if not engine:
+        raise HTTPException(status_code=500, detail="Legal Engine is not initialized.")
+    try:
+        res = engine.analyze_legal_document(
+            document_text=req.document_text,
+            document_type=req.document_type,
+            language=req.language
+        )
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 from typing import Optional, List, Dict, Any
 from src.concordance_data import CONCORDANCE_DB
 import json
+
+@app.get("/api/converter")
+def get_bns_ipc_mappings(query: Optional[str] = None):
+    """
+    Returns BNS <-> IPC cross-reference dataset for rapid conversion and search.
+    """
+    items = CONCORDANCE_DB
+    if query and query.strip():
+        q = query.strip().lower()
+        items = [
+            item for item in items
+            if q in item.get("bns_section", "").lower()
+            or q in item.get("ipc_section", "").lower()
+            or q in item.get("offense_en", "").lower()
+            or q in item.get("offense_hi", "").lower()
+            or q in item.get("bns_title", "").lower()
+            or q in item.get("category", "").lower()
+        ]
+    return {"total": len(items), "mappings": items}
 
 @app.get("/api/library")
 def get_legal_library(category: Optional[str] = None, search: Optional[str] = None):
