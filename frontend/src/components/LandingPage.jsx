@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Scale, Search, FileText, CheckCircle2, MessageSquare, Star, Menu } from 'lucide-react';
+import { ArrowRight, Scale, Search, FileText, CheckCircle2, MessageSquare, Star, Menu, ShieldAlert, Globe, Calculator, Lock, ArrowRightLeft, ChevronDown } from 'lucide-react';
 
 export default function LandingPage({ onExplore }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -297,6 +297,7 @@ export default function LandingPage({ onExplore }) {
           <a href="#features" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Features</a>
           <a href="#solutions" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Solutions</a>
           <a href="#pricing" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Pricing</a>
+          <a href="#faq" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>FAQ</a>
         </div>
 
         <div className="nav-links" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -477,6 +478,71 @@ export default function LandingPage({ onExplore }) {
         </div>
       </section>
 
+      {/* Comprehensive Toolkit Section */}
+      <section className="section-container" style={{ background: '#f8fafc', margin: '4rem auto', borderRadius: '32px', padding: '5rem 3rem' }}>
+        <div className="section-header" style={{ marginBottom: '3rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#eff6ff', color: '#2563eb', padding: '0.5rem 1rem', borderRadius: '9999px', fontWeight: '600', fontSize: '0.875rem', marginBottom: '1rem' }}><Scale size={16} /> A Complete Legal Ecosystem</div>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Beyond just a Chatbot</h2>
+          <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>DhaaraAI provides a full suite of specialized tools designed to handle every aspect of your legal workflow securely and efficiently.</p>
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          {/* Tool 1 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <ArrowRightLeft size={24} color="#2563eb" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>BNS ↔ IPC Converter</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Seamlessly transition to the new legal framework. Translate old IPC sections to the new Bharatiya Nyaya Sanhita instantly.</p>
+          </div>
+          
+          {/* Tool 2 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#fef2f2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <ShieldAlert size={24} color="#ef4444" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Citizen Rights & SOS</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Know your fundamental rights in real-time situations. Access emergency legal SOS features during critical police interactions.</p>
+          </div>
+          
+          {/* Tool 3 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#f0fdf4', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <Globe size={24} color="#22c55e" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Cyber Scanner</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Check URLs, files, and domains for legal and cyber compliance to protect yourself from online fraud and phishing.</p>
+          </div>
+          
+          {/* Tool 4 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#fdf4ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <FileText size={24} color="#d946ef" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Smart Legal Drafting</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Generate professionally formatted FIRs, legal notices, NDAs, and agreements by just answering a few questions.</p>
+          </div>
+          
+          {/* Tool 5 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#fffbeb', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <Calculator size={24} color="#d97706" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Fee Calculator</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Instantly estimate legal costs, court fees, and stamp duties based on your state and case type.</p>
+          </div>
+          
+          {/* Tool 6 */}
+          <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ width: '48px', height: '48px', background: '#f3f4f6', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <Lock size={24} color="#4b5563" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Legal Vault</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Securely store and organize your sensitive legal documents with bank-level encryption and easy retrieval.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="section-container">
         <div className="section-header">
@@ -524,6 +590,41 @@ export default function LandingPage({ onExplore }) {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="section-container" style={{ maxWidth: '800px', margin: '6rem auto' }}>
+        <div className="section-header">
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
+          <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Everything you need to know about DhaaraAI.</p>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <FAQItem 
+            question="What exactly is DhaaraAI?" 
+            answer="DhaaraAI is a comprehensive AI legal assistant tailored specifically for Indian law. It helps professionals and citizens with legal research, contract review, generating legal drafts, understanding their rights, and much more."
+          />
+          <FAQItem 
+            question="Is my private legal data secure?" 
+            answer="Absolutely. We use enterprise-grade AES-256 encryption to protect your data. Your uploaded documents and private queries are strictly confidential and are NEVER used to train our public AI models."
+          />
+          <FAQItem 
+            question="Can DhaaraAI replace my lawyer?" 
+            answer="No. DhaaraAI is an incredibly powerful tool designed to assist with legal research and workflows, but it does not provide formal legal advice. You should always consult a qualified attorney for specific legal matters."
+          />
+          <FAQItem 
+            question="Does it support the new BNS criminal laws?" 
+            answer="Yes! We have a built-in BNS ↔ IPC converter and our AI is fully trained on the new Bharatiya Nyaya Sanhita, Bharatiya Nagarik Suraksha Sanhita, and Bharatiya Sakshya Adhiniyam."
+          />
+          <FAQItem 
+            question="Can I analyze my own contracts or PDFs?" 
+            answer="Yes, our Smart Document Review tool allows you to upload PDFs and images of contracts. The AI will instantly audit them, summarize key points, and highlight potential high-risk clauses."
+          />
+          <FAQItem 
+            question="Do you offer a free trial?" 
+            answer="Yes, all of our plans include a 3-day free trial so you can explore the full capabilities of DhaaraAI before making a commitment."
+          />
         </div>
       </section>
 
@@ -658,6 +759,31 @@ export default function LandingPage({ onExplore }) {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
+    </div>
+  );
+}
+
+// FAQ Item component
+function FAQItem({ question, answer }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: '1px solid #e2e8f0', padding: '1.5rem 0' }}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', color: '#0f172a', fontWeight: '600', fontSize: '1.1rem', fontFamily: 'inherit' }}
+      >
+        {question}
+        <ChevronDown size={20} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s ease', color: '#64748b' }} />
+      </button>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateRows: isOpen ? '1fr' : '0fr',
+        transition: 'grid-template-rows 0.3s ease',
+      }}>
+        <div style={{ overflow: 'hidden' }}>
+          <p style={{ paddingTop: '1rem', color: '#475569', lineHeight: '1.6', margin: 0 }}>{answer}</p>
+        </div>
+      </div>
     </div>
   );
 }
