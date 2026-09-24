@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Settings as SettingsIcon, Key, Languages, Moon, Sun, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export default function Settings({ language, onLanguageChange, theme, onThemeChange }) {
+export default function Settings({ language, onLanguageChange, theme, onThemeChange, user, onUserChange }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
+  
+  const [nameInput, setNameInput] = useState(user?.name || '');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [profileMessage, setProfileMessage] = useState(null);
 
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -44,6 +48,25 @@ export default function Settings({ language, onLanguageChange, theme, onThemeCha
     }
   };
 
+  const handleUpdateProfile = () => {
+    if (nameInput.trim().length === 0) {
+      setProfileMessage({ type: 'error', text: isHindi ? 'नाम खाली नहीं हो सकता।' : 'Name cannot be empty.' });
+      return;
+    }
+    
+    // In a real app, this would be an API call to change the password
+    let updatedUser = { ...user, name: nameInput };
+    if (passwordInput.trim().length > 0) {
+      updatedUser.password = passwordInput;
+    }
+    
+    if (onUserChange) onUserChange(updatedUser);
+    
+    setProfileMessage({ type: 'success', text: isHindi ? 'प्रोफाइल सफलतापूर्वक अपडेट हो गई!' : 'Profile updated successfully!' });
+    setPasswordInput('');
+    setTimeout(() => setProfileMessage(null), 3000);
+  };
+
   return (
     <div className="animate-fade-in" style={{ padding: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1, height: '100%', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
       {/* Top Header */}
@@ -69,6 +92,36 @@ export default function Settings({ language, onLanguageChange, theme, onThemeCha
         </h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Profile Setting */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>{isHindi ? 'प्रोफ़ाइल अपडेट करें' : 'Update Profile'}</div>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{isHindi ? 'अपना नाम या पासवर्ड बदलें' : 'Change your name or account password'}</div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+              <div style={{ flex: '1 1 200px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px', display: 'block' }}>{isHindi ? 'नाम (Name)' : 'Name'}</label>
+                <input type="text" value={nameInput} onChange={e => setNameInput(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }} placeholder={isHindi ? 'अपना नाम दर्ज करें' : 'Enter your name'} />
+              </div>
+              <div style={{ flex: '1 1 200px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px', display: 'block' }}>{isHindi ? 'नया पासवर्ड (New Password)' : 'New Password'}</label>
+                <input type="password" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }} placeholder={isHindi ? 'खाली छोड़ें यदि नहीं बदलना है' : 'Leave empty to keep current'} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+               <button onClick={handleUpdateProfile} className="btn-primary" style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px' }}>
+                 {isHindi ? 'अपडेट करें' : 'Update Profile'}
+               </button>
+               {profileMessage && (
+                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: profileMessage.type === 'error' ? '#ef4444' : '#10b981' }}>
+                   {profileMessage.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+                   {profileMessage.text}
+                 </div>
+               )}
+            </div>
+          </div>
+
+          <div style={{ height: '1px', background: '#f1f5f9', width: '100%' }}></div>
           {/* Language Setting */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
             <div>

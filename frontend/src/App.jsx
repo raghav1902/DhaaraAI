@@ -9,6 +9,8 @@ import CyberChecker from './components/CyberChecker';
 import LegalVault from './components/LegalVault';
 import FeeCalculator from './components/FeeCalculator';
 import Settings from './components/Settings';
+import LandingPage from './components/LandingPage';
+import AuthPage from './components/AuthPage';
 import {
   Scale,
   BookOpen,
@@ -24,10 +26,16 @@ import {
   Globe,
   Menu,
   X,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 
 function App() {
+  const [appView, setAppView] = useState('landing');
+  const [user, setUser] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
   const [activeTab, setActiveTab] = useState('chat');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('light');
@@ -61,6 +69,14 @@ function App() {
     { id: 'cyber', label: isHindi ? 'साइबर स्कैनर' : 'Cyber Scanner', icon: Globe },
     { id: 'settings', label: isHindi ? 'सेटिंग्स' : 'Settings', icon: SettingsIcon },
   ];
+
+  if (appView === 'landing') {
+    return <LandingPage onExplore={() => setAppView('auth')} />;
+  }
+
+  if (appView === 'auth') {
+    return <AuthPage onLogin={(userData) => { setUser(userData); setAppView('app'); setActiveTab('chat'); }} />;
+  }
 
   return (
     <div className="app-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)', transition: 'all 0.3s ease' }}>
@@ -169,6 +185,24 @@ function App() {
         overflowY: 'auto',
         transition: 'all 0.3s ease'
       }}>
+        {/* Top Bar for Profile */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', position: 'relative' }}>
+          <div 
+             onClick={() => setShowProfileMenu(!showProfileMenu)}
+             style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', cursor: 'pointer', fontSize: '18px', userSelect: 'none', boxShadow: '0 2px 10px rgba(59,130,246,0.3)' }}>
+            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+          </div>
+          {showProfileMenu && (
+            <div style={{ position: 'absolute', top: '50px', right: '0', background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', zIndex: 100, minWidth: '200px', border: '1px solid #e2e8f0' }}>
+               <div style={{ fontWeight: '700', marginBottom: '4px', color: '#0f172a' }}>{user?.name || 'User'}</div>
+               <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{user?.email || 'user@example.com'}</div>
+               <button onClick={() => { setUser(null); setAppView('landing'); setShowProfileMenu(false); }} style={{ width: '100%', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                 <LogOut size={16} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
+               </button>
+            </div>
+          )}
+        </div>
+
         <div style={{ maxWidth: '1040px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, height: '100%' }}>
           {activeTab === 'chat' && (
             <LegalChat
@@ -221,6 +255,8 @@ function App() {
               onLanguageChange={setLanguage}
               theme={theme}
               onThemeChange={setTheme}
+              user={user}
+              onUserChange={setUser}
             />
           )}
         </div>
