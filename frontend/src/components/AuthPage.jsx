@@ -4,14 +4,69 @@ import { Scale, ArrowLeft } from 'lucide-react';
 export default function AuthPage({ onLogin, onBack }) {
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+  const [authError, setAuthError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin({
-      name: isLogin ? 'User' : `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      password: formData.password
-    });
+    setAuthError('');
+
+    const emailTrimmed = formData.email.trim().toLowerCase();
+
+    // Get existing registered users list from localStorage
+    let registeredUsers = [];
+    try {
+      registeredUsers = JSON.parse(localStorage.getItem('dhaara_registered_users') || '[]');
+    } catch {
+      registeredUsers = [];
+    }
+
+    if (isLogin) {
+      // Find matching user by email
+      const existingUser = registeredUsers.find(
+        u => u.email && u.email.trim().toLowerCase() === emailTrimmed
+      );
+
+      let userName = '';
+      if (existingUser && existingUser.name) {
+        userName = existingUser.name;
+      } else {
+        // Fallback: derive name from email prefix (e.g. raghav@gmail.com -> Raghav)
+        const prefix = emailTrimmed.split('@')[0] || 'User';
+        userName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+      }
+
+      onLogin({
+        name: userName,
+        email: formData.email,
+        password: formData.password
+      });
+    } else {
+      // Registration flow
+      if (formData.password !== formData.confirmPassword) {
+        setAuthError('Passwords do not match');
+        return;
+      }
+
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName.trim() || 'User';
+      
+      // Update or append in registered users list
+      const filtered = registeredUsers.filter(
+        u => u.email && u.email.trim().toLowerCase() !== emailTrimmed
+      );
+      filtered.push({
+        email: emailTrimmed,
+        name: fullName,
+        password: formData.password
+      });
+
+      localStorage.setItem('dhaara_registered_users', JSON.stringify(filtered));
+
+      onLogin({
+        name: fullName,
+        email: formData.email,
+        password: formData.password
+      });
+    }
   };
 
   return (

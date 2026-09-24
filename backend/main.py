@@ -232,7 +232,61 @@ def get_legal_library(category: Optional[str] = None, search: Optional[str] = No
         "items": results
     }
 
+@app.get("/api/cyber-check")
+def check_cyber_breach(email: str):
+    """
+    Queries XposedOrNot live open-source data breach database for an email.
+    """
+    clean_email = email.strip().lower()
+    if not clean_email or "@" not in clean_email:
+        return {"status": "error", "message": "Invalid email address"}
+
+    import urllib.request
+    import urllib.error
+
+    url = f"https://api.xposedornot.com/v1/check-email/{clean_email}"
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "DhaaraAI-CyberChecker/1.0"}
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=8) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode("utf-8"))
+                # If email not found in any breach
+                if data.get("Error") == "Not found":
+                    return {"status": "safe", "count": 0, "breaches": []}
+                
+                # If breaches found: data["breaches"] is typically [ [list of breach names] ]
+                raw_breaches = data.get("breaches", [])
+                breach_names = []
+                if raw_breaches and isinstance(raw_breaches, list):
+                    first_elem = raw_breaches[0]
+                    if isinstance(first_elem, list):
+                        breach_names = first_elem
+                    elif isinstance(first_elem, str):
+                        breach_names = raw_breaches
+
+                formatted_breaches = [
+                    {"name": b, "data": "Email, Passwords or Account Credentials"}
+                    for b in breach_names[:25]
+                ]
+
+                return {
+                    "status": "breached",
+                    "count": len(breach_names),
+                    "breaches": formatted_breaches
+                }
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return {"status": "safe", "count": 0, "breaches": []}
+        return {"status": "error", "message": f"Service returned code {e.code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "engine_loaded": engine is not None}
+
 

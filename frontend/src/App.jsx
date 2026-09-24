@@ -32,8 +32,24 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const [appView, setAppView] = useState('landing');
-  const [user, setUser] = useState(null);
+  const [appView, setAppView] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('dhaara_active_user');
+      return savedUser ? 'app' : 'landing';
+    } catch {
+      return 'landing';
+    }
+  });
+
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('dhaara_active_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const [activeTab, setActiveTab] = useState('chat');
@@ -75,7 +91,19 @@ function App() {
   }
 
   if (appView === 'auth') {
-    return <AuthPage onLogin={(userData) => { setUser(userData); setAppView('app'); setActiveTab('chat'); }} onBack={() => setAppView('landing')} />;
+    return (
+      <AuthPage 
+        onLogin={(userData) => { 
+          setUser(userData); 
+          try {
+            localStorage.setItem('dhaara_active_user', JSON.stringify(userData));
+          } catch {}
+          setAppView('app'); 
+          setActiveTab('chat'); 
+        }} 
+        onBack={() => setAppView('landing')} 
+      />
+    );
   }
 
   return (
@@ -196,9 +224,16 @@ function App() {
             <div style={{ position: 'absolute', top: '50px', right: '0', background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', zIndex: 100, minWidth: '200px', border: '1px solid #e2e8f0' }}>
                <div style={{ fontWeight: '700', marginBottom: '4px', color: '#0f172a' }}>{user?.name || 'User'}</div>
                <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{user?.email || 'user@example.com'}</div>
-               <button onClick={() => { setUser(null); setAppView('landing'); setShowProfileMenu(false); }} style={{ width: '100%', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                 <LogOut size={16} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
-               </button>
+                <button onClick={() => { 
+                  setUser(null); 
+                  try {
+                    localStorage.removeItem('dhaara_active_user');
+                  } catch {}
+                  setAppView('landing'); 
+                  setShowProfileMenu(false); 
+                }} style={{ width: '100%', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <LogOut size={16} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
+                </button>
             </div>
           )}
         </div>
@@ -256,7 +291,12 @@ function App() {
               theme={theme}
               onThemeChange={setTheme}
               user={user}
-              onUserChange={setUser}
+              onUserChange={(updatedUser) => {
+                setUser(updatedUser);
+                try {
+                  localStorage.setItem('dhaara_active_user', JSON.stringify(updatedUser));
+                } catch {}
+              }}
             />
           )}
         </div>

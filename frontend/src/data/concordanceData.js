@@ -200,3 +200,13 @@ export const FALLBACK_CONCORDANCE_DB = [
     "accused_guidance": "Compound the matter with the victim or post station bail."
   }
 ];
+
+export const POPULAR_QUERIES = [
+  { label: "IPC 420 (Cheating / 318 BNS)", q: "420" },
+  { label: "IPC 302 (Murder / 103 BNS)", q: "302" },
+  { label: "IPC 304A (Hit & Run / 106 BNS)", q: "304A" },
+  { label: "IPC 498A (Cruelty / 85 BNS)", q: "498A" },
+  { label: "IPC 506 (Threat / 351 BNS)", q: "506" },
+  { label: "IPC 406 (Breach of Trust / 316 BNS)", q: "406" },
+  { label: "Cyber & Online Fraud", q: "fraud" }
+];
