@@ -172,8 +172,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
     } catch (err) {
       console.error('Drafting request error:', err);
       setDraftError(isHindi 
-        ? 'ड्राफ्ट जनरेट करने में त्रुटि हुई। कृपया जांचें कि बैकएंड सर्वर चल रहा है।'
-        : 'Failed to generate draft. Please ensure the backend server is running.');
+        ? '[500 Internal Server Error] ड्राफ्ट जनरेट करने में त्रुटि हुई। कृपया जांचें कि बैकएंड सर्वर चल रहा है।'
+        : '[500 Internal Server Error] Failed to generate draft. Please ensure the backend server is running.');
     } finally {
       setIsGenerating(false);
     }
@@ -250,21 +250,21 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             onClick={() => loadPreset('cyber')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
           >
-            💳 {isHindi ? 'यूपीआई साइबर फ्रॉड FIR' : 'UPI Cyber Fraud FIR'}
+            {isHindi ? 'यूपीआई साइबर फ्रॉड FIR' : 'UPI Cyber Fraud FIR'}
           </button>
           <button 
             type="button"
             onClick={() => loadPreset('accident')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
           >
-            🏍️ {isHindi ? 'बाइक एक्सीडेंट टक्कर FIR' : 'Bike Hit & Run FIR'}
+            {isHindi ? 'बाइक एक्सीडेंट टक्कर FIR' : 'Bike Hit & Run FIR'}
           </button>
           <button 
             type="button"
             onClick={() => loadPreset('notice')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
           >
-            📄 {isHindi ? 'चेक बाउंस लीगल नोटिस' : 'Cheque Bounce Legal Notice'}
+            {isHindi ? 'चेक बाउंस लीगल नोटिस' : 'Cheque Bounce Legal Notice'}
           </button>
         </div>
       )}
@@ -563,8 +563,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             ) : (
               <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '13px', color: '#64748b' }}>
                 {isHindi 
-                  ? 'ℹ️ आरोपी को "अज्ञात व्यक्ति (Unknown Culprit)" के रूप में चिह्नित किया गया है। पुलिस धारा 173 BNSS के तहत तकनीकी विश्लेषण, बैंक UTR व कॉल रिकॉर्ड के आधार पर आरोपी की शिनाख्त करेगी।'
-                  : 'ℹ️ Accused will be formally addressed as "Unknown Person(s)". Investigating officers will trace the culprits using cyber/banking audit trails under Section 173 BNSS.'}
+                  ? 'आरोपी को "अज्ञात व्यक्ति (Unknown Culprit)" के रूप में चिह्नित किया गया है। पुलिस धारा 173 BNSS के तहत तकनीकी विश्लेषण, बैंक UTR व कॉल रिकॉर्ड के आधार पर आरोपी की शिनाख्त करेगी।'
+                  : 'Accused will be formally addressed as "Unknown Person(s)". Investigating officers will trace the culprits using cyber/banking audit trails under Section 173 BNSS.'}
               </div>
             )}
           </div>

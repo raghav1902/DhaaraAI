@@ -92,8 +92,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
     } catch (err) {
       console.error('Contract audit error:', err);
       setError(isHindi 
-        ? 'दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।' 
-        : 'Failed to analyze document. Ensure backend server is running.');
+        ? '[500 Internal Server Error] दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।' 
+        : '[500 Internal Server Error] Failed to analyze document. Ensure backend server is running.');
     } finally {
       setLoading(false);
     }
@@ -154,7 +154,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               fontWeight: '500'
             }}
           >
-            🏠 {isHindi ? 'आवासीय किराया अनुबंध' : 'Rental Agreement'}
+            {isHindi ? 'आवासीय किराया अनुबंध' : 'Rental Agreement'}
           </button>
           <button 
             type="button"
@@ -170,7 +170,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               fontWeight: '500'
             }}
           >
-            💼 {isHindi ? 'जॉब व सर्विस बॉन्ड' : 'Employment Bond'}
+            {isHindi ? 'जॉब व सर्विस बॉन्ड' : 'Employment Bond'}
           </button>
           <button 
             type="button"
@@ -186,7 +186,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               fontWeight: '500'
             }}
           >
-            💻 {isHindi ? 'फ्रीलांस सर्विस अनुबंध' : 'Freelance Agreement'}
+            {isHindi ? 'फ्रीलांस सर्विस अनुबंध' : 'Freelance Agreement'}
           </button>
         </div>
       </div>
@@ -385,7 +385,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
                       <span style={{ fontWeight: '700', fontSize: '14.5px', color: '#991b1b' }}>
-                        ⚠️ Clause #{idx + 1}: {flag.clause}
+                        Clause #{idx + 1}: {flag.clause}
                       </span>
                       <span style={{ 
                         fontSize: '11px', 
@@ -406,7 +406,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
 
                     {flag.statute && (
                       <div style={{ display: 'inline-block', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', marginBottom: '12px' }}>
-                        ⚖️ <strong>{isHindi ? 'लागू भारतीय कानून:' : 'Indian Statute:'}</strong> {flag.statute}
+                        <strong>{isHindi ? 'लागू भारतीय कानून:' : 'Indian Statute:'}</strong> {flag.statute}
                       </div>
                     )}
 
