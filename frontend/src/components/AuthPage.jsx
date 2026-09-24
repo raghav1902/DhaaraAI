@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Scale } from 'lucide-react';
+import { Scale, ArrowLeft } from 'lucide-react';
 
-export default function AuthPage({ onLogin }) {
+export default function AuthPage({ onLogin, onBack }) {
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
 
@@ -94,6 +94,14 @@ export default function AuthPage({ onLogin }) {
         }
       `}</style>
       
+            <button onClick={onBack} style={{
+        position: 'absolute', top: '2rem', left: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', 
+        background: 'white', border: '1px solid #e2e8f0', color: '#0f172a', padding: '0.5rem 1rem', 
+        borderRadius: '999px', cursor: 'pointer', fontWeight: '500', fontSize: '0.9rem', zIndex: 10
+      }}>
+        <ArrowLeft size={16} /> Back to Home
+      </button>
+
       <div className="auth-container">
         {/* Left Side */}
         <div className="auth-left">

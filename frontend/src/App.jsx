@@ -75,7 +75,7 @@ function App() {
   }
 
   if (appView === 'auth') {
-    return <AuthPage onLogin={(userData) => { setUser(userData); setAppView('app'); setActiveTab('chat'); }} />;
+    return <AuthPage onLogin={(userData) => { setUser(userData); setAppView('app'); setActiveTab('chat'); }} onBack={() => setAppView('landing')} />;
   }
 
   return (

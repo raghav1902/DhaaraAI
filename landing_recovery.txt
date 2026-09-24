@@ -1,0 +1,745 @@
+Created At: 2026-09-24T20:25:53+05:30
+Completed At: 2026-09-24T20:25:53+05:30
+File Path: `file:///c:/Users/ragha/OneDrive/Desktop/DhaaraAI/frontend/src/components/LandingPage.jsx`
+Total Lines: 800
+Total Bytes: 49161
+Showing lines 1 to 800
+Content truncated: showing bytes 0-46080 of 49161. To see more, call this tool again with the same line range and ContentOffset=46080.
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: import React, { useState, useEffect } from 'react';
+2: import { ArrowRight, Scale, Search, FileText, CheckCircle2, MessageSquare, Star, Menu, ShieldAlert, Globe, Calculator, Lock, ArrowRightLeft, ChevronDown } from 'lucide-react';
+3: 
+4: export default function LandingPage({ onExplore }) {
+5:   const [isScrolled, setIsScrolled] = useState(false);
+6:   const [activeModal, setActiveModal] = useState(null);
+7: 
+8:   useEffect(() => {
+9:     const handleScroll = () => setIsScrolled(window.scrollY > 20);
+10:     window.addEventListener('scroll', handleScroll);
+11:     return () => window.removeEventListener('scroll', handleScroll);
+12:   }, []);
+13: 
+14:   return (
+15:     <div className="dhaara-landing" style={{
+16:       backgroundColor: '#eef2f6',
+17:       backgroundImage: `linear-gradient(rgba(200, 210, 220, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 210, 220, 0.4) 1px, transparent 1px)`,
+18:       backgroundSize: '60px 60px',
+19:     }}>
+20:       <style>{`
+21:         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+22:         
+23:         .dhaara-landing {
+24:           font-family: 'Inter', sans-serif;
+25:           color: #0f172a;
+26:           overflow-x: hidden;
+27:         }
+28: 
+29:         h1, h2, h3, h4, .outfit-font {
+30:           font-family: 'Outfit', sans-serif;
+31:         }
+32: 
+33:         .gradient-text {
+34:           background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+35:           -webkit-background-clip: text;
+36:           -webkit-text-fill-color: transparent;
+37:         }
+38:         
+39:         /* Animations */
+40:         @keyframes fadeInUp {
+41:           from { opacity: 0; transform: translateY(30px); }
+42:           to { opacity: 1; transform: translateY(0); }
+43:         }
+44:         
+45:         @keyframes pulseGlow {
+46:           0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+47:           70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+48:           100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+49:         }
+50: 
+51:         @keyframes float {
+52:           0% { transform: translateY(0px); }
+53:           50% { transform: translateY(-12px); }
+54:           100% { transform: translateY(0px); }
+55:         }
+56:         
+57:         .animate-fade-in-up {
+58:           animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+59:           opacity: 0;
+60:         }
+61:         
+62:         .delay-100 { animation-delay: 100ms; }
+63:         .delay-200 { animation-delay: 200ms; }
+64:         .delay-300 { animation-delay: 300ms; }
+65: 
+66:         /* Navbar */
+67:         .navbar {
+68:           position: fixed;
+69:           top: 0; left: 0; right: 0;
+70:           z-index: 50;
+71:           transition: all 0.3s ease;
+72:           padding: 1rem 2rem;
+73:           display: flex;
+74:           justify-content: space-between;
+75:           align-items: center;
+76:           border-bottom: 1px solid transparent;
+77:         }
+78:         .navbar.scrolled {
+79:           background: rgba(255, 255, 255, 0.85);
+80:           backdrop-filter: blur(12px);
+81:           border-bottom: 1px solid rgba(0,0,0,0.05);
+82:           box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+83:         }
+84: 
+85:         /* Buttons */
+86:         .btn-primary {
+87:           background: #2563eb;
+88:           color: white;
+89:           padding: 0.75rem 1.5rem;
+90:           border-radius: 9999px;
+91:           font-weight: 600;
+92:           display: inline-flex;
+93:           align-items: center;
+94:           gap: 0.5rem;
+95:           transition: all 0.3s ease;
+96:           border: none;
+97:           cursor: pointer;
+98:         }
+99:         .btn-primary:hover {
+100:           background: #1d4ed8;
+101:           transform: translateY(-2px);
+102:           box-shadow: 0 10px 25px -5px rgba(37,99,235, 0.4);
+103:         }
+104:         
+105:         .btn-secondary {
+106:           background: white;
+107:           color: #0f172a;
+108:           padding: 0.75rem 1.5rem;
+109:           border-radius: 9999px;
+110:           font-weight: 600;
+111:           display: inline-flex;
+112:           align-items: center;
+113:           gap: 0.5rem;
+114:           transition: all 0.3s ease;
+115:           border: 1px solid #e2e8f0;
+116:           cursor: pointer;
+117:           box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+118:         }
+119:         .btn-secondary:hover {
+120:           background: #f8fafc;
+121:           border-color: #cbd5e1;
+122:           transform: translateY(-2px);
+123:         }
+124: 
+125:         /* Hero */
+126:         .hero-section {
+127:           padding: 160px 20px 100px;
+128:           text-align: center;
+129:           position: relative;
+130:           max-width: 1200px;
+131:           margin: 0 auto;
+132:         }
+133:         .hero-title {
+134:           font-size: clamp(3rem, 8vw, 5.5rem);
+135:           font-weight: 800;
+136:           line-height: 1.1;
+137:           letter-spacing: -0.03em;
+138:           margin-bottom: 1.5rem;
+139:         }
+140:         .hero-subtitle {
+141:           font-size: clamp(1.1rem, 2vw, 1.35rem);
+142:           color: #475569;
+143:           max-width: 700px;
+144:           margin: 0 auto 2.5rem;
+145:           line-height: 1.6;
+146:         }
+147: 
+148:         /* Stats */
+149:         .stats-container {
+150:           display: flex;
+151:           justify-content: center;
+152:           gap: 3rem;
+153:           margin-top: 4rem;
+154:           padding-top: 3rem;
+155:           border-top: 1px solid rgba(0,0,0,0.05);
+156:         }
+157: 
+158:         /* Features */
+159:         .section-container {
+160:           padding: 100px 20px;
+161:           max-width: 1200px;
+162:           margin: 0 auto;
+163:         }
+164:         .section-header {
+165:           text-align: center;
+166:           margin-bottom: 4rem;
+167:         }
+168:         .feature-grid {
+169:           display: flex;
+170:           flex-direction: column;
+171:           gap: 6rem;
+172:         }
+173:         .feature-row {
+174:           display: flex;
+175:           align-items: center;
+176:           gap: 4rem;
+177:         }
+178:         .feature-row:nth-child(even) {
+179:           flex-direction: row-reverse;
+180:         }
+181:         .feature-content {
+182:           flex: 1;
+183:         }
+184:         .feature-visual {
+185:           flex: 1;
+186:           background: white;
+187:           border: 1px solid #e2e8f0;
+188:           box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+189:           border-radius: 24px;
+190:           aspect-ratio: 4/3;
+191:           display: flex;
+192:           align-items: center;
+193:           justify-content: center;
+194:           position: relative;
+195:           overflow: hidden;
+196:           animation: float 6s ease-in-out infinite;
+197:         }
+198:         
+199:         .feature-badge {
+200:           display: inline-flex;
+201:           align-items: center;
+202:           gap: 0.5rem;
+203:           background: #eff6ff;
+204:           color: #2563eb;
+205:           padding: 0.5rem 1rem;
+206:           border-radius: 9999px;
+207:           font-weight: 600;
+208:           font-size: 0.875rem;
+209:           margin-bottom: 1.5rem;
+210:         }
+211: 
+212:         /* Audience Cards */
+213:         .audience-grid {
+214:           display: grid;
+215:           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+216:           gap: 2rem;
+217:         }
+218:         .audience-card {
+219:           background: white;
+220:           border: 1px solid #e2e8f0;
+221:           box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+222:           padding: 2.5rem 2rem;
+223:           border-radius: 20px;
+224:           transition: all 0.3s ease;
+225:         }
+226:         .audience-card:hover {
+227:           transform: translateY(-5px);
+228:           box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+229:           border-color: #cbd5e1;
+230:         }
+231: 
+232:         /* Pricing */
+233:         .pricing-grid {
+234:           display: grid;
+235:           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+236:           gap: 2rem;
+237:           align-items: center;
+238:         }
+239:         .pricing-card {
+240:           background: white;
+241:           border: 1px solid #e2e8f0;
+242:           box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+243:           padding: 3rem 2rem;
+244:           border-radius: 24px;
+245:           position: relative;
+246:           transition: all 0.3s ease;
+247:         }
+248:         .pricing-card:hover {
+249:           transform: translateY(-5px);
+250:           box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+251:         }
+252:         .pricing-card.popular {
+253:           border: 2px solid #3b82f6;
+254:           transform: scale(1.05);
+255:         }
+256:         .pricing-card.popular:hover {
+257:           transform: scale(1.05) translateY(-5px);
+258:         }
+259:         
+260:         /* Footer */
+261:         .footer {
+262:           border-top: 1px solid rgba(0,0,0,0.05);
+263:           padding: 4rem 2rem 2rem;
+264:           margin-top: 4rem;
+265:           background: white;
+266:         }
+267: 
+268:         @media (max-width: 768px) {
+269:           .feature-row, .feature-row:nth-child(even) {
+270:             flex-direction: column;
+271:             gap: 2rem;
+272:           }
+273:           .pricing-card.popular, .pricing-card.popular:hover {
+274:             transform: scale(1);
+275:           }
+276:           .nav-links {
+277:             display: none;
+278:           }
+279:           .stats-container {
+280:             flex-direction: column;
+281:             gap: 1.5rem;
+282:             align-items: center;
+283:           }
+284:         }
+285:       `}</style>
+286: 
+287:       {/* Navbar */}
+288:       <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+289:         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', fontSize: '1.25rem', fontFamily: 'Outfit, sans-serif' }}>
+290:           <div style={{ background: '#2563eb', padding: '0.4rem', borderRadius: '8px' }}>
+291:             <Scale size={24} color="white" />
+292:           </div>
+293:           DhaaraAI
+294:         </div>
+295:         
+296:         <div className="nav-links" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+297:           <a href="#features" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Features</a>
+298:           <a href="#solutions" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Solutions</a>
+299:           <a href="#pricing" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>Pricing</a>
+300:           <a href="#faq" style={{ color: '#475569', fontWeight: '500', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>FAQ</a>
+301:         </div>
+302: 
+303:         <div className="nav-links" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+304:           <button style={{ background: 'transparent', border: 'none', color: '#0f172a', fontWeight: '600', cursor: 'pointer' }}>Login</button>
+305:           <button className="btn-primary" onClick={onExplore} style={{ padding: '0.5rem 1.25rem' }}>
+306:             Start for Free
+307:           </button>
+308:         </div>
+309:         
+310:         <button className="mobile-menu-btn" style={{ display: 'none', background: 'transparent', border: 'none', color: '#0f172a' }}>
+311:           <Menu size={24} />
+312:         </button>
+313:       </nav>
+314: 
+315:       {/* Hero Section */}
+316:       <section className="hero-section">
+317:         <div className="animate-fade-in-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'white', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', padding: '0.5rem 1rem', borderRadius: '999px', marginBottom: '2rem', fontSize: '0.875rem', color: '#475569', fontWeight: '500' }}>
+318:           <Sparkles size={16} color="#2563eb" /> Introducing DhaaraAI - Smarter Legal Workflows
+319:         </div>
+320:         <h1 className="hero-title animate-fade-in-up delay-100">
+321:           Revolutionize your legal work with <span className="gradient-text">DhaaraAI</span>
+322:         </h1>
+323:         <p className="hero-subtitle animate-fade-in-up delay-200">
+324:           Get verified legal answers, review any contract, search millions of cases, and generate custom agreements instantly with our virtual legal assistant.
+325:         </p>
+326:         <div className="animate-fade-in-up delay-300" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+327:           <button className="btn-primary" onClick={onExplore} style={{ padding: '1rem 2rem', fontSize: '1.1rem', animation: 'pulseGlow 2s infinite' }}>
+328:             Try For Free Now <ArrowRight size={20} />
+329:           </button>
+330:           <button className="btn-secondary" onClick={onExplore} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+331:             View Demo
+332:           </button>
+333:         </div>
+334:         
+335:         <div className="stats-container animate-fade-in-up delay-300">
+336:           <div style={{ textAlign: 'center' }}>
+337:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', fontFamily: 'Outfit', color: '#0f172a' }}>10k+</div>
+338:             <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Legal Professionals</div>
+339:           </div>
+340:           <div style={{ textAlign: 'center' }}>
+341:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', fontFamily: 'Outfit', color: '#0f172a' }}>2M+</div>
+342:             <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Legal Queries Processed</div>
+343:           </div>
+344:           <div style={{ textAlign: 'center' }}>
+345:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', fontFamily: 'Outfit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', color: '#0f172a' }}>
+346:               4.9 <Star size={24} fill="#f59e0b" color="#f59e0b" />
+347:             </div>
+348:             <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>User Rating</div>
+349:           </div>
+350:         </div>
+351:       </section>
+352: 
+353:       {/* Features Section */}
+354:       <section id="features" className="section-container">
+355:         <div className="section-header">
+356:           <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Everything you need for efficient legal work</h2>
+357:           <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>A powerful platform combining AI research, document analysis, and drafting in one seamless experience.</p>
+358:         </div>
+359: 
+360:         <div className="feature-grid">
+361:           {/* Feature 1 */}
+362:           <div className="feature-row">
+363:             <div className="feature-content">
+364:               <div className="feature-badge"><MessageSquare size={16} /> AI Legal Chatbot</div>
+365:               <h3 style={{ fontSize: '2rem', marginBottom: '1.25rem' }}>Instant answers with verified citations</h3>
+366:               <p style={{ color: '#475569', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+367:                 Chat with our AI legal assistant and get instant answers drawn from comprehensive databases of case law, statutes, and precedents.
+368:               </p>
+369:               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem' }}>
+370:                 {['Instant answers to complex legal questions', 'Verified citations from real sources', '24/7 availability for legal guidance'].map((item, i) => (
+371:                   <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', color: '#334155', fontWeight: '500' }}>
+372:                     <CheckCircle2 size={20} color="#2563eb" /> {item}
+373:                   </li>
+374:                 ))}
+375:               </ul>
+376:               <button className="btn-secondary" onClick={onExplore}>Try AI Chatbot <ArrowRight size={16} /></button>
+377:             </div>
+378:             <div className="feature-visual">
+379:               <div style={{ width: '80%', height: '70%', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+380:                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+381:                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#2563eb', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+382:                     <Scale size={16} color="white" />
+383:                   </div>
+384:                   <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '0 12px 12px 12px', fontSize: '0.9rem', color: '#334155', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>Based on the Indian Contract Act, 1872, section 73... [Citation: Hadley v Baxendale]</div>
+385:                 </div>
+386:                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexDirection: 'row-reverse' }}>
+387:                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e2e8f0', flexShrink: 0 }} />
+388:                   <div style={{ background: '#2563eb', padding: '1rem', borderRadius: '12px 0 12px 12px', fontSize: '0.9rem', color: 'white' }}>Can you summarize the precedent for damages?</div>
+389:                 </div>
+390:               </div>
+391:             </div>
+392:           </div>
+393: 
+394:           {/* Feature 2 */}
+395:           <div className="feature-row">
+396:             <div className="feature-content">
+397:               <div className="feature-badge"><Search size={16} /> Case Law AI</div>
+398:               <h3 style={{ fontSize: '2rem', marginBottom: '1.25rem' }}>Advanced AI reasoning for complex scenarios</h3>
+399:               <p style={{ color: '#475569', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+400:                 Search millions of cases with semantic understanding. Find relevant precedents faster than traditional boolean searches.
+401:               </p>
+402:               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem' }}>
+403:                 {['Access millions of court judgments', 'Advanced semantic AI-powered search', 'Find relevant precedents instantly'].map((item, i) => (
+404:                   <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', color: '#334155', fontWeight: '500' }}>
+405:                     <CheckCircle2 size={20} color="#2563eb" /> {item}
+406:                   </li>
+407:                 ))}
+408:               </ul>
+409:               <button className="btn-secondary" onClick={onExplore}>Start Researching <ArrowRight size={16} /></button>
+410:             </div>
+411:             <div className="feature-visual" style={{ animationDelay: '1s' }}>
+412:                <div style={{ width: '80%', height: '70%', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+413:                  <div style={{ background: 'white', border: '1px solid #e2e8f0', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', padding: '0 1rem', color: '#64748b', gap: '0.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}><Search size={16} /> Search cases involving intellectual property...</div>
+414:                  <div style={{ flex: 1, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem' }}>
+415:                    <div style={{ width: '60%', height: '12px', background: '#cbd5e1', borderRadius: '4px', marginBottom: '0.5rem' }} />
+416:                    <div style={{ width: '90%', height: '8px', background: '#e2e8f0', borderRadius: '4px', marginBottom: '0.5rem' }} />
+417:                    <div style={{ width: '80%', height: '8px', background: '#e2e8f0', borderRadius: '4px' }} />
+418:                  </div>
+419:                </div>
+420:             </div>
+421:           </div>
+422: 
+423:           {/* Feature 3 */}
+424:           <div className="feature-row">
+425:             <div className="feature-content">
+426:               <div className="feature-badge"><FileText size={16} /> AI Document Review</div>
+427:               <h3 style={{ fontSize: '2rem', marginBottom: '1.25rem' }}>Upload, analyze, and review contracts</h3>
+428:               <p style={{ color: '#475569', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+429:                 Upload legal documents, contracts, and agreements. Chat with your documents, identify risks, and get instant summaries.
+430:               </p>
+431:               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem' }}>
+432:                 {['Instant contract review & summaries', 'Risk identification & clause highlights', 'Interactive chat with your documents'].map((item, i) => (
+433:                   <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', color: '#334155', fontWeight: '500' }}>
+434:                     <CheckCircle2 size={20} color="#2563eb" /> {item}
+435:                   </li>
+436:                 ))}
+437:               </ul>
+438:               <button className="btn-secondary" onClick={onExplore}>Analyze Documents <ArrowRight size={16} /></button>
+439:             </div>
+440:             <div className="feature-visual" style={{ animationDelay: '2s' }}>
+441:                <div style={{ width: '80%', height: '80%', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', overflow: 'hidden' }}>
+442:                  <div style={{ flex: 1, borderRight: '1px solid #e2e8f0', padding: '1.5rem', background: 'white' }}>
+443:                    <div style={{ width: '40%', height: '12px', background: '#cbd5e1', borderRadius: '4px', marginBottom: '1rem' }} />
+444:                    <div style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', marginBottom: '0.5rem' }} />
+445:                    <div style={{ width: '90%', height: '8px', background: '#e2e8f0', borderRadius: '4px', marginBottom: '0.5rem' }} />
+446:                    <div style={{ width: '95%', height: '8px', background: 'rgba(239,68,68,0.2)', borderRadius: '4px', marginBottom: '0.5rem' }} />
+447:                  </div>
+448:                  <div style={{ width: '40%', padding: '1.5rem', background: '#fff1f2' }}>
+449:                     <div style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 'bold', marginBottom: '0.5rem' }}>High Risk Detected</div>
+450:                     <div style={{ fontSize: '0.75rem', color: '#475569' }}>Liability clause is overly broad and favors the counterparty.</div>
+451:                  </div>
+452:                </div>
+453:             </div>
+454:           </div>
+455:         </div>
+456:       </section>
+457: 
+458:       {/* Solutions / Audience */}
+459:       <section id="solutions" className="section-container">
+460:         <div className="section-header">
+461:           <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Designed for everyone who needs legal help</h2>
+462:           <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Tailored AI solutions for different professional needs.</p>
+463:         </div>
+464:         
+465:         <div className="audience-grid">
+466:           {[
+467:             { title: 'Legal Professionals', desc: 'Accelerate legal research with AI precision and automate routine drafting.' },
+468:             { title: 'Business Owners', desc: 'Review contracts, understand legal obligations, and mitigate risks early.' },
+469:             { title: 'Law Firms', desc: 'Scale your practice with enterprise-grade AI legal research and document tools.' },
+470:             { title: 'Individuals', desc: 'Get clear, jargon-free answers to everyday legal questions and disputes.' }
+471:           ].map((item, i) => (
+472:             <div key={i} className="audience-card" style={{ animationDelay: `${i * 100}ms` }}>
+473:               <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>AI for {item.title}</h3>
+474:               <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '1.5rem' }}>{item.desc}</p>
+475:               <a href="#" style={{ color: '#2563eb', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>Learn more <ArrowRight size={14} /></a>
+476:             </div>
+477:           ))}
+478:         </div>
+479:       </section>
+480: 
+481:       {/* Comprehensive Toolkit Section */}
+482:       <section className="section-container" style={{ background: '#f8fafc', margin: '4rem auto', borderRadius: '32px', padding: '5rem 3rem' }}>
+483:         <div className="section-header" style={{ marginBottom: '3rem' }}>
+484:           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#eff6ff', color: '#2563eb', padding: '0.5rem 1rem', borderRadius: '9999px', fontWeight: '600', fontSize: '0.875rem', marginBottom: '1rem' }}><Scale size={16} /> A Complete Legal Ecosystem</div>
+485:           <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Beyond just a Chatbot</h2>
+486:           <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>DhaaraAI provides a full suite of specialized tools designed to handle every aspect of your legal workflow securely and efficiently.</p>
+487:         </div>
+488:         
+489:         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+490:           {/* Tool 1 */}
+491:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+492:             <div style={{ width: '48px', height: '48px', background: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+493:               <ArrowRightLeft size={24} color="#2563eb" />
+494:             </div>
+495:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>BNS ↔ IPC Converter</h3>
+496:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Seamlessly transition to the new legal framework. Translate old IPC sections to the new Bharatiya Nyaya Sanhita instantly.</p>
+497:           </div>
+498:           
+499:           {/* Tool 2 */}
+500:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+501:             <div style={{ width: '48px', height: '48px', background: '#fef2f2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+502:               <ShieldAlert size={24} color="#ef4444" />
+503:             </div>
+504:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Citizen Rights & SOS</h3>
+505:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Know your fundamental rights in real-time situations. Access emergency legal SOS features during critical police interactions.</p>
+506:           </div>
+507:           
+508:           {/* Tool 3 */}
+509:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+510:             <div style={{ width: '48px', height: '48px', background: '#f0fdf4', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+511:               <Globe size={24} color="#22c55e" />
+512:             </div>
+513:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Cyber Scanner</h3>
+514:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Check URLs, files, and domains for legal and cyber compliance to protect yourself from online fraud and phishing.</p>
+515:           </div>
+516:           
+517:           {/* Tool 4 */}
+518:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+519:             <div style={{ width: '48px', height: '48px', background: '#fdf4ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+520:               <FileText size={24} color="#d946ef" />
+521:             </div>
+522:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Smart Legal Drafting</h3>
+523:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Generate professionally formatted FIRs, legal notices, NDAs, and agreements by just answering a few questions.</p>
+524:           </div>
+525:           
+526:           {/* Tool 5 */}
+527:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+528:             <div style={{ width: '48px', height: '48px', background: '#fffbeb', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+529:               <Calculator size={24} color="#d97706" />
+530:             </div>
+531:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Fee Calculator</h3>
+532:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Instantly estimate legal costs, court fees, and stamp duties based on your state and case type.</p>
+533:           </div>
+534:           
+535:           {/* Tool 6 */}
+536:           <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', transition: 'all 0.3s ease', cursor: 'default' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+537:             <div style={{ width: '48px', height: '48px', background: '#f3f4f6', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+538:               <Lock size={24} color="#4b5563" />
+539:             </div>
+540:             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#0f172a' }}>Legal Vault</h3>
+541:             <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.6' }}>Securely store and organize your sensitive legal documents with bank-level encryption and easy retrieval.</p>
+542:           </div>
+543:         </div>
+544:       </section>
+545: 
+546:       {/* Pricing Section */}
+547:       <section id="pricing" className="section-container">
+548:         <div className="section-header">
+549:           <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Choose the plan that fits you</h2>
+550:           <p style={{ color: '#64748b', fontSize: '1.1rem' }}>All plans include a 3-day free trial.</p>
+551:         </div>
+552: 
+553:         <div className="pricing-grid">
+554:           {/* Basic */}
+555:           <div className="pricing-card">
+556:             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Basic</h3>
+557:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>$13.99<span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 'normal' }}>/mo</span></div>
+558:             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>Billed annually</p>
+559:             <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: '2rem' }}>Get Started</button>
+560:             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+561:               {['Advanced AI Model Access', 'Unlimited Queries', 'Up-to-Date Legal Data', 'Standard Support'].map((feat, i) => (
+562:                 <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}><CheckCircle2 size={18} color="#2563eb" /> {feat}</li>
+563:               ))}
+564:             </ul>
+565:           </div>
+566:           
+567:           {/* Plus */}
+568:           <div className="pricing-card popular">
+569:             <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#2563eb', color: 'white', padding: '4px 12px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 'bold', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Most Popular</div>
+570:             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Plus</h3>
+571:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>$34.99<span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 'normal' }}>/mo</span></div>
+572:             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>Billed annually</p>
+573:             <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: '2rem' }}>Get Started</button>
+574:             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+575:               {['Advanced AI Model Access', 'Unlimited Queries', 'Document Upload (PDF/Image)', 'Document Review (50/mo)', 'Document Generation', 'Priority Support'].map((feat, i) => (
+576:                 <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}><CheckCircle2 size={18} color="#2563eb" /> {feat}</li>
+577:               ))}
+578:             </ul>
+579:           </div>
+580:           
+581:           {/* Premium */}
+582:           <div className="pricing-card">
+583:             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Premium</h3>
+584:             <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>$69.99<span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 'normal' }}>/mo</span></div>
+585:             <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>Billed annually</p>
+586:             <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: '2rem' }}>Get Started</button>
+587:             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+588:               {['Everything in Plus', 'Document Review (Unlimited)', 'Web Search Access', 'Deep Research Mode', 'Dedicated Account Manager'].map((feat, i) => (
+589:                 <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#334155', fontWeight: '500' }}><CheckCircle2 size={18} color="#2563eb" /> {feat}</li>
+590:               ))}
+591:             </ul>
+592:           </div>
+593:         </div>
+594:       </section>
+595: 
+596:       {/* FAQ Section */}
+597:       <section id="faq" className="section-container" style={{ maxWidth: '800px', margin: '6rem auto' }}>
+598:         <div className="section-header">
+599:           <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Frequently Asked Questions</h2>
+600:           <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Everything you need to know about DhaaraAI.</p>
+601:         </div>
+602:         
+603:         <div style={{ display: 'flex', flexDirection: 'column' }}>
+604:           <FAQItem 
+605:             question="What exactly is DhaaraAI?" 
+606:             answer="DhaaraAI is a comprehensive AI legal assistant tailored specifically for Indian law. It helps professionals and citizens with legal research, contract review, generating legal drafts, understanding their rights, and much more."
+607:           />
+608:           <FAQItem 
+609:             question="Is my private legal data secure?" 
+610:             answer="Absolutely. We use enterprise-grade AES-256 encryption to protect your data. Your uploaded documents and private queries are strictly confidential and are NEVER used to train our public AI models."
+611:           />
+612:           <FAQItem 
+613:             question="Can DhaaraAI replace my lawyer?" 
+614:             answer="No. DhaaraAI is an incredibly powerful tool designed to assist with legal research and workflows, but it does not provide formal legal advice. You should always consult a qualified attorney for specific legal matters."
+615:           />
+616:           <FAQItem 
+617:             question="Does it support the new BNS criminal laws?" 
+618:             answer="Yes! We have a built-in BNS ↔ IPC converter and our AI is fully trained on the new Bharatiya Nyaya Sanhita, Bharatiya Nagarik Suraksha Sanhita, and Bharatiya Sakshya Adhiniyam."
+619:           />
+620:           <FAQItem 
+621:             question="Can I analyze my own contracts or PDFs?" 
+622:             answer="Yes, our Smart Document Review tool allows you to upload PDFs and images of contracts. The AI will instantly audit them, summarize key points, and highlight potential high-risk clauses."
+623:           />
+624:           <FAQItem 
+625:             question="Do you offer a free trial?" 
+626:             answer="Yes, all of our plans include a 3-day free trial so you can explore the full capabilities of DhaaraAI before making a commitment."
+627:           />
+628:         </div>
+629:       </section>
+630: 
+631:       {/* Footer */}
+632:       <footer className="footer">
+633:         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '4rem', justifyContent: 'space-between' }}>
+634:           <div style={{ maxWidth: '300px' }}>
+635:             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', fontSize: '1.5rem', fontFamily: 'Outfit, sans-serif', marginBottom: '1rem' }}>
+636:               <div style={{ background: '#2563eb', padding: '0.4rem', borderRadius: '8px' }}>
+637:                 <Scale size={24} color="white" />
+638:               </div>
+639:               DhaaraAI
+640:             </div>
+641:             <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: '1.6' }}>
+642:               Your all-in-one Legal Companion. Revolutionizing legal research, document review, and drafting with advanced artificial intelligence.
+643:             </p>
+644:           </div>
+645:           
+646:           <div style={{ display: 'flex', gap: '4rem', flexWrap: 'wrap' }}>
+647:             <div>
+648:               <h4 style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>Product</h4>
+649:               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+650:                 {[
+651:                   { label: 'AI Legal Assistant', href: '#features' },
+652:                   { label: 'Case Law AI', href: '#features' },
+653:                   { label: 'Document Review', href: '#features' },
+654:                   { label: 'Contract Generator', href: '#features' },
+655:                   { label: 'Pricing', href: '#pricing' }
+656:                 ].map((link, i) => (
+657:                   <li key={i}><a href={link.href} style={{ color: '#475569', textDecoration: 'none', fontSize: '0.9rem' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>{link.label}</a></li>
+658:                 ))}
+659:               </ul>
+660:             </div>
+661:             <div>
+662:               <h4 style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>Company</h4>
+663:               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+664:                 {[
+665:                   { label: 'About Us', modal: 'About Us' },
+666:                   { label: 'Contact', href: 'mailto:support@dhaaraai.com' },
+667:                   { label: 'Blog', modal: 'Blog' },
+668:                   { label: 'Privacy Policy', modal: 'Privacy Policy' },
+669:                   { label: 'Terms of Service', modal: 'Terms of Service' }
+670:                 ].map((link, i) => (
+671:                   <li key={i}>
+672:                     {link.href ? (
+673:                       <a href={link.href} style={{ color: '#475569', textDecoration: 'none', fontSize: '0.9rem' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>{link.label}</a>
+674:                     ) : (
+675:                       <button onClick={() => setActiveModal(link.modal)} style={{ background: 'none', border: 'none', padding: 0, color: '#475569', fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit' }} onMouseOver={e=>e.target.style.color='#0f172a'} onMouseOut={e=>e.target.style.color='#475569'}>{link.label}</button>
+676:                     )}
+677:                   </li>
+678:                 ))}
+679:               </ul>
+680:             </div>
+681:           </div>
+682:         </div>
+683:         <div style={{ maxWidth: '1200px', margin: '4rem auto 0', paddingTop: '2rem', borderTop: '1px solid rgba(0,0,0,0.05)', textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem' }}>
+684:           © 2026 DhaaraAI, All rights reserved.
+685:         </div>
+686:       </footer>
+687: 
+688:       {/* Modal */}
+689:       {activeModal && (
+690:         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }} onClick={() => setActiveModal(null)}>
+691:           <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', maxWidth: '700px', width: '90%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', transform: 'translateY(0)', animation: 'slideUp 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
+692:             <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#0f172a', borderBottom: '2px solid #e2e8f0', paddingBottom: '1rem' }}>{activeModal}</h2>
+693:             
+694:             <div style={{ marginBottom: '2.5rem' }}>
+695:               {activeModal === 'About Us' && (
+696:                 <>
+697:                   <p style={{ color: '#475569', marginBottom: '1rem', lineHeight: '1.6' }}>
+698:                     DhaaraAI was founded with a single, clear mission: to democratize access to legal intelligence. 
+699:                     We believe that everyone—from solo practitioners and large law firms to ordinary citizens—deserves fast, accurate, and affordable legal assistance.
+700:                   </p>
+701:                   <p style={{ color: '#475569', marginBottom: '1rem', lineHeight: '1.6' }}>
+702:                     By harnessing the power of advanced artificial intelligence, we've built a platform that simplifies complex legal research, automates tedious document reviews, and empowers you to make informed decisions with confidence.
+703:                   </p>
+704:                   <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', marginTop: '2rem', border: '1px solid #e2e8f0' }}>
+705:                     <h4 style={{ color: '#0f172a', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Our Vision</h4>
+706:                     <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0, lineHeight: '1.5' }}>To be the world's most trusted AI legal companion, ensuring justice and legal clarity are never out of reach.</p>
+707:                   </div>
+708:                 </>
+709:               )}
+710: 
+711:               {activeModal === 'Blog' && (
+712:                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+713:                   <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '1.5rem' }}>
+714:                     <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 'bold', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>LEGAL TECH • RECENT</div>
+715:                     <h4 style={{ fontSize: '1.3rem', marginBottom: '0.75rem', color: '#0f172a' }}>How AI is Reshaping Contract Review</h4>
+716:                     <p style={{ color: '#475569', fontSize: '1rem', margin: 0, lineHeight: '1.6' }}>Discover how modern AI models can identify risky clauses and save hours of manual review time for legal teams...</p>
+717:                     <a href="#" style={{ color: '#2563eb', fontSize: '0.95rem', marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: '500' }}>Read more &rarr;</a>
+718:                   </div>
+719:                   <div>
+720:                     <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 'bold', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>PRODUCT UPDATE • PREVIOUS</div>
+721:                     <h4 style={{ fontSize: '1.3rem', marginBottom: '0.75rem', color: '#0f172a' }}>Introducing Case Law Semantic Search</h4>
+722:                     <p style={{ color: '#475569', fontSize: '1rem', margin: 0, lineHeight: '1.6' }}>We are thrilled to announce our new semantic search engine that understands the context behind your legal queries...</p>
+723:                     <a href="#" style={{ color: '#2563eb', fontSize: '0.95rem', marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: '500' }}>Read more &rarr;</a>
+724:                   </div>
+725:                 </div>
+726:               )}
+727: 
+728:               {activeModal === 'Privacy Policy' && (
+729:                 <div style={{ fontSize: '1rem', color: '#475569', lineHeight: '1.7' }}>
+730:                   <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem' }}>Last updated: Current Date</p>
+731:                   <h4 style={{ color: '#0f172a', margin: '2rem 0 0.75rem', fontSize: '1.2rem' }}>1. Information We Collect</h4>
+732:                   <p>We collect information you provide directly to us when you create an account, use our AI chat, or upload documents for review. This may include personal details and the contents of uploaded files.</p>
+733:                   <h4 style={{ color: '#0f172a', margin: '2rem 0 0.75rem', fontSize: '1.2rem' }}>2. How We Use Your Information</h4>
+734:         
+<truncated 1191 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
