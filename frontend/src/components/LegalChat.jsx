@@ -37,18 +37,18 @@ function sanitizeMarkdownForSpeech(mdText, isHindi) {
   return text.trim();
 }
 
-export default function LegalChat({ 
-  initialQuery = null, 
-  onQueryConsumed = () => {}, 
-  language = 'English', 
-  onLanguageChange = () => {} 
+export default function LegalChat({
+  initialQuery = null,
+  onQueryConsumed = () => { },
+  language = 'English',
+  onLanguageChange = () => { }
 }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: isHindi 
+      content: isHindi
         ? 'नमस्ते! लीगलजीपीटी (DhaaraAI) में आपका स्वागत है। मैं आपका कानूनी सहायक हूँ। आप भारतीय कानूनों (BNS 2023, IPC, BNSS, मोटर वाहन आदि) के बारे में कोई भी सवाल पूछ सकते हैं। मैं आपको तुरंत, सीधा व पूरा समाधान प्रदान करूँगा।'
         : 'Namaste! Welcome to LegalGPT (DhaaraAI). I am your AI Legal Assistant. You can ask me questions about Indian laws, cases, or procedures in simple language. I will provide direct, quick, and complete statutory guidance.',
       language: language
@@ -101,8 +101,8 @@ export default function LegalChat({
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setSpeechError(isHindi 
-        ? 'आपका ब्राउज़र वॉयस इनपुट का समर्थन नहीं करता। कृपया Chrome या Edge का उपयोग करें।' 
+      setSpeechError(isHindi
+        ? 'आपका ब्राउज़र वॉयस इनपुट का समर्थन नहीं करता। कृपया Chrome या Edge का उपयोग करें।'
         : 'Your browser does not support Web Speech Recognition. Please use Chrome or Edge.');
       return;
     }
@@ -142,8 +142,8 @@ export default function LegalChat({
       recognition.onerror = (event) => {
         console.warn('Speech recognition error:', event.error);
         if (event.error !== 'no-speech') {
-          setSpeechError(isHindi 
-            ? `माइक्रोफ़ोन त्रुटि: ${event.error}` 
+          setSpeechError(isHindi
+            ? `माइक्रोफ़ोन त्रुटि: ${event.error}`
             : `Microphone issue: ${event.error}`);
         }
         setIsListening(false);
@@ -157,8 +157,8 @@ export default function LegalChat({
     } catch (err) {
       console.error('Speech recognition initiation error:', err);
       setIsListening(false);
-      setSpeechError(isHindi 
-        ? 'माइक्रोफ़ोन शुरू करने में समस्या आई।' 
+      setSpeechError(isHindi
+        ? 'माइक्रोफ़ोन शुरू करने में समस्या आई।'
         : 'Could not access microphone.');
     }
   };
@@ -243,7 +243,7 @@ export default function LegalChat({
       console.error('Error fetching legal response:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: isHindi 
+        content: isHindi
           ? 'त्रुटि: लीगलजीपीटी बैकएंड सर्वर से कनेक्ट नहीं हो सका। कृपया जांचें कि सर्वर चल रहा है।'
           : 'Error: Cannot connect to LegalGPT backend. Make sure the FastAPI server is running.',
         isError: true
@@ -259,29 +259,29 @@ export default function LegalChat({
   };
 
   const promptSuggestions = isHindi ? [
-    { label: '🏍️ बाइक एक्सीडेंट (Rash Driving 281)', query: 'मेरे बाइक का एक्सीडेंट हो गया दूसरी बाइक से, क्या कानून लगेगा और तुरंत क्या करें?' },
-    { label: '💳 ऑनलाइन ठगी (Cheating 318(4))', query: 'ऑनलाइन यूपीआई या बैंक फ्रॉड हो गया, धारा 318(4) BNS के तहत पैसे कैसे रुकवाएं?' },
-    { label: '📄 चेक बाउंस (NI Act 138)', query: 'चेक बाउंस होने पर 30 दिन का नोटिस कैसे भेजें और क्या सजा होगी?' },
-    { label: '👮 पुलिस FIR न लिखे तो?', query: 'अगर पुलिस थाने में FIR दर्ज करने से मना करे तो Zero FIR और मजिस्ट्रेट के पास क्या अधिकार हैं?' }
+    { label: 'बाइक एक्सीडेंट (Rash Driving 281)', query: 'मेरे बाइक का एक्सीडेंट हो गया दूसरी बाइक से, क्या कानून लगेगा और तुरंत क्या करें?' },
+    { label: 'ऑनलाइन ठगी (Cheating 318(4))', query: 'ऑनलाइन यूपीआई या बैंक फ्रॉड हो गया, धारा 318(4) BNS के तहत पैसे कैसे रुकवाएं?' },
+    { label: 'चेक बाउंस (NI Act 138)', query: 'चेक बाउंस होने पर 30 दिन का नोटिस कैसे भेजें और क्या सजा होगी?' },
+    { label: 'पुलिस FIR न लिखे तो?', query: 'अगर पुलिस थाने में FIR दर्ज करने से मना करे तो Zero FIR और मजिस्ट्रेट के पास क्या अधिकार हैं?' }
   ] : [
-    { label: '🏍️ Road Accident (BNS 281)', query: 'My bike had an accident with another bike. What case will be filed and what are the immediate steps?' },
-    { label: '💳 Online Fraud (BNS 318(4))', query: 'Someone cheated me online through UPI. How to freeze accounts and file FIR under BNS?' },
-    { label: '📄 Cheque Bounce (Sec 138)', query: 'What is the procedure for cheque bounce and statutory 30-day notice under NI Act?' },
-    { label: '👮 Police Refusal for FIR', query: 'What remedies are available under BNSS if the police officer refuses to register an FIR?' }
+    { label: 'Road Accident (BNS 281)', query: 'My bike had an accident with another bike. What case will be filed and what are the immediate steps?' },
+    { label: 'Online Fraud (BNS 318(4))', query: 'Someone cheated me online through UPI. How to freeze accounts and file FIR under BNS?' },
+    { label: 'Cheque Bounce (Sec 138)', query: 'What is the procedure for cheque bounce and statutory 30-day notice under NI Act?' },
+    { label: 'Police Refusal for FIR', query: 'What remedies are available under BNSS if the police officer refuses to register an FIR?' }
   ];
 
   return (
-    <div className="glass-panel animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '620px', flex: 1 }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '620px', flex: 1 }}>
       {/* Header controls */}
       <div style={{ padding: '14px 22px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
-          <Bot color="var(--primary)" size={20} /> 
+          <Bot color="var(--primary)" size={20} />
           {isHindi ? 'लीगल असिस्टेंट (AI Legal Assistant)' : 'AI Legal Assistant'}
         </h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>भाषा / Lang:</span>
-          <select 
-            value={language} 
+          <select
+            value={language}
             onChange={(e) => onLanguageChange(e.target.value)}
             className="input-field"
             style={{ width: '135px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
@@ -325,9 +325,9 @@ export default function LegalChat({
       {/* Chat Area */}
       <div style={{ flex: 1, padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
         {messages.map((msg, idx) => (
-          <div key={idx} style={{ 
-            display: 'flex', 
-            gap: '14px', 
+          <div key={idx} style={{
+            display: 'flex',
+            gap: '14px',
             alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
             maxWidth: msg.role === 'user' ? '80%' : '92%'
           }}>
@@ -336,11 +336,11 @@ export default function LegalChat({
                 <Bot size={20} />
               </div>
             )}
-            
-            <div style={{ 
-              background: msg.role === 'user' ? 'var(--primary)' : 'rgba(255,255,255,0.95)', 
+
+            <div style={{
+              background: msg.role === 'user' ? 'var(--primary)' : 'rgba(255,255,255,0.95)',
               color: msg.role === 'user' ? 'white' : 'var(--text-main)',
-              padding: '16px 20px', 
+              padding: '16px 20px',
               borderRadius: '16px',
               borderTopRightRadius: msg.role === 'user' ? 0 : '16px',
               borderTopLeftRadius: msg.role === 'assistant' ? 0 : '16px',
@@ -394,7 +394,7 @@ export default function LegalChat({
 
                   <div className="markdown-content" style={{ fontSize: '14.5px', color: msg.isError ? 'var(--danger)' : 'inherit' }}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
-                    
+
                     {msg.sources && msg.sources.length > 0 && (
                       <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e5e7eb' }}>
                         <p style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.5px' }}>
@@ -413,16 +413,16 @@ export default function LegalChat({
             </div>
           </div>
         ))}
-        
+
         {isLoading && (
           <div style={{ display: 'flex', gap: '14px', alignSelf: 'flex-start', maxWidth: '85%' }}>
-             <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                <RefreshCw size={18} className="animate-spin" />
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.95)', padding: '14px 18px', borderRadius: '16px', borderTopLeftRadius: 0, border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-                <Loader2 size={16} className="animate-spin" style={{ marginRight: '8px', color: 'var(--primary)' }} /> 
-                {isHindi ? 'कानूनी धाराएं और समाधान तैयार हो रहा है...' : 'Analyzing statutes & formulating quick response...'}
-              </div>
+            <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+              <RefreshCw size={18} className="animate-spin" />
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.95)', padding: '14px 18px', borderRadius: '16px', borderTopLeftRadius: 0, border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+              <Loader2 size={16} className="animate-spin" style={{ marginRight: '8px', color: 'var(--primary)' }} />
+              {isHindi ? 'कानूनी धाराएं और समाधान तैयार हो रहा है...' : 'Analyzing statutes & formulating quick response...'}
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -433,11 +433,11 @@ export default function LegalChat({
         <div style={{ background: '#fee2e2', borderTop: '1px solid #fca5a5', padding: '8px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#b91c1c', fontSize: '13px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="mic-recording-pulse" />
-            <strong>{isHindi ? '🎙️ आवाज़ सुन रहा हूँ... कृपया बोलें' : '🎙️ Listening... Speak your query clearly'}</strong>
+            <strong>{isHindi ? 'आवाज़ सुन रहा हूँ... कृपया बोलें' : 'Listening... Speak your query clearly'}</strong>
             <span style={{ fontSize: '11.5px', color: '#991b1b' }}>({isHindi ? 'हिंदी इनपुट' : 'English Input'})</span>
           </div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handleToggleVoiceInput}
             style={{ background: '#ef4444', color: 'white', border: 'none', borderRadius: '12px', padding: '2px 10px', fontSize: '11px', cursor: 'pointer' }}
           >
@@ -448,7 +448,7 @@ export default function LegalChat({
 
       {speechError && (
         <div style={{ background: '#fffbeb', borderTop: '1px solid #fef3c7', padding: '6px 20px', color: '#b45309', fontSize: '12px' }}>
-          ⚠️ {speechError}
+          {speechError}
         </div>
       )}
 
@@ -459,8 +459,8 @@ export default function LegalChat({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={isHindi 
-              ? "सवाल लिखें या माइक दबाकर बोलें (उदा. ऑनलाइन ठगी हो गई, पैसे कैसे रुकवाएं?)" 
+            placeholder={isHindi
+              ? "सवाल लिखें या माइक दबाकर बोलें (उदा. ऑनलाइन ठगी हो गई, पैसे कैसे रुकवाएं?)"
               : "Type or click mic to speak (e.g. Bike accident happened, what are the steps?)"}
             className="input-field"
             disabled={isLoading}
@@ -495,16 +495,16 @@ export default function LegalChat({
           </button>
 
           {/* Send Button */}
-          <button 
-            type="submit" 
-            className="btn-primary" 
+          <button
+            type="submit"
+            className="btn-primary"
             disabled={isLoading || !input.trim()}
-            style={{ 
-              position: 'absolute', 
-              right: '6px', 
-              top: '6px', 
-              bottom: '6px', 
-              padding: '0 14px', 
+            style={{
+              position: 'absolute',
+              right: '6px',
+              top: '6px',
+              bottom: '6px',
+              padding: '0 14px',
               opacity: (isLoading || !input.trim()) ? 0.6 : 1,
               borderRadius: '8px'
             }}

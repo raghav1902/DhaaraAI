@@ -23,8 +23,14 @@ Accessible in both **English and Hindi**, DhaaraAI empowers users to generate le
    - The AI audits the text against the Indian Contract Act 1872 and highlights "Red Flags" (e.g., unfair non-compete clauses, one-sided termination).
    - Provides balanced, fair alternative clauses that you can negotiate with before signing.
 
-4. **Bilingual Support (English & Hindi)**
+4. **Comprehensive Legal Tools**
+   - **Fee Calculator:** Estimate legal and government charges including Consumer Court Filing Fees and Traffic Challan fines.
+   - **Cyber Scanner:** Perform basic checks and guidelines for cyber fraud incident reporting.
+   - **Legal Vault:** A secure, locally encrypted vault to save your legal drafts and documents securely on your device.
+
+5. **Bilingual Support (English & Hindi) & Theming**
    - Fully localized UI and AI generation in English and pure Hindi (Devanagari) to serve a diverse demographic.
+   - Modern Light and Dark mode options available from the built-in Settings panel.
 
 ---
 

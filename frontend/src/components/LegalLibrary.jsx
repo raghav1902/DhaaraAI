@@ -61,7 +61,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
   };
 
   return (
-    <div className="glass-panel animate-fade-in" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="animate-fade-in" style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '18px' }}>
         <div>
@@ -70,7 +70,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
             {isHindi ? 'भारतीय कानून एवं धारा संग्रह (Legal Library)' : 'Indian Statutory Codes & Concordance Library'}
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>
-            {isHindi 
+            {isHindi
               ? 'भारतीय न्याय संहिता (BNS 2023), IPC 1860, BNSS एवं मुख्य अधिनियमों की प्रमाणित धाराएं व प्रक्रिया'
               : 'Verified statutory directory of Bharatiya Nyaya Sanhita (BNS 2023), IPC 1860, and Landmark Safeguards'}
           </p>
@@ -95,7 +95,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
           style={{ paddingLeft: '48px', height: '48px', fontSize: '15px' }}
         />
         {searchQuery && (
-          <button 
+          <button
             onClick={() => setSearchQuery('')}
             style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
           >
@@ -128,11 +128,19 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
         ))}
       </div>
 
-      {/* Content Area */}
       {isLoading ? (
-        <div style={{ textAlign: 'center', padding: '50px 0', color: 'var(--text-muted)' }}>
-          <div className="animate-spin" style={{ display: 'inline-block', width: '28px', height: '28px', border: '3px solid #e5e7eb', borderTopColor: 'var(--primary)', borderRadius: '50%', marginBottom: '12px' }} />
-          <p>{isHindi ? 'कानूनी धाराएं लोड हो रही हैं...' : 'Loading statutory provisions...'}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="glass-panel" style={{ padding: '18px 20px', border: '1px solid var(--glass-border)' }}>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                <div className="skeleton-box skeleton-text" style={{ width: '60px', height: '22px', borderRadius: '6px' }}></div>
+                <div className="skeleton-box skeleton-text" style={{ width: '100px', height: '22px', borderRadius: '6px' }}></div>
+              </div>
+              <div className="skeleton-box skeleton-title"></div>
+              <div className="skeleton-box skeleton-text"></div>
+              <div className="skeleton-box skeleton-text" style={{ width: '70%' }}></div>
+            </div>
+          ))}
         </div>
       ) : error ? (
         <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '12px', color: 'var(--danger)' }}>
@@ -152,15 +160,15 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
             const isBailable = item.bailable && item.bailable.toLowerCase().includes('bailable') && !item.bailable.toLowerCase().startsWith('non');
 
             return (
-              <div 
+              <div
                 key={item.id}
+                className="hover-tactile"
                 style={{
                   background: 'rgba(255, 255, 255, 0.85)',
                   border: '1px solid var(--glass-border)',
                   borderRadius: '14px',
                   padding: '18px 20px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                  transition: 'box-shadow 0.2s ease, border-color 0.2s ease'
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
                 }}
               >
                 {/* Top Section Tags & Category */}
@@ -193,31 +201,17 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                 {/* Quick Attributes Chips */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                   {item.nature && (
-                    <span style={{ 
-                      fontSize: '12px', 
-                      padding: '3px 10px', 
-                      borderRadius: '12px', 
-                      background: item.nature.toLowerCase().includes('non-cognizable') ? '#f3f4f6' : '#fee2e2', 
-                      color: item.nature.toLowerCase().includes('non-cognizable') ? '#4b5563' : '#b91c1c', 
-                      fontWeight: '600' 
-                    }}>
+                    <span className={`badge ${item.nature.toLowerCase().includes('non-cognizable') ? 'badge-info' : 'badge-danger'}`}>
                       {item.nature}
                     </span>
                   )}
                   {item.bailable && (
-                    <span style={{ 
-                      fontSize: '12px', 
-                      padding: '3px 10px', 
-                      borderRadius: '12px', 
-                      background: isBailable ? '#d1fae5' : '#fed7aa', 
-                      color: isBailable ? '#065f46' : '#9a3412', 
-                      fontWeight: '600' 
-                    }}>
+                    <span className={`badge ${isBailable ? 'badge-success' : 'badge-warning'}`}>
                       {item.bailable}
                     </span>
                   )}
                   {item.punishment && (
-                    <span style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', background: '#f0f9ff', color: '#0369a1', fontWeight: '500' }}>
+                    <span className="badge badge-info" style={{ background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0' }}>
                       {item.punishment}
                     </span>
                   )}
@@ -262,22 +256,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
 
                   <button
                     onClick={() => handleAskSection(item)}
-                    style={{
-                      background: 'rgba(59, 130, 246, 0.08)',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      color: 'var(--primary)',
-                      padding: '6px 14px',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      transition: 'all 0.15s ease'
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = 'white'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(59, 130, 246, 0.08)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                    className="btn-ghost"
                   >
                     <Sparkles size={15} />
                     {isHindi ? 'AI से पूछें' : 'Ask AI'}

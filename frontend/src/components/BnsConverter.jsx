@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  ArrowRightLeft, 
-  Search, 
-  Scale, 
-  Shield, 
-  AlertCircle, 
-  Gavel, 
-  Clock, 
+import {
+  ArrowRightLeft,
+  Search,
+  Scale,
+  Shield,
+  AlertCircle,
+  Gavel,
+  Clock,
   BookOpen,
   CheckCircle2,
   Filter
@@ -39,7 +39,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
   const filterLocal = (q) => {
     if (!q || !q.trim()) return FALLBACK_CONCORDANCE_DB;
     const lower = q.trim().toLowerCase();
-    return FALLBACK_CONCORDANCE_DB.filter(item => 
+    return FALLBACK_CONCORDANCE_DB.filter(item =>
       item.bns_section?.toLowerCase().includes(lower) ||
       item.ipc_section?.toLowerCase().includes(lower) ||
       item.offense_en?.toLowerCase().includes(lower) ||
@@ -85,7 +85,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header Banner */}
-      <div className="glass-panel" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #059669' }}>
+      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #059669' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ background: 'linear-gradient(135deg, #059669, #10b981)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
             <ArrowRightLeft size={26} />
@@ -95,7 +95,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
               {isHindi ? 'BNS 2023 ↔ IPC 1860 धारा परिवर्तक (Live Concordance)' : 'BNS 2023 ↔ IPC 1860 Section Converter & Calculator'}
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
-              {isHindi 
+              {isHindi
                 ? 'पुरानी आईपीसी (IPC) की धारा अथवा नई भारतीय न्याय संहिता (BNS) की धारा दर्ज करें और सजा, जमानत व कानूनी बदलाव तुरंत देखें।'
                 : 'Instant cross-reference for the New Criminal Laws (effective 1 July 2024). Compare sections, bail status, sentences, and BNSS trial procedure.'}
             </p>
@@ -112,16 +112,14 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
               key={idx}
               type="button"
               onClick={() => selectQuery(pq.q)}
+              className="btn-ghost"
               style={{
                 background: searchTerm === pq.q ? '#059669' : 'rgba(5, 150, 105, 0.08)',
-                color: searchTerm === pq.q ? '#fff' : '#047857',
-                border: '1px solid rgba(5, 150, 105, 0.25)',
+                color: searchTerm === pq.q ? '#fff' : '#059669',
+                borderColor: searchTerm === pq.q ? '#059669' : 'rgba(5, 150, 105, 0.25)',
                 borderRadius: '16px',
                 padding: '4px 10px',
                 fontSize: '12px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                transition: 'all 0.15s ease'
               }}
             >
               {pq.label}
@@ -138,8 +136,8 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
             type="text"
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder={isHindi 
-              ? "आईपीसी धारा (जैसे 420, 302, 304A), नई BNS धारा या अपराध का नाम लिखें..." 
+            placeholder={isHindi
+              ? "आईपीसी धारा (जैसे 420, 302, 304A), नई BNS धारा या अपराध का नाम लिखें..."
               : "Type any IPC Section (e.g. 420, 302, 304A), BNS Section (318, 103), or offense keyword..."}
             style={{
               width: '100%',
@@ -163,43 +161,46 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
             <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)' }}>
               {isHindi ? `परिणाम (${items.length})` : `Matches (${items.length})`}
             </span>
-            {loading && <span style={{ fontSize: '12px', color: '#059669' }}>Searching...</span>}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {items.map((item, idx) => {
+            {loading ? (
+              [1, 2, 3, 4, 5].map(i => (
+                <div key={i} style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px' }}>
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                    <div className="skeleton-box skeleton-text" style={{ width: '50px', height: '18px', borderRadius: '4px' }}></div>
+                    <div className="skeleton-box skeleton-text" style={{ width: '50px', height: '18px', borderRadius: '4px' }}></div>
+                  </div>
+                  <div className="skeleton-box skeleton-title" style={{ width: '80%' }}></div>
+                  <div className="skeleton-box skeleton-text" style={{ width: '40%' }}></div>
+                </div>
+              ))
+            ) : items.map((item, idx) => {
               const isSelected = selectedItem?.id === item.id;
               return (
                 <div
                   key={item.id || idx}
                   onClick={() => setSelectedItem(item)}
+                  className="hover-tactile"
                   style={{
                     background: isSelected ? 'rgba(5, 150, 105, 0.08)' : '#fff',
                     border: isSelected ? '1px solid #059669' : '1px solid #e2e8f0',
                     borderRadius: '10px',
                     padding: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
+                    cursor: 'pointer'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '800', color: '#059669', background: '#dcfce7', padding: '2px 6px', borderRadius: '4px' }}>
+                      <span className="badge" style={{ background: '#dcfce7', color: '#059669' }}>
                         BNS {item.bns_section}
                       </span>
                       <ArrowRightLeft size={12} color="#94a3b8" />
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                      <span className="badge" style={{ background: '#f1f5f9', color: '#64748b' }}>
                         IPC {item.ipc_section}
                       </span>
                     </div>
-                    <span style={{ 
-                      fontSize: '10.5px', 
-                      fontWeight: '700', 
-                      padding: '2px 6px', 
-                      borderRadius: '4px',
-                      background: item.bailable === 'Bailable' ? '#dcfce7' : '#fee2e2',
-                      color: item.bailable === 'Bailable' ? '#166534' : '#991b1b'
-                    }}>
+                    <span className={`badge ${item.bailable === 'Bailable' ? 'badge-success' : 'badge-danger'}`}>
                       {item.bailable}
                     </span>
                   </div>
@@ -265,27 +266,27 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
 
             {/* Statutory Parameters Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
-              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
                   {isHindi ? 'अपराध की प्रकृति' : 'Offense Nature'}
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: selectedItem.nature === 'Cognizable' ? '#dc2626' : '#166534' }}>
+                <span className={`badge ${selectedItem.nature === 'Cognizable' ? 'badge-danger' : 'badge-success'}`} style={{ marginTop: '4px' }}>
                   {selectedItem.nature}
                 </span>
               </div>
-              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
                   {isHindi ? 'जमानत की स्थिति' : 'Bail Status'}
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: selectedItem.bailable === 'Bailable' ? '#166534' : '#dc2626' }}>
+                <span className={`badge ${selectedItem.bailable === 'Bailable' ? 'badge-success' : 'badge-danger'}`} style={{ marginTop: '4px' }}>
                   {selectedItem.bailable}
                 </span>
               </div>
-              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
                   {isHindi ? 'सुनवाई अदालत' : 'Triable By'}
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#1e40af' }}>
+                <span className="badge badge-info" style={{ marginTop: '4px' }}>
                   {selectedItem.triable_by}
                 </span>
               </div>
@@ -323,8 +324,8 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {selectedItem.victim_guidance && (
                 <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#166534', display: 'block', marginBottom: '2px' }}>
-                    🛡️ {isHindi ? 'पीड़ित / शिकायतकर्ता के अधिकार:' : 'Action Plan for Victim / Complainant:'}
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <Shield size={14} /> {isHindi ? 'पीड़ित / शिकायतकर्ता के अधिकार:' : 'Action Plan for Victim / Complainant:'}
                   </span>
                   <span style={{ fontSize: '12px', color: '#14532d', lineHeight: '1.5' }}>
                     {selectedItem.victim_guidance}
@@ -333,8 +334,8 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
               )}
               {selectedItem.accused_guidance && (
                 <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 14px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#92400e', display: 'block', marginBottom: '2px' }}>
-                    ⚖️ {isHindi ? 'आरोपी पक्ष हेतु सुरक्षा प्रावधान:' : 'Safeguards for Accused / Signer:'}
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#92400e', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <Scale size={14} /> {isHindi ? 'आरोपी पक्ष हेतु सुरक्षा प्रावधान:' : 'Safeguards for Accused / Signer:'}
                   </span>
                   <span style={{ fontSize: '12px', color: '#78350f', lineHeight: '1.5' }}>
                     {selectedItem.accused_guidance}

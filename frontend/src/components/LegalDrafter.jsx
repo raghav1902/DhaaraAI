@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { 
-  FileText, Copy, Printer, Check, ArrowRight, ArrowLeft, 
-  ShieldCheck, AlertCircle, RefreshCw, User, UserX, 
+import {
+  FileText, Copy, Printer, Check, ArrowRight, ArrowLeft,
+  ShieldCheck, AlertCircle, RefreshCw, User, UserX,
   Calendar, MapPin, Sparkles, Scale, CheckCircle2, RotateCcw,
-  Download
+  Download, Mic, MicOff
 } from 'lucide-react';
 
 import { CATEGORIES, EVIDENCE_PRESETS } from './LegalDrafter/DrafterConstants';
+import html2pdf from 'html2pdf.js';
 
-export default function LegalDrafter({ language = 'English', onLanguageChange = () => {} }) {
+export default function LegalDrafter({ language = 'English', onLanguageChange = () => { } }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
   // Step management: 1 (Type & Category), 2 (Parties), 3 (Facts & Evidence), 4 (Review & Generate), 5 (Result)
   const [step, setStep] = useState(1);
   const [documentType, setDocumentType] = useState('FIR Application');
   const [incidentCategory, setIncidentCategory] = useState('Cyber Fraud');
-  
+
   // Complainant & Accused
   const [complainant, setComplainant] = useState({
     name: '',
@@ -39,6 +40,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
   const [selectedEvidences, setSelectedEvidences] = useState([]);
   const [customEvidence, setCustomEvidence] = useState('');
   const [reliefSought, setReliefSought] = useState('');
+
+  // Voice Input State
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = React.useRef(null);
 
   // Generated draft state
   const [isGenerating, setIsGenerating] = useState(false);
@@ -65,12 +70,12 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       });
       setIncidentDatetime('21-09-2026, 02:30 PM');
       setIncidentLocation(isHindi ? 'ऑनलाइन (इंटरनेट बैंकिंग / यूपीआई)' : 'Online (UPI & Net Banking)');
-      setFacts(isHindi 
+      setFacts(isHindi
         ? 'आरोपी ने पार्ट-टाइम रिव्यू जॉब का झांसा देकर टेलीग्राम पर संपर्क किया। आरोपी ने एक फर्जी लिंक भेजकर मेरे बैंक खाते से 3 अलग-अलग किश्तों में कुल ₹75,000 धोखे से ट्रांसफर करवा लिए।'
         : 'The accused contacted me via WhatsApp offering a work-from-home review task. After building trust, they shared a fraudulent payment gateway link and induced me to transfer Rs. 75,000 across 3 UPI transactions under false promises.');
       setSelectedEvidences(['bank_slip', 'chat_history']);
       setCustomEvidence(isHindi ? 'साइबर हेल्पलाइन 1930 शिकायत संख्या #CYB2026/88902' : 'Cyber Helpline 1930 Acknowledgment #CYB2026/88902');
-      setReliefSought(isHindi 
+      setReliefSought(isHindi
         ? 'धारा 173 BNSS व धारा 318(4) BNS के तहत प्राथमिकी दर्ज कर आरोपी के बैंक खातों को तुरंत फ्रीज करने व राशि वापस दिलाने की कृपा करें।'
         : 'Registration of FIR under Section 173 BNSS and Section 318(4) BNS, freezing of the recipient accounts, and restitution of Rs. 75,000.');
       setStep(4);
@@ -91,12 +96,12 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       });
       setIncidentDatetime('20-09-2026, 08:15 PM');
       setIncidentLocation(isHindi ? 'मानसरोवर चौराहा, मुख्य मार्ग, जयपुर' : 'Mansarovar Chauraha, Main Ring Road, Jaipur');
-      setFacts(isHindi 
+      setFacts(isHindi
         ? 'प्रार्थी अपनी मोटरसाइकिल (RJ-14-EM-1234) से घर लौट रहा था। तभी तेज रफ्तार व लापरवाही से आती हुई सफेद कार (RJ-14-CB-9009) ने पीछे से टक्कर मार दी। प्रार्थी के दाहिने पैर में फ्रैक्चर हुआ और वाहन चालक बिना रुके फरार हो गया।'
         : 'The complainant was returning home on his motorcycle when the accused driving a white SUV at excessive speed negligently rammed the complainant from behind, causing severe leg injuries and motorcycle damage, before speeding away.');
       setSelectedEvidences(['cctv_footage', 'photos', 'medical_slip']);
       setCustomEvidence('');
-      setReliefSought(isHindi 
+      setReliefSought(isHindi
         ? 'धारा 281 व 125(a) BNS तथा मोटर वाहन अधिनियम के तहत FIR दर्ज कर अभियुक्त की पहचान कर सख्त कानूनी कार्रवाई की जाए।'
         : 'Immediate registration of FIR under BNS Sections 281 and 125, impounding of offending vehicle, and statutory legal action.');
       setStep(4);
@@ -117,12 +122,12 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       });
       setIncidentDatetime('15-09-2026');
       setIncidentLocation(isHindi ? 'चांदनी चौक, दिल्ली' : 'Chandni Chowk, Delhi');
-      setFacts(isHindi 
+      setFacts(isHindi
         ? 'विपक्ष ने माल आपूर्ति के एवज में चेक संख्या 451201 राशि ₹1,50,000 HDFC बैंक का जारी किया था। प्रार्थी ने इसे अपने बैंक में लगाया, जो दिनांक 15-09-2026 को "अपर्याप्त राशि (Funds Insufficient)" के मेमो के साथ अनादरित हो गया।'
         : 'In discharge of legally enforceable debt for goods supplied, you issued Cheque No. 451201 for Rs. 1,50,000 drawn on HDFC Bank. The said cheque was dishonored upon presentation with bank return memo dated 15-09-2026 citing "Funds Insufficient".');
       setSelectedEvidences(['cheque_memo', 'written_agreement']);
       setCustomEvidence('');
-      setReliefSought(isHindi 
+      setReliefSought(isHindi
         ? 'इस नोटिस की प्राप्ति के 15 दिनों के भीतर संपूर्ण राशि ₹1,50,000 का भुगतान करें, अन्यथा परक्राम्य लिखत अधिनियम की धारा 138 एवं BNS की धारा 318 के तहत मुकदमा दायर किया जाएगा।'
         : 'Pay the entire cheque amount of Rs. 1,50,000 within 15 days of this notice, failing which legal proceedings under Section 138 NI Act and BNS 318 will be initiated.');
       setStep(4);
@@ -171,7 +176,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       setStep(5);
     } catch (err) {
       console.error('Drafting request error:', err);
-      setDraftError(isHindi 
+      setDraftError(isHindi
         ? '[500 Internal Server Error] ड्राफ्ट जनरेट करने में त्रुटि हुई। कृपया जांचें कि बैकएंड सर्वर चल रहा है।'
         : '[500 Internal Server Error] Failed to generate draft. Please ensure the backend server is running.');
     } finally {
@@ -207,8 +212,101 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPdf = () => {
+    if (!generatedResult?.draft) return;
+    const docTitle = documentType === 'Legal Demand Notice' ? 'Legal_Demand_Notice' : 'Police_Complaint_FIR';
+
+    // Create a temporary hidden div with exactly the styling we want for the PDF
+    const element = document.createElement('div');
+    element.style.padding = '20mm';
+    element.style.fontFamily = '"Times New Roman", Times, serif';
+    element.style.fontSize = '12pt';
+    element.style.lineHeight = '1.6';
+    element.style.textAlign = 'justify';
+    element.style.color = '#000000';
+    element.style.background = '#ffffff';
+
+    // Add header
+    const emblem = isHindi ? 'सत्यमेव जयते' : 'FORMAL LEGAL INSTRUMENT • BHARAT (INDIA)';
+    const headerTitle = documentType === 'Legal Demand Notice'
+      ? (isHindi ? 'विधिक मांग नोटिस' : 'STATUTORY LEGAL DEMAND NOTICE')
+      : (isHindi ? 'प्रथम सूचना रिपोर्ट (FIR) हेतु औपचारिक शिकायत' : 'FORMAL POLICE COMPLAINT (UNDER SECTION 173 BNSS, 2023)');
+
+    element.innerHTML = `
+      <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:24px;">
+        <div style="font-size:10pt;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${emblem}</div>
+        <h1 style="font-size:16pt;font-weight:bold;margin:6px 0 2px;text-transform:uppercase;">${headerTitle}</h1>
+        <div style="font-size:9pt;">Formulated under the Bharatiya Nagarik Suraksha Sanhita, 2023 & BNS 2023</div>
+      </div>
+      <div style="white-space:pre-wrap;">${generatedResult.draft}</div>
+    `;
+
+    const opt = {
+      margin: 10,
+      filename: `${docTitle}_DhaaraAI.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+  };
+
+  const handleSaveToVault = () => {
+    if (!generatedResult?.draft) return;
+    const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+    const newDraft = {
+      id: Date.now().toString(),
+      type: documentType,
+      title: complainant.name ? `${documentType} - ${complainant.name}` : documentType,
+      content: generatedResult.draft,
+      date: new Date().toISOString()
+    };
+    drafts.push(newDraft);
+    localStorage.setItem('dhaara_vault_drafts', JSON.stringify(drafts));
+    alert(isHindi ? 'दस्तावेज़ सुरक्षित वॉल्ट में सहेजा गया!' : 'Document saved to Secure Vault!');
+  };
+
+  const handleToggleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert(isHindi ? 'आपका ब्राउज़र वॉयस इनपुट का समर्थन नहीं करता।' : 'Your browser does not support Voice Input. Please use Chrome/Edge.');
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = isHindi ? 'hi-IN' : 'en-IN';
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setFacts(prev => prev + (prev ? ' ' : '') + finalTranscript);
+      }
+    };
+
+    recognition.start();
+  };
+
   return (
-    <div className="glass-panel animate-fade-in" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="animate-fade-in" style={{ padding: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, height: '100%' }}>
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -227,8 +325,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
         {/* Language selector & Presets */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <select 
-            value={language} 
+          <select
+            value={language}
             onChange={(e) => onLanguageChange(e.target.value)}
             className="input-field"
             style={{ width: '135px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
@@ -245,21 +343,21 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           <span style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
             <Sparkles size={15} /> {isHindi ? 'त्वरित नमूना भरें:' : 'Quick Sample Autofill:'}
           </span>
-          <button 
+          <button
             type="button"
             onClick={() => loadPreset('cyber')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
           >
             {isHindi ? 'यूपीआई साइबर फ्रॉड FIR' : 'UPI Cyber Fraud FIR'}
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => loadPreset('accident')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
           >
             {isHindi ? 'बाइक एक्सीडेंट टक्कर FIR' : 'Bike Hit & Run FIR'}
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => loadPreset('notice')}
             style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
@@ -273,17 +371,17 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       {step < 5 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', margin: '8px 0' }}>
           <div style={{ position: 'absolute', top: '16px', left: '40px', right: '40px', height: '3px', background: '#e2e8f0', zIndex: 0 }} />
-          <div 
-            style={{ 
-              position: 'absolute', 
-              top: '16px', 
-              left: '40px', 
-              width: step === 1 ? '0%' : step === 2 ? '33%' : step === 3 ? '66%' : '90%', 
-              height: '3px', 
-              background: 'var(--primary)', 
+          <div
+            style={{
+              position: 'absolute',
+              top: '16px',
+              left: '40px',
+              width: step === 1 ? '0%' : step === 2 ? '33%' : step === 3 ? '66%' : '90%',
+              height: '3px',
+              background: 'var(--primary)',
               zIndex: 0,
               transition: 'width 0.3s ease'
-            }} 
+            }}
           />
 
           {[
@@ -292,27 +390,27 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             { num: 3, labelEn: 'Incident & Evidence', labelHi: 'घटना व साक्ष्य' },
             { num: 4, labelEn: 'Review & Draft', labelHi: 'समीक्षा व प्रारूप' }
           ].map(s => (
-            <div 
-              key={s.num} 
+            <div
+              key={s.num}
               onClick={() => s.num < step && setStep(s.num)}
-              style={{ 
-                zIndex: 1, 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
+              style={{
+                zIndex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
                 gap: '6px',
                 cursor: s.num < step ? 'pointer' : 'default'
               }}
             >
-              <div style={{ 
-                width: '32px', 
-                height: '32px', 
-                borderRadius: '50%', 
-                background: step >= s.num ? 'var(--primary)' : 'white', 
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: step >= s.num ? 'var(--primary)' : 'white',
                 border: step >= s.num ? 'none' : '2px solid #cbd5e1',
                 color: step >= s.num ? 'white' : '#64748b',
-                display: 'flex', 
-                alignItems: 'center', 
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: '700',
                 fontSize: '13px',
@@ -331,13 +429,13 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {/* STEP 1: DOCUMENT TYPE & CATEGORY */}
       {step === 1 && (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
           <div>
             <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '8px', display: 'block' }}>
               {isHindi ? '1. आप कौन सा दस्तावेज़ तैयार करना चाहते हैं?' : '1. Which document do you want to generate?'}
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-              <div 
+              <div
                 onClick={() => setDocumentType('FIR Application')}
                 style={{
                   border: documentType === 'FIR Application' ? '2px solid var(--primary)' : '1px solid #e2e8f0',
@@ -355,13 +453,13 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                   </strong>
                 </div>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: 0, lineHeight: '1.4' }}>
-                  {isHindi 
-                    ? 'थाना प्रभारी (SHO) को धारा 173 BNSS के तहत संज्ञेय अपराधों की जांच व कार्रवाई हेतु आवेदन पत्र।' 
+                  {isHindi
+                    ? 'थाना प्रभारी (SHO) को धारा 173 BNSS के तहत संज्ञेय अपराधों की जांच व कार्रवाई हेतु आवेदन पत्र।'
                     : 'Formal application to Jurisdictional SHO under Section 173 BNSS for cognizable offenses, investigation & arrest.'}
                 </p>
               </div>
 
-              <div 
+              <div
                 onClick={() => setDocumentType('Legal Demand Notice')}
                 style={{
                   border: documentType === 'Legal Demand Notice' ? '2px solid var(--primary)' : '1px solid #e2e8f0',
@@ -379,8 +477,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                   </strong>
                 </div>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: 0, lineHeight: '1.4' }}>
-                  {isHindi 
-                    ? 'दूसरी पार्टी को 15 दिन की वैधानिक मोहलत, क्षतिपूर्ति या चेक बाउंस/अनुबंध उल्लंघन की औपचारिक चेतावनी।' 
+                  {isHindi
+                    ? 'दूसरी पार्टी को 15 दिन की वैधानिक मोहलत, क्षतिपूर्ति या चेक बाउंस/अनुबंध उल्लंघन की औपचारिक चेतावनी।'
                     : 'Formal legal warning giving 15-day cure period before initiating civil suit or criminal prosecution.'}
                 </p>
               </div>
@@ -416,10 +514,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <button 
-              type="button" 
-              className="btn-primary" 
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: '20px' }}>
+            <button
+              type="button"
+              className="btn-primary"
               onClick={() => setStep(2)}
               style={{ padding: '10px 22px' }}
             >
@@ -431,7 +529,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {/* STEP 2: PARTIES DETAILS */}
       {step === 2 && (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
           {/* Complainant Section */}
           <div style={{ background: 'white', borderRadius: '12px', padding: '18px', border: '1px solid #e2e8f0' }}>
             <h4 style={{ margin: '0 0 14px', fontSize: '15px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -443,10 +541,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                   {isHindi ? 'आवेदक का पूरा नाम *' : 'Full Name *'}
                 </label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={complainant.name} 
+                <input
+                  type="text"
+                  className="input-field"
+                  value={complainant.name}
                   onChange={e => setComplainant({ ...complainant, name: e.target.value })}
                   placeholder={isHindi ? 'उदा. राजेश शर्मा' : 'e.g. Rajesh Sharma'}
                   style={{ height: '40px', fontSize: '13.5px' }}
@@ -457,10 +555,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                   {isHindi ? 'पिता / पति का नाम' : 'Father / Spouse Name'}
                 </label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={complainant.father_name} 
+                <input
+                  type="text"
+                  className="input-field"
+                  value={complainant.father_name}
                   onChange={e => setComplainant({ ...complainant, father_name: e.target.value })}
                   placeholder={isHindi ? 'उदा. श्री मोहन शर्मा' : 'e.g. Shri Mohan Sharma'}
                   style={{ height: '40px', fontSize: '13.5px' }}
@@ -471,10 +569,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                   {isHindi ? 'मोबाइल नंबर *' : 'Contact Mobile No. *'}
                 </label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={complainant.phone} 
+                <input
+                  type="text"
+                  className="input-field"
+                  value={complainant.phone}
                   onChange={e => setComplainant({ ...complainant, phone: e.target.value })}
                   placeholder="98XXXXXXXX"
                   style={{ height: '40px', fontSize: '13.5px' }}
@@ -485,10 +583,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                   {isHindi ? 'संबंधित पुलिस थाना / शहर *' : 'Jurisdictional Police Station / City *'}
                 </label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={complainant.police_station} 
+                <input
+                  type="text"
+                  className="input-field"
+                  value={complainant.police_station}
                   onChange={e => setComplainant({ ...complainant, police_station: e.target.value })}
                   placeholder={isHindi ? 'उदा. थाना कोतवाली, जयपुर' : 'e.g. PS Cyber Crime / Connaught Place'}
                   style={{ height: '40px', fontSize: '13.5px' }}
@@ -499,10 +597,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                   {isHindi ? 'आवेदक का पूरा स्थायी/वर्तमान पता *' : 'Full Residential Address *'}
                 </label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  value={complainant.address} 
+                <input
+                  type="text"
+                  className="input-field"
+                  value={complainant.address}
                   onChange={e => setComplainant({ ...complainant, address: e.target.value })}
                   placeholder={isHindi ? 'मकान नंबर, गली, इलाका, शहर, पिन कोड' : 'House No, Street, Landmark, City, PIN Code'}
                   style={{ height: '40px', fontSize: '13.5px' }}
@@ -520,9 +618,9 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
               </h4>
 
               <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', color: '#475569' }}>
-                <input 
-                  type="checkbox" 
-                  checked={isAccusedUnknown} 
+                <input
+                  type="checkbox"
+                  checked={isAccusedUnknown}
                   onChange={e => setIsAccusedUnknown(e.target.checked)}
                   style={{ width: '16px', height: '16px' }}
                 />
@@ -536,10 +634,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                   <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                     {isHindi ? 'आरोपी का नाम या संस्था *' : 'Accused Name / Organization *'}
                   </label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    value={accused.name} 
+                  <input
+                    type="text"
+                    className="input-field"
+                    value={accused.name}
                     onChange={e => setAccused({ ...accused, name: e.target.value })}
                     placeholder={isHindi ? 'उदा. सुमित सक्सेना / एक्सवाईजेड फाइनेंस' : 'e.g. Sumit Saxena / XYZ Finance'}
                     style={{ height: '40px', fontSize: '13.5px' }}
@@ -550,10 +648,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                   <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
                     {isHindi ? 'आरोपी का पता / मोबाइल / डिजिटल हैंडल' : 'Address / Mobile / Handle'}
                   </label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    value={accused.address} 
+                  <input
+                    type="text"
+                    className="input-field"
+                    value={accused.address}
                     onChange={e => setAccused({ ...accused, address: e.target.value })}
                     placeholder={isHindi ? 'पता, फोन नंबर, या डिजिटल खाता' : 'Known residence, phone, or Telegram/bank ID'}
                     style={{ height: '40px', fontSize: '13.5px' }}
@@ -562,25 +660,25 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
               </div>
             ) : (
               <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '13px', color: '#64748b' }}>
-                {isHindi 
+                {isHindi
                   ? 'आरोपी को "अज्ञात व्यक्ति (Unknown Culprit)" के रूप में चिह्नित किया गया है। पुलिस धारा 173 BNSS के तहत तकनीकी विश्लेषण, बैंक UTR व कॉल रिकॉर्ड के आधार पर आरोपी की शिनाख्त करेगी।'
                   : 'Accused will be formally addressed as "Unknown Person(s)". Investigating officers will trace the culprits using cyber/banking audit trails under Section 173 BNSS.'}
               </div>
             )}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-            <button 
-              type="button" 
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '20px' }}>
+            <button
+              type="button"
               onClick={() => setStep(1)}
               style={{ background: 'none', border: '1px solid #cbd5e1', padding: '9px 18px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <ArrowLeft size={16} /> {isHindi ? 'पीछे जाएं' : 'Back'}
             </button>
 
-            <button 
-              type="button" 
-              className="btn-primary" 
+            <button
+              type="button"
+              className="btn-primary"
               onClick={() => setStep(3)}
               disabled={!complainant.name || !complainant.phone}
               style={{ opacity: (!complainant.name || !complainant.phone) ? 0.6 : 1 }}
@@ -593,17 +691,17 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {/* STEP 3: INCIDENT DETAILS & EVIDENCE */}
       {step === 3 && (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
             <div>
               <label style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Calendar size={15} color="var(--primary)" />
                 {isHindi ? 'घटना का दिनांक व समय *' : 'Date & Time of Occurrence *'}
               </label>
-              <input 
-                type="text" 
-                className="input-field" 
-                value={incidentDatetime} 
+              <input
+                type="text"
+                className="input-field"
+                value={incidentDatetime}
                 onChange={e => setIncidentDatetime(e.target.value)}
                 placeholder={isHindi ? 'उदा. 21-09-2026, दोपहर 02:30 बजे' : 'e.g. 21-09-2026, 02:30 PM'}
                 style={{ height: '42px', fontSize: '13.5px' }}
@@ -615,10 +713,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 <MapPin size={15} color="var(--primary)" />
                 {isHindi ? 'घटना का स्थान *' : 'Exact Place of Occurrence *'}
               </label>
-              <input 
-                type="text" 
-                className="input-field" 
-                value={incidentLocation} 
+              <input
+                type="text"
+                className="input-field"
+                value={incidentLocation}
                 onChange={e => setIncidentLocation(e.target.value)}
                 placeholder={isHindi ? 'उदा. रिंग रोड चौराहा / ऑनलाइन इंटरनेट बैंकिंग' : 'e.g. Sector 18 Market / Online Banking'}
                 style={{ height: '42px', fontSize: '13.5px' }}
@@ -627,16 +725,48 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           </div>
 
           <div>
-            <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '6px', display: 'block' }}>
-              {isHindi ? 'घटना का संपूर्ण विवरण (Facts of the Case) *' : 'Detailed Statement of Facts *'}
-            </label>
-            <textarea 
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>
+                {isHindi ? 'घटना का संपूर्ण विवरण (Facts of the Case) *' : 'Detailed Statement of Facts *'}
+              </label>
+              <button
+                type="button"
+                onClick={handleToggleVoiceInput}
+                className={isListening ? 'mic-recording-pulse' : 'btn-ghost'}
+                style={{
+                  background: isListening ? '#fee2e2' : 'rgba(59, 130, 246, 0.08)',
+                  color: isListening ? '#dc2626' : 'var(--primary)',
+                  border: isListening ? '1px solid #fca5a5' : '1px solid rgba(59, 130, 246, 0.2)',
+                  padding: '4px 10px',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  animation: isListening ? 'none' : undefined
+                }}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff size={14} />
+                    {isHindi ? 'बोलना बंद करें' : 'Stop Listening'}
+                  </>
+                ) : (
+                  <>
+                    <Mic size={14} />
+                    {isHindi ? 'बोलकर टाइप करें' : 'Voice Type'}
+                  </>
+                )}
+              </button>
+            </div>
+            <textarea
               rows={5}
               className="input-field"
               value={facts}
               onChange={e => setFacts(e.target.value)}
-              placeholder={isHindi 
-                ? 'क्रमबद्ध रूप से लिखें कि क्या हुआ, आरोपी ने क्या कहा या किया, क्या नुकसान हुआ, आदि...' 
+              placeholder={isHindi
+                ? 'क्रमबद्ध रूप से लिखें कि क्या हुआ, आरोपी ने क्या कहा या किया, क्या नुकसान हुआ, आदि...'
                 : 'State what happened in chronological order: what the accused did, transaction details, loss or injury caused...'}
               style={{ fontSize: '13.5px', lineHeight: '1.5', resize: 'vertical' }}
             />
@@ -687,10 +817,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             </div>
 
             <div style={{ marginTop: '10px' }}>
-              <input 
-                type="text" 
-                className="input-field" 
-                value={customEvidence} 
+              <input
+                type="text"
+                className="input-field"
+                value={customEvidence}
                 onChange={e => setCustomEvidence(e.target.value)}
                 placeholder={isHindi ? 'अन्य कोई दस्तावेज या शिकायत संख्या (उदा. 1930 साइबर कंप्लेंट पावती)' : 'Other additional documents or complaint references (optional)'}
                 style={{ height: '38px', fontSize: '13px' }}
@@ -703,30 +833,30 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '6px', display: 'block' }}>
               {isHindi ? 'मांगी गई राहत / कानूनी प्रार्थना (Relief / Prayer)' : 'Relief / Demands Sought'}
             </label>
-            <input 
-              type="text" 
-              className="input-field" 
-              value={reliefSought} 
+            <input
+              type="text"
+              className="input-field"
+              value={reliefSought}
               onChange={e => setReliefSought(e.target.value)}
-              placeholder={isHindi 
-                ? 'उदा. धारा 173 BNSS के तहत तुरंत FIR दर्ज कर अभियुक्तों की गिरफ्तारी व वसूली की जाए।' 
+              placeholder={isHindi
+                ? 'उदा. धारा 173 BNSS के तहत तुरंत FIR दर्ज कर अभियुक्तों की गिरफ्तारी व वसूली की जाए।'
                 : 'e.g. Immediate registration of FIR, freezing of beneficiary accounts, and recovery of damages.'}
               style={{ height: '42px', fontSize: '13.5px' }}
             />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setStep(2)}
               style={{ background: 'none', border: '1px solid #cbd5e1', padding: '9px 18px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <ArrowLeft size={16} /> {isHindi ? 'पीछे जाएं' : 'Back'}
             </button>
 
-            <button 
-              type="button" 
-              className="btn-primary" 
+            <button
+              type="button"
+              className="btn-primary"
               onClick={() => setStep(4)}
               disabled={!facts.trim() || !incidentLocation.trim()}
               style={{ opacity: (!facts.trim() || !incidentLocation.trim()) ? 0.6 : 1 }}
@@ -739,7 +869,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {/* STEP 4: REVIEW & GENERATE */}
       {step === 4 && (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
           <div style={{ background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '20px' }}>
             <h3 style={{ margin: '0 0 14px', fontSize: '17px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckCircle2 size={20} color="var(--primary)" />
@@ -790,9 +920,9 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button 
-              type="button" 
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '20px' }}>
+            <button
+              type="button"
               onClick={() => setStep(3)}
               disabled={isGenerating}
               style={{ background: 'none', border: '1px solid #cbd5e1', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -800,9 +930,9 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
               <ArrowLeft size={16} /> {isHindi ? 'बदलाव करें' : 'Edit Details'}
             </button>
 
-            <button 
-              type="button" 
-              className="btn-primary" 
+            <button
+              type="button"
+              className="btn-primary"
               onClick={handleGenerateDraft}
               disabled={isGenerating}
               style={{ padding: '12px 28px', fontSize: '15px', fontWeight: '600' }}
@@ -891,7 +1021,51 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 title={isHindi ? 'Word (.doc) प्रारूप डाउनलोड करें' : 'Download Word (.doc) format'}
               >
                 <Download size={16} />
-                {isHindi ? 'Word (.doc) डाउनलोड' : 'Download Word (.doc)'}
+                {isHindi ? 'Word (.doc)' : 'Word (.doc)'}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                style={{
+                  background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 14px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title={isHindi ? 'PDF प्रारूप डाउनलोड करें' : 'Download PDF format'}
+              >
+                <Download size={16} />
+                {isHindi ? 'PDF डाउनलोड' : 'Download PDF'}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveToVault}
+                style={{
+                  background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 14px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title={isHindi ? 'वॉल्ट में सुरक्षित करें' : 'Save to Vault'}
+              >
+                <ShieldCheck size={16} />
+                {isHindi ? 'वॉल्ट में सहेजें' : 'Save to Vault'}
               </button>
 
               <button
@@ -915,7 +1089,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           </div>
 
           {/* Printable Official Paper Container */}
-          <div 
+          <div
             id="printable-legal-document"
             className="official-legal-document"
             style={{
@@ -938,7 +1112,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
                 {isHindi ? 'सत्यमेव जयते' : 'FORMAL LEGAL INSTRUMENT • BHARAT (INDIA)'}
               </div>
               <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: '6px 0 2px', textTransform: 'uppercase', letterSpacing: '1px', color: '#0f172a' }}>
-                {documentType === 'Legal Demand Notice' 
+                {documentType === 'Legal Demand Notice'
                   ? (isHindi ? 'विधिक मांग नोटिस' : 'STATUTORY LEGAL DEMAND NOTICE')
                   : (isHindi ? 'प्रथम सूचना रिपोर्ट (FIR) हेतु औपचारिक शिकायत' : 'FORMAL POLICE COMPLAINT (UNDER SECTION 173 BNSS, 2023)')}
               </h1>
@@ -954,10 +1128,20 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
             {/* Footer statutory assurance */}
             <div style={{ marginTop: '36px', paddingTop: '16px', borderTop: '1px dashed #94a3b8', fontSize: '11px', color: '#64748b', textAlign: 'center', fontFamily: 'sans-serif' }}>
-              {isHindi 
+              {isHindi
                 ? 'यह विधिक प्रारूप भारतीय संसद द्वारा पारित भारतीय न्याय संहिता (BNS 2023) एवं भारतीय नागरिक सुरक्षा संहिता (BNSS 2023) के प्रावधानों के अनुरूप तैयार किया गया है।'
                 : 'This statutory document is drafted in strict adherence to Bharatiya Nagarik Suraksha Sanhita (BNSS 2023) and Bharatiya Nyaya Sanhita (BNS 2023).'}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {copied && (
+        <div className="toast-container">
+          <div className="toast-message">
+            <CheckCircle2 size={18} color="#4ade80" />
+            {isHindi ? 'ड्राफ्ट क्लिपबोर्ड पर कॉपी किया गया!' : 'Draft copied to clipboard!'}
           </div>
         </div>
       )}

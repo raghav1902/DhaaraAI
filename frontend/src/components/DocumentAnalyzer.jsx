@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { 
-  FileSearch, 
-  AlertTriangle, 
-  CheckCircle2, 
-  ShieldAlert, 
-  Copy, 
-  Check, 
-  Sparkles, 
-  FileText, 
-  Scale, 
-  Lightbulb, 
+import {
+  FileSearch,
+  AlertTriangle,
+  CheckCircle2,
+  ShieldAlert,
+  Copy,
+  Check,
+  Sparkles,
+  FileText,
+  Scale,
+  Lightbulb,
   Info,
   RefreshCw
 } from 'lucide-react';
@@ -91,8 +91,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       setAnalysis(res.data);
     } catch (err) {
       console.error('Contract audit error:', err);
-      setError(isHindi 
-        ? '[500 Internal Server Error] दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।' 
+      setError(isHindi
+        ? '[500 Internal Server Error] दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।'
         : '[500 Internal Server Error] Failed to analyze document. Ensure backend server is running.');
     } finally {
       setLoading(false);
@@ -116,7 +116,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header Banner */}
-      <div className="glass-panel" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid var(--primary)' }}>
+      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid var(--primary)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
@@ -127,7 +127,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 {isHindi ? 'AI विधिक दस्तावेज व अनुबंध समीक्षक (Contract Audit)' : 'AI Legal Document & Contract Risk Analyzer'}
               </h2>
               <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
-                {isHindi 
+                {isHindi
                   ? 'भारतीय अनुबंध कानून (Indian Contract Act 1872), मॉडल टेनेंसी एक्ट व उपभोक्ता संरक्षण कानूनों के तहत एकतरफा व गैर-कानूनी शर्तों की जांच करें।'
                   : 'Screen rental deeds, employment bonds, and freelance agreements for unfair clauses, unlawful forfeiture, and Indian statutory compliance.'}
               </p>
@@ -140,48 +140,48 @@ export default function DocumentAnalyzer({ language = 'English' }) {
           <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>
             {isHindi ? 'नमूना अनुबंध लोड करें:' : 'Load Sample Contract:'}
           </span>
-          <button 
+          <button
             type="button"
             onClick={() => loadSample('rent')}
-            style={{ 
-              background: 'rgba(59, 130, 246, 0.08)', 
-              border: '1px solid rgba(59, 130, 246, 0.25)', 
-              color: 'var(--primary)', 
-              borderRadius: '20px', 
-              padding: '5px 12px', 
-              fontSize: '12.5px', 
+            style={{
+              background: 'rgba(59, 130, 246, 0.08)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              color: 'var(--primary)',
+              borderRadius: '20px',
+              padding: '5px 12px',
+              fontSize: '12.5px',
               cursor: 'pointer',
               fontWeight: '500'
             }}
           >
             {isHindi ? 'आवासीय किराया अनुबंध' : 'Rental Agreement'}
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => loadSample('employment')}
-            style={{ 
-              background: 'rgba(234, 88, 12, 0.08)', 
-              border: '1px solid rgba(234, 88, 12, 0.25)', 
-              color: '#ea580c', 
-              borderRadius: '20px', 
-              padding: '5px 12px', 
-              fontSize: '12.5px', 
+            style={{
+              background: 'rgba(234, 88, 12, 0.08)',
+              border: '1px solid rgba(234, 88, 12, 0.25)',
+              color: '#ea580c',
+              borderRadius: '20px',
+              padding: '5px 12px',
+              fontSize: '12.5px',
               cursor: 'pointer',
               fontWeight: '500'
             }}
           >
             {isHindi ? 'जॉब व सर्विस बॉन्ड' : 'Employment Bond'}
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => loadSample('freelance')}
-            style={{ 
-              background: 'rgba(16, 185, 129, 0.08)', 
-              border: '1px solid rgba(16, 185, 129, 0.25)', 
-              color: '#059669', 
-              borderRadius: '20px', 
-              padding: '5px 12px', 
-              fontSize: '12.5px', 
+            style={{
+              background: 'rgba(16, 185, 129, 0.08)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              color: '#059669',
+              borderRadius: '20px',
+              padding: '5px 12px',
+              fontSize: '12.5px',
               cursor: 'pointer',
               fontWeight: '500'
             }}
@@ -235,8 +235,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             rows={8}
             value={documentText}
             onChange={(e) => setDocumentText(e.target.value)}
-            placeholder={isHindi 
-              ? "यहाँ अनुबंध की शर्तें, एग्रीमेंट का टेक्स्ट अथवा विवादित क्लाउज पेस्ट करें..." 
+            placeholder={isHindi
+              ? "यहाँ अनुबंध की शर्तें, एग्रीमेंट का टेक्स्ट अथवा विवादित क्लाउज पेस्ट करें..."
               : "Paste the contract clauses, rent agreement, or employment contract text here to inspect..."}
             style={{
               width: '100%',
@@ -326,12 +326,12 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                   {(() => {
                     const badge = getRiskBadgeColor(analysis.risk_score);
                     return (
-                      <span style={{ 
-                        background: badge.bg, 
-                        color: badge.text, 
+                      <span style={{
+                        background: badge.bg,
+                        color: badge.text,
                         border: `1px solid ${badge.border}`,
-                        padding: '6px 14px', 
-                        borderRadius: '20px', 
+                        padding: '6px 14px',
+                        borderRadius: '20px',
                         fontWeight: '700',
                         fontSize: '15px'
                       }}>
@@ -373,12 +373,12 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             {analysis.red_flags && analysis.red_flags.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {analysis.red_flags.map((flag, idx) => (
-                  <div 
-                    key={idx} 
-                    style={{ 
-                      border: '1px solid #fee2e2', 
-                      background: '#fff', 
-                      borderRadius: '12px', 
+                  <div
+                    key={idx}
+                    style={{
+                      border: '1px solid #fee2e2',
+                      background: '#fff',
+                      borderRadius: '12px',
                       padding: '16px',
                       boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                     }}
@@ -387,11 +387,11 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                       <span style={{ fontWeight: '700', fontSize: '14.5px', color: '#991b1b' }}>
                         Clause #{idx + 1}: {flag.clause}
                       </span>
-                      <span style={{ 
-                        fontSize: '11px', 
-                        fontWeight: '700', 
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: '700',
                         textTransform: 'uppercase',
-                        padding: '3px 8px', 
+                        padding: '3px 8px',
                         borderRadius: '12px',
                         background: flag.severity === 'High' ? '#fee2e2' : '#fef9c3',
                         color: flag.severity === 'High' ? '#991b1b' : '#854d0e'
@@ -433,15 +433,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                               fontWeight: '600'
                             }}
                           >
-                            {copiedIndex === idx ? (
-                              <>
-                                <Check size={12} /> {isHindi ? 'कॉपी हो गया' : 'Copied'}
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} /> {isHindi ? 'कॉपी करें' : 'Copy'}
-                              </>
-                            )}
+                            <Copy size={12} /> {isHindi ? 'कॉपी करें' : 'Copy'}
                           </button>
                         </div>
                         <p style={{ margin: 0, fontSize: '12.5px', color: '#14532d', fontFamily: 'monospace', lineHeight: '1.5' }}>
@@ -490,6 +482,16 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 )) || <li>{isHindi ? 'वकील से परामर्श अवश्य लें।' : 'Verify terms with an advocate.'}</li>}
               </ul>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {copiedIndex !== null && (
+        <div className="toast-container">
+          <div className="toast-message">
+            <CheckCircle2 size={18} color="#4ade80" />
+            {isHindi ? 'शर्त क्लिपबोर्ड पर कॉपी की गई!' : 'Clause copied to clipboard!'}
           </div>
         </div>
       )}
