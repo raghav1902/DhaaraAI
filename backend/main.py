@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import io
 
 # Ensure the correct path for imports
 ROOT_DIR = Path(__file__).parent
@@ -115,6 +116,57 @@ def analyze_contract(req: ContractAnalysisRequest):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/upload-document")
+async def upload_document(file: UploadFile = File(...)):
+    """
+    Accepts PDF or text files, extracts content and returns parsed text for contract risk audit.
+    """
+    filename = file.filename.lower() if file.filename else "unknown"
+    contents = await file.read()
+    
+    if not contents:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    extracted_text = ""
+
+    if filename.endswith(".pdf"):
+        try:
+            import pypdf
+            pdf_reader = pypdf.PdfReader(io.BytesIO(contents))
+            pages_text = []
+            for page in pdf_reader.pages:
+                txt = page.extract_text()
+                if txt:
+                    pages_text.append(txt)
+            extracted_text = "\n\n".join(pages_text).strip()
+            if not extracted_text:
+                raise HTTPException(
+                    status_code=422, 
+                    detail="No readable text found in PDF. It might be scanned/image-based."
+                )
+        except Exception as e:
+            if isinstance(e, HTTPException):
+                raise e
+            raise HTTPException(status_code=422, detail=f"Failed to parse PDF document: {str(e)}")
+    elif filename.endswith(".txt") or filename.endswith(".md"):
+        try:
+            extracted_text = contents.decode("utf-8")
+        except UnicodeDecodeError:
+            extracted_text = contents.decode("latin-1", errors="replace")
+    else:
+        # Fallback to UTF-8 decoding for other text/doc files
+        try:
+            extracted_text = contents.decode("utf-8")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Unsupported file format. Please upload a .pdf, .txt, or .md file.")
+
+    return {
+        "filename": file.filename,
+        "text": extracted_text,
+        "size_bytes": len(contents),
+        "word_count": len(extracted_text.split())
+    }
 
 from typing import Optional, List, Dict, Any
 from src.concordance_data import CONCORDANCE_DB

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import {
   FileSearch,
@@ -12,7 +12,10 @@ import {
   Scale,
   Lightbulb,
   Info,
-  RefreshCw
+  RefreshCw,
+  Upload,
+  FileCheck,
+  Loader2
 } from 'lucide-react';
 import { SAMPLE_CONTRACTS } from '../data/contractAnalyzerData';
 import AnalysisResultsView from './DocumentAnalyzer/AnalysisResultsView';
@@ -22,19 +25,54 @@ export default function DocumentAnalyzer({ language = 'English' }) {
   const [documentType, setDocumentType] = useState('Rental / Lease Agreement');
   const [documentText, setDocumentText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const fileInputRef = useRef(null);
 
   const loadSample = (key) => {
     const sample = SAMPLE_CONTRACTS[key];
     if (sample) {
       setDocumentText(sample.text);
+      setUploadedFileName(null);
       if (key === 'rent') setDocumentType('Rental / Lease Agreement');
       else if (key === 'employment') setDocumentType('Employment Contract / Bond');
       else setDocumentType('Freelance / Service Agreement');
       setAnalysis(null);
       setError(null);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setError(null);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await axios.post('http://localhost:8000/api/upload-document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data && res.data.text) {
+        setDocumentText(res.data.text);
+        setUploadedFileName(res.data.filename);
+        setAnalysis(null);
+      } else {
+        setError(isHindi ? 'दस्तावेज से टेक्स्ट नहीं निकाला जा सका।' : 'Could not extract text from document.');
+      }
+    } catch (err) {
+      console.error('File upload error:', err);
+      const detail = err.response?.data?.detail;
+      setError(detail || (isHindi ? 'दस्तावेज अपलोड करने में त्रुटि आई।' : 'Failed to upload and extract document.'));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -185,10 +223,85 @@ export default function DocumentAnalyzer({ language = 'English' }) {
           </div>
         </div>
 
+        {/* Document Upload Area */}
+        <div style={{
+          border: '2px dashed #cbd5e1',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          background: '#f8fafc',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          transition: 'all 0.2s ease'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: '#eff6ff', padding: '10px', borderRadius: '10px', color: 'var(--primary)', display: 'flex' }}>
+              <Upload size={20} />
+            </div>
+            <div>
+              <div style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--text-main)' }}>
+                {isHindi ? 'PDF या टेक्स्ट दस्तावेज अपलोड करें' : 'Upload Contract / Legal PDF'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                {isHindi ? 'समर्थित प्रारूप: .pdf, .txt (स्वचालित टेक्स्ट निष्कर्षण)' : 'Supported formats: .pdf, .txt (auto text extraction)'}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".pdf,.txt,.md"
+              style={{ display: 'none' }}
+              id="contract-file-upload"
+            />
+            <label
+              htmlFor="contract-file-upload"
+              style={{
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                padding: '7px 16px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: 'var(--primary)',
+                cursor: uploading ? 'wait' : 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+              }}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 size={15} className="spin" />
+                  {isHindi ? 'दस्तावेज पढ़ा जा रहा है...' : 'Extracting Text...'}
+                </>
+              ) : (
+                <>
+                  <Upload size={15} />
+                  {isHindi ? 'फाइल चुनें (.pdf / .txt)' : 'Browse File'}
+                </>
+              )}
+            </label>
+          </div>
+        </div>
+
+        {uploadedFileName && (
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 14px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: '#166534', fontSize: '12.5px' }}>
+            <FileCheck size={16} />
+            <span><strong>{uploadedFileName}</strong> {isHindi ? 'सफलतापूर्वक लोड किया गया!' : 'successfully loaded!'}</span>
+          </div>
+        )}
+
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>
-              {isHindi ? 'अनुबंध का पाठ (Text) पेस्ट करें' : 'Paste Contract Clauses or Agreement Text'}
+              {isHindi ? 'अनुबंध का पाठ (Text) अथवा निष्कर्षित सामग्री' : 'Contract Clauses or Extracted Text'}
             </label>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
               {documentText.length} {isHindi ? 'अक्षर' : 'characters'}

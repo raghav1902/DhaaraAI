@@ -85,5 +85,57 @@ class TestRAGOfflineFallback(unittest.TestCase):
         self.assertIn("Statutory", resp)
         self.assertIn("138", resp)
 
+class TestFastAPIEndpoints(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from fastapi.testclient import TestClient
+        from main import app
+        cls.client = TestClient(app)
+
+    def test_health_check_endpoint(self):
+        resp = self.client.get("/api/health")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("status"), "ok")
+
+    def test_converter_endpoint(self):
+        resp = self.client.get("/api/converter?query=theft")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("mappings", data)
+        self.assertGreater(data.get("total", 0), 0)
+
+    def test_library_endpoint(self):
+        resp = self.client.get("/api/library")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("items", data)
+        self.assertIn("categories", data)
+
+    def test_upload_text_document(self):
+        import io
+        file_content = b"This agreement is made between Tenant and Landlord for apartment rent."
+        file_obj = io.BytesIO(file_content)
+        resp = self.client.post(
+            "/api/upload-document",
+            files={"file": ("test_lease.txt", file_obj, "text/plain")}
+        )
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("filename"), "test_lease.txt")
+        self.assertIn("Tenant and Landlord", data.get("text", ""))
+
+    def test_contract_analyzer_endpoint(self):
+        payload = {
+            "document_text": "The company may withhold salary without explanation for 6 months.",
+            "document_type": "Employment Contract / Bond",
+            "language": "English"
+        }
+        resp = self.client.post("/api/analyze-contract", json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("risk_score", data)
+        self.assertIn("red_flags", data)
+
 if __name__ == "__main__":
     unittest.main()
