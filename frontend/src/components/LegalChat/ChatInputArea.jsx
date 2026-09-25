@@ -38,18 +38,18 @@ export default function ChatInputArea({
       )}
 
       {/* Input Area */}
-      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.6)', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
-        <form onSubmit={handleSend} style={{ display: 'flex', gap: '10px', position: 'relative' }}>
+      <div style={{ padding: '12px 14px', borderTop: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.7)', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+        <form onSubmit={handleSend} style={{ display: 'flex', gap: '8px', position: 'relative', alignItems: 'center' }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={isHindi
-              ? "सवाल लिखें या माइक दबाकर बोलें (उदा. ऑनलाइन ठगी हो गई, पैसे कैसे रुकवाएं?)"
-              : "Type or click mic to speak (e.g. Bike accident happened, what are the steps?)"}
+              ? "सवाल लिखें या माइक दबाएं..."
+              : "Type question or tap mic..."}
             className="input-field"
             disabled={isLoading}
-            style={{ paddingRight: '98px', height: '48px', fontSize: '14.5px' }}
+            style={{ paddingRight: '88px', height: '46px', fontSize: '14px', width: '100%' }}
           />
 
           {/* Voice Input Microphone Button */}
@@ -59,9 +59,9 @@ export default function ChatInputArea({
             disabled={isLoading}
             style={{
               position: 'absolute',
-              right: '54px',
-              top: '6px',
-              bottom: '6px',
+              right: '48px',
+              top: '5px',
+              bottom: '5px',
               width: '36px',
               border: 'none',
               borderRadius: '8px',
@@ -86,11 +86,14 @@ export default function ChatInputArea({
             disabled={isLoading || !input.trim()}
             style={{
               position: 'absolute',
-              right: '6px',
-              top: '6px',
-              bottom: '6px',
-              padding: '0 14px',
-              opacity: (isLoading || !input.trim()) ? 0.6 : 1,
+              right: '5px',
+              top: '5px',
+              bottom: '5px',
+              width: '38px',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               borderRadius: '8px'
             }}
           >

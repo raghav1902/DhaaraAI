@@ -73,10 +73,15 @@ export default function AuthPage({ onLogin, onBack }) {
     <div style={{
       minHeight: '100vh',
       display: 'flex',
+      flexDirection: 'column',
       backgroundColor: '#eef2f6',
       backgroundImage: `linear-gradient(rgba(200, 210, 220, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 210, 220, 0.3) 1px, transparent 1px)`,
       backgroundSize: '60px 60px',
-      fontFamily: 'Inter, sans-serif'
+      fontFamily: 'Inter, sans-serif',
+      overflowX: 'hidden',
+      width: '100%',
+      maxWidth: '100vw',
+      boxSizing: 'border-box'
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -92,17 +97,23 @@ export default function AuthPage({ onLogin, onBack }) {
           margin: 0 auto;
           align-items: center;
           padding: 2rem;
+          box-sizing: border-box;
         }
         
         .auth-left {
           flex: 1;
           padding-right: 4rem;
+          box-sizing: border-box;
+          min-width: 0;
         }
 
         .auth-right {
           flex: 1;
           display: flex;
           justify-content: center;
+          box-sizing: border-box;
+          min-width: 0;
+          width: 100%;
         }
         
         .auth-card {
@@ -112,6 +123,7 @@ export default function AuthPage({ onLogin, onBack }) {
           box-shadow: 0 4px 20px rgba(0,0,0,0.05);
           width: 100%;
           max-width: 440px;
+          box-sizing: border-box;
         }
 
         input {
@@ -122,6 +134,8 @@ export default function AuthPage({ onLogin, onBack }) {
           font-size: 0.95rem;
           outline: none;
           transition: border-color 0.2s;
+          box-sizing: border-box;
+          min-width: 0;
         }
         input:focus {
           border-color: #3b82f6;
@@ -131,47 +145,79 @@ export default function AuthPage({ onLogin, onBack }) {
           display: flex;
           gap: 1rem;
           margin-bottom: 1rem;
+          width: 100%;
+        }
+
+        .row input {
+          flex: 1;
+          min-width: 0;
         }
 
         @media (max-width: 900px) {
           .auth-container {
-            flex-direction: column;
-            justify-content: center;
+            flex-direction: column !important;
+            justify-content: center !important;
+            padding: 1rem !important;
+            width: 100% !important;
+            max-width: 100% !important;
           }
           .auth-left {
-            padding-right: 0;
-            margin-bottom: 3rem;
-            text-align: center;
+            padding-right: 0 !important;
+            margin-bottom: 2rem !important;
+            text-align: center !important;
+            width: 100% !important;
+          }
+          .auth-right {
+            width: 100% !important;
+          }
+          .auth-card {
+            padding: 1.75rem 1.25rem !important;
+            border-radius: 18px !important;
+            width: 100% !important;
+            max-width: 100% !important;
           }
           .trust-section {
-            justify-content: center;
+            justify-content: center !important;
+          }
+          .auth-back-btn {
+            position: static !important;
+            margin: 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .row {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
           }
         }
       `}</style>
       
-            <button onClick={onBack} style={{
-        position: 'absolute', top: '2rem', left: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', 
-        background: 'white', border: '1px solid #e2e8f0', color: '#0f172a', padding: '0.5rem 1rem', 
-        borderRadius: '999px', cursor: 'pointer', fontWeight: '500', fontSize: '0.9rem', zIndex: 10
-      }}>
-        <ArrowLeft size={16} /> Back to Home
-      </button>
+      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 0', boxSizing: 'border-box' }}>
+        <button onClick={onBack} className="auth-back-btn" style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.5rem', 
+          background: 'white', border: '1px solid #e2e8f0', color: '#0f172a', padding: '0.45rem 0.9rem', 
+          borderRadius: '999px', cursor: 'pointer', fontWeight: '500', fontSize: '0.85rem'
+        }}>
+          <ArrowLeft size={15} /> Back to Home
+        </button>
+      </div>
 
       <div className="auth-container">
         {/* Left Side */}
         <div className="auth-left">
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: 'bold', color: '#0f172a' }}>
-            <div style={{ background: '#2563eb', padding: '12px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Scale size={28} color="white" />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem', fontSize: '1.6rem', fontWeight: 'bold', color: '#0f172a' }}>
+            <div style={{ background: '#2563eb', padding: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Scale size={24} color="white" />
             </div>
             DhaaraAI
           </div>
           
-          <h1 style={{ fontSize: '3.5rem', fontWeight: '700', color: '#0f172a', lineHeight: '1.1', marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 5vw, 3.25rem)', fontWeight: '700', color: '#0f172a', lineHeight: '1.15', marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>
             The #1 <span style={{ color: '#2563eb' }}>AI legal assistant</span> for everyday legal issues
           </h1>
           
-          <p style={{ fontSize: '1.25rem', color: '#64748b', lineHeight: '1.6', marginBottom: '3rem', maxWidth: '480px' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.2rem)', color: '#64748b', lineHeight: '1.6', marginBottom: '2rem', maxWidth: '480px' }}>
             Join thousands of lawyers and legal professionals using AI to streamline research, review documents, and resolve legal questions in seconds.
           </p>
           

@@ -28,7 +28,8 @@ import {
   X,
   Settings as SettingsIcon,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Smartphone
 } from 'lucide-react';
 
 function App() {
@@ -56,9 +57,50 @@ function App() {
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('light');
   const [injectedQuery, setInjectedQuery] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > 868;
+    }
+    return true;
+  });
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 868) {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isHindi = language === 'Hindi' || language === 'हिंदी';
+
+  React.useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    }
+  };
 
   React.useEffect(() => {
     if (theme === 'dark') {
@@ -107,9 +149,18 @@ function App() {
   }
 
   return (
-    <div className="app-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)', transition: 'all 0.3s ease' }}>
+    <div className="app-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)', transition: 'all 0.3s ease', position: 'relative' }}>
+      {/* Mobile Drawer Overlay Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="mobile-backdrop"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <nav className="no-print" style={{
+      <nav className={`no-print app-sidebar ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{
         width: isSidebarOpen ? '260px' : '80px',
         minWidth: isSidebarOpen ? '260px' : '80px',
         padding: '24px 16px',
@@ -120,7 +171,7 @@ function App() {
         top: '0',
         height: '100vh',
         overflow: 'hidden',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}>
         {/* Top Control - Toggle & Logo */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarOpen ? 'space-between' : 'center', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0', minHeight: '60px' }}>
@@ -129,7 +180,10 @@ function App() {
               display: isSidebarOpen ? 'flex' : 'none', 
               alignItems: 'center', gap: '12px', cursor: 'pointer', overflow: 'hidden' 
             }} 
-            onClick={() => setActiveTab('chat')}
+            onClick={() => {
+              setActiveTab('chat');
+              if (window.innerWidth <= 868) setIsSidebarOpen(false);
+            }}
           >
             <div style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', padding: '10px', borderRadius: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '40px', minHeight: '40px' }}>
               <Scale size={20} />
@@ -162,15 +216,20 @@ function App() {
         </div>
 
         {/* Navigation Tabs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, marginTop: isSidebarOpen ? '0' : '30px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, marginTop: isSidebarOpen ? '0' : '30px', overflowY: 'auto' }}>
           {navItems.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                title={tab.label} // Hover title
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (window.innerWidth <= 868) {
+                    setIsSidebarOpen(false);
+                  }
+                }}
+                title={tab.label}
                 style={{
                   background: isActive ? 'rgba(59, 130, 246, 0.12)' : 'transparent',
                   border: isActive ? '1px solid rgba(59, 130, 246, 0.25)' : '1px solid transparent',
@@ -196,10 +255,39 @@ function App() {
             );
           })}
         </div>
+
+        {/* PWA Install Button */}
+        {isInstallable && (
+          <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+            <button
+              onClick={handleInstallApp}
+              title={isHindi ? "ऐप इंस्टॉल करें" : "Install App"}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                padding: isSidebarOpen ? '10px 14px' : '10px 0',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isSidebarOpen ? 'flex-start' : 'center',
+                gap: '10px',
+                fontSize: '13px',
+                fontWeight: '600',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+              }}
+            >
+              <Smartphone size={18} style={{ minWidth: '18px' }} />
+              {isSidebarOpen && <span>{isHindi ? 'ऐप इंस्टॉल करें' : 'Install App'}</span>}
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Main Content Area */}
-      <main style={{
+      <main className="app-main" style={{
         flex: 1,
         margin: '16px 16px 16px 0',
         padding: '32px 40px',
@@ -213,30 +301,60 @@ function App() {
         overflowY: 'auto',
         transition: 'all 0.3s ease'
       }}>
-        {/* Top Bar for Profile */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', position: 'relative' }}>
-          <div 
-             onClick={() => setShowProfileMenu(!showProfileMenu)}
-             style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', cursor: 'pointer', fontSize: '18px', userSelect: 'none', boxShadow: '0 2px 10px rgba(59,130,246,0.3)' }}>
-            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-          </div>
-          {showProfileMenu && (
-            <div style={{ position: 'absolute', top: '50px', right: '0', background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', zIndex: 100, minWidth: '200px', border: '1px solid #e2e8f0' }}>
-               <div style={{ fontWeight: '700', marginBottom: '4px', color: '#0f172a' }}>{user?.name || 'User'}</div>
-               <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{user?.email || 'user@example.com'}</div>
-                <button onClick={() => { 
-                  setUser(null); 
-                  try {
-                    localStorage.removeItem('dhaara_active_user');
-                  } catch {}
-                  setAppView('landing'); 
-                  setShowProfileMenu(false); 
-                }} style={{ width: '100%', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <LogOut size={16} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
-                </button>
+        {/* Top Bar for Mobile & Profile */}
+        <div className="app-top-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative' }}>
+          {/* Mobile hamburger toggle & title */}
+          <div className="mobile-header-bar" style={{ display: 'none', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              style={{
+                background: '#f1f5f9',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-main)',
+                cursor: 'pointer'
+              }}
+              aria-label="Open menu"
+            >
+              <Menu size={20} />
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', padding: '6px', borderRadius: '8px', color: 'white', display: 'flex' }}>
+                <Scale size={16} />
+              </div>
+              <span style={{ fontWeight: '800', fontSize: '16px', color: 'var(--text-main)' }}>LegalGPT</span>
             </div>
-          )}
+          </div>
+
+          <div style={{ marginLeft: 'auto', position: 'relative' }}>
+            <div 
+               onClick={() => setShowProfileMenu(!showProfileMenu)}
+               style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', cursor: 'pointer', fontSize: '18px', userSelect: 'none', boxShadow: '0 2px 10px rgba(59,130,246,0.3)' }}>
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            {showProfileMenu && (
+              <div style={{ position: 'absolute', top: '50px', right: '0', background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', zIndex: 100, minWidth: '200px', border: '1px solid #e2e8f0' }}>
+                 <div style={{ fontWeight: '700', marginBottom: '4px', color: '#0f172a' }}>{user?.name || 'User'}</div>
+                 <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{user?.email || 'user@example.com'}</div>
+                  <button onClick={() => { 
+                    setUser(null); 
+                    try {
+                      localStorage.removeItem('dhaara_active_user');
+                    } catch {}
+                    setAppView('landing'); 
+                    setShowProfileMenu(false); 
+                  }} style={{ width: '100%', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <LogOut size={16} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
+                  </button>
+              </div>
+            )}
+          </div>
         </div>
+
 
         <div style={{ maxWidth: '1040px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, height: '100%' }}>
           {activeTab === 'chat' && (

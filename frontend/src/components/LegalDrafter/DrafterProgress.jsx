@@ -61,15 +61,22 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
         >
           {isHindi ? 'चेक बाउंस नोटिस' : 'Cheque Bounce Notice'}
         </button>
+        <button
+          type="button"
+          onClick={() => onLoadPreset('tenant')}
+          style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
+        >
+          {isHindi ? 'किराया डिपॉजिट नोटिस' : 'Tenant Deposit Notice'}
+        </button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '10px 0 20px', padding: '0 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '10px 0 16px', padding: '0 10px' }}>
         <div
           style={{
             position: 'absolute',
             top: '16px',
-            left: '40px',
-            right: '40px',
+            left: '24px',
+            right: '24px',
             height: '3px',
             background: '#e2e8f0',
             zIndex: 0
@@ -79,8 +86,8 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
           style={{
             position: 'absolute',
             top: '16px',
-            left: '40px',
-            width: `${((step - 1) / 3) * 80}%`,
+            left: '24px',
+            width: `${((step - 1) / 3) * 85}%`,
             height: '3px',
             background: 'var(--primary)',
             zIndex: 0,
@@ -98,7 +105,9 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '6px',
-              cursor: s.num < step ? 'pointer' : 'default'
+              cursor: s.num < step ? 'pointer' : 'default',
+              maxWidth: '75px',
+              textAlign: 'center'
             }}
           >
             <div style={{
@@ -114,11 +123,12 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
               fontWeight: '700',
               fontSize: '13px',
               boxShadow: step === s.num ? '0 0 0 4px rgba(59, 130, 246, 0.2)' : 'none',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0
             }}>
               {step > s.num ? <Check size={16} /> : s.num}
             </div>
-            <span style={{ fontSize: '12px', fontWeight: step === s.num ? '600' : '500', color: step === s.num ? 'var(--primary)' : '#64748b' }}>
+            <span style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: step === s.num ? '700' : '500', color: step === s.num ? 'var(--primary)' : '#64748b' }}>
               {isHindi ? s.labelHi : s.labelEn}
             </span>
           </div>

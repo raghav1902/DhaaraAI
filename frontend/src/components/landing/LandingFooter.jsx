@@ -4,8 +4,8 @@ import { Scale } from 'lucide-react';
 export default function LandingFooter({ onOpenModal }) {
   return (
     <footer className="footer">
-      <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '3.5rem', justifyContent: 'space-between' }}>
-        <div style={{ maxWidth: '320px' }}>
+      <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: '320px', minWidth: '240px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontWeight: '800', fontSize: '1.35rem', fontFamily: 'Outfit, sans-serif', marginBottom: '0.85rem' }}>
             <div style={{ background: '#2563eb', padding: '0.4rem', borderRadius: '8px', color: 'white', display: 'flex' }}>
               <Scale size={20} />
@@ -17,7 +17,7 @@ export default function LandingFooter({ onOpenModal }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '3.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap', minWidth: '200px' }}>
           <div>
             <h4 style={{ fontSize: '0.98rem', fontWeight: '700', marginBottom: '1.25rem', color: '#0f172a' }}>Product</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>

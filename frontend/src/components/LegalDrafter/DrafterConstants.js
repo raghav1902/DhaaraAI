@@ -5,6 +5,7 @@ export const CATEGORIES = [
   { id: 'Theft', en: 'Theft & Stolen Property (BNS 303, 317)', hi: 'चोरी व छीना-झपटी (BNS 303, 317)' },
   { id: 'Assault', en: 'Physical Assault & Threat (BNS 115, 351)', hi: 'मारपीट व आपराधिक धमकी (BNS 115, 351)' },
   { id: 'Cheque Bounce', en: 'Cheque Bounce / Non-Payment (Sec 138 NI Act)', hi: 'चेक बाउंस / गैर-भुगतान (NI Act 138)' },
+  { id: 'Tenant/Landlord Dispute', en: 'Tenant / Landlord Dispute & Deposit (Model Tenancy)', hi: 'किरायेदार-मकान मालिक विवाद व सिक्योरिटी डिपॉजिट' },
   { id: 'Matrimonial', en: 'Domestic Violence / Cruelty (BNS 85, 86)', hi: 'घरेलू हिंसा व प्रताड़ना (BNS 85, 86)' },
   { id: 'Other', en: 'Other Statutory Dispute', hi: 'अन्य वैधानिक विवाद' }
 ];

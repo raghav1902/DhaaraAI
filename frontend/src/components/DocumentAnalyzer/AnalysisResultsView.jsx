@@ -1,7 +1,9 @@
-import React from 'react';
-import { ShieldAlert, CheckCircle2, Copy, Lightbulb, Scale } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldAlert, CheckCircle2, Copy, Lightbulb, Scale, Save, Check } from 'lucide-react';
 
 export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
+  const [savedToVault, setSavedToVault] = useState(false);
+
   if (!analysis) return null;
 
   const getRiskBadgeColor = (score) => {
@@ -13,6 +15,40 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
   };
 
   const badge = getRiskBadgeColor(analysis.risk_score);
+
+  const handleSaveAuditToVault = () => {
+    try {
+      const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+      const formattedAudit = [
+        `CONTRACT RISK AUDIT REPORT`,
+        `Overall Risk: ${analysis.risk_score} (${analysis.risk_percentage || 50}%)`,
+        `Engine: ${analysis.source || 'Indian Legal Audit Engine'}`,
+        `Date: ${new Date().toLocaleString()}`,
+        `\n--- EXECUTIVE SUMMARY ---\n${analysis.summary || 'N/A'}`,
+        `\n--- FLAGGED RED FLAGS (${analysis.red_flags?.length || 0}) ---`,
+        ...(analysis.red_flags || []).map((rf, i) =>
+          `\n[${i + 1}] Issue: ${rf.issue}\nStatute: ${rf.applicable_law}\nProblematic Clause:\n"${rf.problematic_clause}"\nReason:\n${rf.statutory_problem}\nBalanced Alternative:\n"${rf.fair_alternative}"`
+        ),
+        `\n--- MISSING CRUCIAL PROTECTIONS ---`,
+        ...(analysis.missing_protections || []).map(p => `• ${p}`),
+        `\n--- ACTIONABLE ADVICE ---`,
+        ...(analysis.actionable_advice || []).map(a => `• ${a}`)
+      ].join('\n');
+
+      drafts.push({
+        id: Date.now().toString(),
+        type: 'Contract Audit Report',
+        title: `Audit Report - ${analysis.risk_score} Risk (${new Date().toLocaleDateString()})`,
+        content: formattedAudit,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('dhaara_vault_drafts', JSON.stringify(drafts));
+      setSavedToVault(true);
+      setTimeout(() => setSavedToVault(false), 2500);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -41,8 +77,26 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
             </div>
           </div>
 
-          <div style={{ background: '#f8fafc', padding: '8px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', color: 'var(--text-muted)' }}>
-            <span>Engine: {analysis.source || 'Indian Legal Audit Engine'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={handleSaveAuditToVault}
+              className="btn-ghost"
+              style={{
+                fontSize: '13px',
+                padding: '7px 14px',
+                background: savedToVault ? '#f0fdf4' : 'rgba(59, 130, 246, 0.08)',
+                color: savedToVault ? '#16a34a' : 'var(--primary)',
+                borderColor: savedToVault ? '#86efac' : 'rgba(59, 130, 246, 0.2)'
+              }}
+            >
+              {savedToVault ? <Check size={15} color="#16a34a" /> : <Save size={15} />}
+              {savedToVault
+                ? (isHindi ? 'वॉल्ट में सहेजा गया!' : 'Saved to Vault!')
+                : (isHindi ? 'वॉल्ट में सहेजें' : 'Save to Vault')}
+            </button>
+            <div style={{ background: '#f8fafc', padding: '8px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', color: 'var(--text-muted)' }}>
+              <span>Engine: {analysis.source || 'Indian Legal Audit Engine'}</span>
+            </div>
           </div>
         </div>
 

@@ -55,6 +55,33 @@ export const getPresetData = (presetKey, isHindi) => {
         ? '15 दिवस के भीतर ₹2,50,000/- मय 18% ब्याज अदा करें, अन्यथा पराक्राम्य लिखत अधिनियम की धारा 138 व बीएनएस की धारा 318 के तहत अदालत में अभियोजन चलाया जाएगा।'
         : 'Pay Rs. 2,50,000/- with 18% contractual interest within 15 days, failing which criminal proceedings under Section 138 of Negotiable Instruments Act and Section 318 BNS shall be instituted.'
     };
+  } else if (presetKey === 'tenant') {
+    return {
+      documentType: 'Legal Demand Notice',
+      incidentCategory: 'Tenant/Landlord Dispute',
+      complainant: {
+        name: isHindi ? 'सुनील शर्मा' : 'Sunil Sharma',
+        father_name: isHindi ? 'श्री आर.पी. शर्मा' : 'Shri R.P. Sharma',
+        phone: '9822334455',
+        address: isHindi ? 'फ्लैट 302, पाम हाइट्स, अंधेरी वेस्ट, मुंबई' : 'Flat 302, Palm Heights, Andheri West, Mumbai - 400053',
+        police_station: isHindi ? 'अंधेरी पुलिस स्टेशन' : 'Andheri Police Station'
+      },
+      isAccusedUnknown: false,
+      accused: {
+        name: isHindi ? 'राजीव मल्होत्रा (मकान मालिक)' : 'Rajeev Malhotra (Landlord)',
+        address: isHindi ? 'कोठी 14, जुहू लेन, मुंबई' : 'Bungalow 14, Juhu Lane, Mumbai - 400049'
+      },
+      incidentDatetime: '15-09-2026',
+      incidentLocation: isHindi ? 'किराया आवास, फ्लैट 302, अंधेरी वेस्ट' : 'Leased Premises, Flat 302, Andheri West, Mumbai',
+      facts: isHindi
+        ? 'किराया समझौता नियमानुसार 31 अगस्त 2026 को समाप्त होने व बिना किसी बकाए के शांतिपूर्ण कब्जा सौंपने के बावजूद मकान मालिक ने ₹1,20,000 की सुरक्षा जमा (Security Deposit) राशि अवैध रूप से रोक रखी है और लौटाने से मना कर रहा है।'
+        : 'Despite peaceful handover of the leased premises on 31-08-2026 without any utility or rent dues, the landlord has unlawfully withheld and failed to refund the refundable security deposit of Rs. 1,20,000.',
+      selectedEvidences: ['agreement_copy', 'bank_slip'],
+      customEvidence: isHindi ? 'पंजीकृत किराया समझौता व बैंक जमा पावती' : 'Registered Lease Agreement & Deposit Transfer Receipts',
+      reliefSought: isHindi
+        ? 'सूचना प्राप्ति के 15 दिनों के भीतर ₹1,20,000/- मय 18% वार्षिक ब्याज वापस लौटाएं, अन्यथा मॉडल टेनेंसी एक्ट, दीवानी न्यायालय व बीएनएस के तहत मुकदमा किया जाएगा।'
+        : 'Immediate refund of Rs. 1,20,000/- along with 18% p.a. interest within 15 days, failing which civil and criminal proceedings under Model Tenancy principles and BNS shall be initiated.'
+    };
   }
   return null;
 };
@@ -104,11 +131,12 @@ export const exportDraftToPdf = (documentType, draft, isHindi) => {
   `;
 
   const opt = {
-    margin: 10,
+    margin: [12, 12, 12, 12],
     filename: `${docTitle}_DhaaraAI.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
   html2pdf().set(opt).from(element).save();

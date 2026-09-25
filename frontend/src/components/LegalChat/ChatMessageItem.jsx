@@ -6,29 +6,38 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
   const isUser = msg.role === 'user';
 
   return (
-    <div style={{
-      display: 'flex',
-      gap: '14px',
-      alignSelf: isUser ? 'flex-end' : 'flex-start',
-      maxWidth: isUser ? '80%' : '92%'
-    }}>
+    <div 
+      className="chat-msg-row"
+      style={{
+        display: 'flex',
+        gap: '12px',
+        alignSelf: isUser ? 'flex-end' : 'flex-start',
+        maxWidth: isUser ? '85%' : '94%'
+      }}
+    >
       {!isUser && (
-        <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0 }}>
-          <Bot size={20} />
+        <div style={{ background: 'var(--primary)', padding: '6px', borderRadius: '50%', height: '34px', width: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0 }}>
+          <Bot size={18} />
         </div>
       )}
 
-      <div style={{
-        background: isUser ? 'var(--primary)' : 'rgba(255,255,255,0.95)',
-        color: isUser ? 'white' : 'var(--text-main)',
-        padding: '16px 20px',
-        borderRadius: '16px',
-        borderTopRightRadius: isUser ? 0 : '16px',
-        borderTopLeftRadius: !isUser ? 0 : '16px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-        border: isUser ? 'none' : '1px solid var(--glass-border)',
-        position: 'relative'
-      }}>
+      <div 
+        className="chat-msg-bubble"
+        style={{
+          background: isUser ? 'var(--primary)' : 'rgba(255,255,255,0.95)',
+          color: isUser ? 'white' : 'var(--text-main)',
+          padding: '14px 18px',
+          borderRadius: '16px',
+          borderTopRightRadius: isUser ? 0 : '16px',
+          borderTopLeftRadius: !isUser ? 0 : '16px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+          border: isUser ? 'none' : '1px solid var(--glass-border)',
+          position: 'relative',
+          wordBreak: 'break-word',
+          overflowWrap: 'break-word',
+          minWidth: 0
+        }}
+      >
         {isUser ? (
           <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.5' }}>{msg.content}</p>
         ) : (

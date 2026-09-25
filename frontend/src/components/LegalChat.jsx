@@ -196,10 +196,10 @@ export default function LegalChat({
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '620px', flex: 1 }}>
       {/* Header controls */}
-      <div style={{ padding: '14px 22px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="chat-header-bar" style={{ padding: '14px 22px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
           <Bot color="var(--primary)" size={20} />
-          {isHindi ? 'लीगल असिस्टेंट (AI Legal Assistant)' : 'AI Legal Assistant'}
+          {isHindi ? 'लीगल असिस्टेंट (AI Assistant)' : 'AI Legal Assistant'}
         </h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>भाषा / Lang:</span>
@@ -207,7 +207,7 @@ export default function LegalChat({
             value={language}
             onChange={(e) => onLanguageChange(e.target.value)}
             className="input-field"
-            style={{ width: '135px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
+            style={{ width: '130px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
           >
             <option value="English">English</option>
             <option value="Hindi">हिंदी (Hindi)</option>
@@ -216,8 +216,8 @@ export default function LegalChat({
       </div>
 
       {/* Suggestion Chips */}
-      <div style={{ padding: '10px 20px', background: 'rgba(255, 255, 255, 0.4)', borderBottom: '1px solid rgba(0,0,0,0.03)', display: 'flex', gap: '8px', overflowX: 'auto', scrollbarWidth: 'none' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--primary)', fontWeight: '600', whiteSpace: 'nowrap' }}>
+      <div style={{ padding: '10px 16px', background: 'rgba(255, 255, 255, 0.4)', borderBottom: '1px solid rgba(0,0,0,0.03)', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--primary)', fontWeight: '600', whiteSpace: 'nowrap', flexShrink: 0 }}>
           <Sparkles size={14} /> {isHindi ? 'त्वरित सवाल:' : 'Quick Questions:'}
         </span>
         {promptSuggestions.map((item, idx) => (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Unlock, Save, FileText, Trash2, Key, AlertCircle, Download } from 'lucide-react';
+import { Lock, Unlock, Save, FileText, Trash2, Key, AlertCircle, Download, Eye, Copy, Check, X } from 'lucide-react';
 
 export default function LegalVault({ language = 'English' }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
@@ -8,6 +8,8 @@ export default function LegalVault({ language = 'English' }) {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [savedDrafts, setSavedDrafts] = useState([]);
+  const [previewDraft, setPreviewDraft] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Check if PIN is already set in localStorage
   const hasPin = localStorage.getItem('dhaara_vault_pin') !== null;
@@ -161,24 +163,140 @@ export default function LegalVault({ language = 'English' }) {
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
                   {new Date(draft.date).toLocaleString()}
                 </div>
-                <button
-                  className="btn-ghost"
-                  onClick={() => {
-                    const blob = new Blob([draft.content], { type: 'text/plain' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `${draft.title}.txt`;
-                    a.click();
-                  }}
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  <Download size={14} /> {isHindi ? 'डाउनलोड करें' : 'Download File'}
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    className="btn-ghost"
+                    onClick={() => setPreviewDraft(draft)}
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    <Eye size={14} /> {isHindi ? 'देखें' : 'View'}
+                  </button>
+                  <button
+                    className="btn-ghost"
+                    onClick={() => {
+                      const blob = new Blob([draft.content], { type: 'text/plain;charset=utf-8' });
+                      const a = document.createElement('a');
+                      a.href = URL.createObjectURL(blob);
+                      a.download = `${(draft.title || 'draft').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_')}.txt`;
+                      a.click();
+                      URL.revokeObjectURL(a.href);
+                    }}
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    <Download size={14} /> {isHindi ? 'डाउनलोड' : 'Download'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Preview Modal */}
+      {previewDraft && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            maxWidth: '750px',
+            width: '100%',
+            maxHeight: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '16px 24px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: '#f8fafc'
+            }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#2563eb', background: '#eff6ff', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  {previewDraft.type}
+                </span>
+                <h3 style={{ margin: '4px 0 0', fontSize: '16px', color: '#0f172a', fontWeight: '700' }}>
+                  {previewDraft.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setPreviewDraft(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px', borderRadius: '6px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1, backgroundColor: '#ffffff' }}>
+              <pre style={{
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: '13.5px',
+                lineHeight: '1.7',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                color: '#1e293b',
+                margin: 0
+              }}>
+                {previewDraft.content}
+              </pre>
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '14px 24px',
+              borderTop: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              background: '#f8fafc'
+            }}>
+              <button
+                className="btn-ghost"
+                onClick={() => {
+                  navigator.clipboard.writeText(previewDraft.content);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? <Check size={15} color="#16a34a" /> : <Copy size={15} />}
+                {copied ? (isHindi ? 'कॉपी हो गया!' : 'Copied!') : (isHindi ? 'कॉपी करें' : 'Copy Text')}
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  const blob = new Blob([previewDraft.content], { type: 'text/plain;charset=utf-8' });
+                  const a = document.createElement('a');
+                  a.href = URL.createObjectURL(blob);
+                  a.download = `${(previewDraft.title || 'draft').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_')}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(a.href);
+                }}
+              >
+                <Download size={15} /> {isHindi ? 'टेक्स्ट डाउनलोड करें' : 'Download TXT'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

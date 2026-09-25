@@ -180,7 +180,24 @@ export default function LandingStyles() {
         animation-play-state: paused;
       }
 
+      .footer {
+        padding: 4rem 1.5rem 2rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
       @media (max-width: 900px) {
+        .navbar {
+          padding: 0.75rem 1rem !important;
+        }
+        .section-container {
+          padding: 3rem 1rem !important;
+        }
+        .footer {
+          padding: 3rem 1rem 1.5rem !important;
+        }
         .feature-row, .feature-row:nth-child(even) {
           flex-direction: column !important;
           gap: 2rem !important;
@@ -190,6 +207,19 @@ export default function LandingStyles() {
         }
         .nav-links-desktop {
           display: none !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .navbar {
+          padding: 0.6rem 0.8rem !important;
+        }
+        .btn-primary, .btn-secondary {
+          padding: 0.55rem 0.95rem !important;
+          font-size: 0.84rem !important;
+        }
+        .hero-section {
+          padding: 5.5rem 1rem 2rem !important;
         }
       }
     `}</style>

@@ -2,10 +2,14 @@
   "name": "DhaaraAI - LegalGPT",
   "short_name": "DhaaraAI",
   "description": "Indian Legal Intelligence, Draft Generation & BNS Calculator.",
+  "id": "com.dhaaraai.legalgpt",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#1e40af",
+  "categories": ["legal", "productivity", "utilities"],
   "icons": [
     {
       "src": "/favicon.svg",

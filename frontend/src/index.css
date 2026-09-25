@@ -38,15 +38,16 @@ span {
   line-height: 1.7;
 }
 
-/* Intelligent Dark Mode using Filter Invert & Hue Rotate */
+/* Intelligent Dark Mode with proper tone balancing */
 body.dark-theme {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
-  background-color: #0c0b09;
-  /* Fallback */
+  filter: invert(0.92) hue-rotate(180deg) contrast(0.95);
+  background-color: #0f172a;
 }
 
-/* Invert images back to normal (if there are any) */
-body.dark-theme img {
+/* Invert media and embeds back to normal */
+body.dark-theme img,
+body.dark-theme video,
+body.dark-theme iframe {
   filter: invert(1) hue-rotate(180deg);
 }
 
@@ -378,6 +379,123 @@ body.dark-theme img {
   background-color: #dc2626;
   border-radius: 2px;
   animation: waveBar 0.8s infinite ease-in-out;
+}
+
+/* Mobile & Tablet Responsiveness */
+.mobile-backdrop {
+  display: none;
+}
+
+@media (max-width: 868px) {
+  .app-container {
+    flex-direction: column !important;
+    position: relative !important;
+  }
+
+  /* Drawer Overlay on Mobile */
+  .mobile-backdrop {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(2px) !important;
+    z-index: 1040 !important;
+    animation: fadeIn 0.2s ease forwards;
+  }
+
+  .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    background: #ffffff !important;
+    z-index: 1050 !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15) !important;
+    transform: translateX(0) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding: 20px 16px !important;
+  }
+
+  .app-sidebar.sidebar-closed {
+    transform: translateX(-100%) !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+
+  .mobile-header-bar {
+    display: flex !important;
+  }
+
+  .app-main {
+    margin: 8px 8px 16px 8px !important;
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    max-width: calc(100% - 16px) !important;
+    width: calc(100% - 16px) !important;
+    height: auto !important;
+    min-height: calc(100vh - 16px) !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Chat mobile input bar and headers */
+  .chat-header-bar {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .chat-msg-row {
+    max-width: 96% !important;
+    gap: 8px !important;
+  }
+
+  .chat-msg-bubble {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+  }
+
+  /* Adjust grids inside tools on mobile */
+  .glass-panel {
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .input-field {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Printable legal document scaling */
+  .official-legal-document {
+    padding: 20px 14px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px !important;
+  }
+
+  .btn-primary, .btn-ghost {
+    font-size: 12px !important;
+    padding: 7px 11px !important;
+  }
+
+  .toast-container {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+  }
+
+  .chat-msg-row {
+    max-width: 100% !important;
+  }
 }
 
 /* Print Styles for Legal Drafts */
