@@ -94,14 +94,14 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
                 ? (isHindi ? 'वॉल्ट में सहेजा गया!' : 'Saved to Vault!')
                 : (isHindi ? 'वॉल्ट में सहेजें' : 'Save to Vault')}
             </button>
-            <div style={{ background: '#f8fafc', padding: '8px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px', color: 'var(--text-muted)' }}>
+            <div style={{ background: 'var(--subtle-bg)', padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--card-border)', fontSize: '12px', color: 'var(--text-muted)' }}>
               <span>Engine: {analysis.source || 'Indian Legal Audit Engine'}</span>
             </div>
           </div>
         </div>
 
         {/* Summary */}
-        <div style={{ marginTop: '18px', padding: '14px 18px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '10px', borderLeft: '4px solid var(--primary)' }}>
+        <div style={{ marginTop: '18px', padding: '14px 18px', background: 'var(--primary-light)', borderRadius: '10px', borderLeft: '4px solid var(--primary)' }}>
           <h4 style={{ margin: '0 0 6px', fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>
             {isHindi ? 'दस्तावेज का सरल सारांश' : 'Plain Language Executive Summary'}
           </h4>
@@ -126,15 +126,15 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
               <div
                 key={idx}
                 style={{
-                  border: '1px solid #fee2e2',
-                  background: '#fff',
+                  border: '1px solid var(--card-border)',
+                  background: 'var(--card-bg)',
                   borderRadius: '12px',
                   padding: '16px',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                  boxShadow: 'var(--card-shadow)'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: '700', fontSize: '14.5px', color: '#991b1b' }}>
+                  <span style={{ fontWeight: '700', fontSize: '14.5px', color: '#ef4444' }}>
                     Clause #{idx + 1}: {flag.clause}
                   </span>
                   <span style={{
@@ -150,29 +150,29 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
                   </span>
                 </div>
 
-                <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#374151', lineHeight: '1.5' }}>
+                <p style={{ margin: '0 0 10px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                   <strong>{isHindi ? 'कानूनी समस्या:' : 'Why it is problematic:'}</strong> {flag.issue}
                 </p>
 
                 {flag.statute && (
-                  <div style={{ display: 'inline-block', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', marginBottom: '12px' }}>
+                  <div style={{ display: 'inline-block', background: 'var(--primary-light)', border: '1px solid var(--primary-border)', color: 'var(--primary)', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', marginBottom: '12px' }}>
                     <strong>{isHindi ? 'लागू भारतीय कानून:' : 'Indian Statute:'}</strong> {flag.statute}
                   </div>
                 )}
 
                 {flag.fair_alternative && (
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '12px', marginTop: '6px' }}>
+                  <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '12px', marginTop: '6px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <CheckCircle2 size={14} /> {isHindi ? 'संतुलित वैकल्पिक शर्त (हस्ताक्षर हेतु सुझाई गई):' : 'Recommended Fair Alternative Clause:'}
                       </span>
                       <button
                         type="button"
                         onClick={() => copyClause(flag.fair_alternative, idx)}
                         style={{
-                          background: '#fff',
-                          border: '1px solid #86efac',
-                          color: '#15803d',
+                          background: 'var(--card-bg)',
+                          border: '1px solid rgba(16, 185, 129, 0.4)',
+                          color: '#10b981',
                           borderRadius: '6px',
                           padding: '3px 8px',
                           fontSize: '11.5px',
@@ -186,7 +186,7 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
                         <Copy size={12} /> {isHindi ? 'कॉपी करें' : 'Copy'}
                       </button>
                     </div>
-                    <p style={{ margin: 0, fontSize: '12.5px', color: '#14532d', fontFamily: 'monospace', lineHeight: '1.5' }}>
+                    <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-main)', fontFamily: 'monospace', lineHeight: '1.5' }}>
                       "{flag.fair_alternative}"
                     </p>
                   </div>

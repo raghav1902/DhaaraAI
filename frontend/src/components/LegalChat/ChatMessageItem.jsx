@@ -6,7 +6,7 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
   const isUser = msg.role === 'user';
 
   return (
-    <div 
+    <div
       className="chat-msg-row"
       style={{
         display: 'flex',
@@ -16,22 +16,34 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
       }}
     >
       {!isUser && (
-        <div style={{ background: 'var(--primary)', padding: '6px', borderRadius: '50%', height: '34px', width: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0 }}>
-          <Bot size={18} />
+        <div style={{
+          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          padding: '8px',
+          borderRadius: '12px',
+          height: '36px',
+          width: '36px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          flexShrink: 0,
+          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)'
+        }}>
+          <Bot size={20} />
         </div>
       )}
 
-      <div 
+      <div
         className="chat-msg-bubble"
         style={{
-          background: isUser ? 'var(--primary)' : 'rgba(255,255,255,0.95)',
-          color: isUser ? 'white' : 'var(--text-main)',
-          padding: '14px 18px',
+          background: isUser ? 'var(--primary)' : 'var(--card-bg)',
+          color: isUser ? '#ffffff' : 'var(--text-main)',
+          padding: '16px 20px',
           borderRadius: '16px',
-          borderTopRightRadius: isUser ? 0 : '16px',
-          borderTopLeftRadius: !isUser ? 0 : '16px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-          border: isUser ? 'none' : '1px solid var(--glass-border)',
+          borderTopRightRadius: isUser ? 4 : '16px',
+          borderTopLeftRadius: !isUser ? 4 : '16px',
+          boxShadow: isUser ? '0 4px 12px rgba(37, 99, 235, 0.25)' : 'var(--card-shadow)',
+          border: isUser ? 'none' : '1px solid var(--card-border)',
           position: 'relative',
           wordBreak: 'break-word',
           overflowWrap: 'break-word',
@@ -43,7 +55,7 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
         ) : (
           <div>
             {/* Audio Reader Control Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid var(--card-border)', paddingBottom: '6px' }}>
               <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--primary)' }}>
                 LegalGPT AI
               </span>
@@ -52,9 +64,9 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
                 type="button"
                 onClick={() => handleToggleSpeak(idx, msg.content)}
                 style={{
-                  background: speakingIndex === idx ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.08)',
-                  color: speakingIndex === idx ? '#dc2626' : 'var(--primary)',
-                  border: speakingIndex === idx ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(59, 130, 246, 0.2)',
+                  background: speakingIndex === idx ? 'rgba(239, 68, 68, 0.15)' : 'var(--primary-light)',
+                  color: speakingIndex === idx ? 'var(--danger)' : 'var(--primary)',
+                  border: speakingIndex === idx ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--primary-border)',
                   borderRadius: '14px',
                   padding: '3px 10px',
                   fontSize: '11.5px',
@@ -86,12 +98,12 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
               <ReactMarkdown>{msg.content}</ReactMarkdown>
 
               {msg.sources && msg.sources.length > 0 && (
-                <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e5e7eb' }}>
+                <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
                   <p style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.5px' }}>
                     {isHindi ? 'वैधानिक स्रोत (IndiaCode Verified Sources)' : 'VERIFIED STATUTORY SOURCES (IndiaCode)'}
                   </p>
                   {msg.sources.slice(0, 2).map((src, i) => (
-                    <div key={i} style={{ fontSize: '12px', background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', marginBottom: '5px', color: '#4b5563', border: '1px solid #f1f5f9' }}>
+                    <div key={i} style={{ fontSize: '12px', background: 'var(--subtle-bg)', padding: '6px 10px', borderRadius: '6px', marginBottom: '5px', color: 'var(--text-secondary)', border: '1px solid var(--subtle-border)' }}>
                       <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Reference Provision'}
                     </div>
                   ))}

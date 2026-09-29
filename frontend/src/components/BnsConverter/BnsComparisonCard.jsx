@@ -41,17 +41,17 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
         </div>
 
         {/* Legacy Law: IPC */}
-        <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '14px' }}>
-          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: '#475569' }}>
+        <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '14px' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
             {isHindi ? 'पुराना निरस्त कानून (30 जून 2024 तक)' : 'Legacy Law (Pre July 1, 2024)'}
           </span>
-          <div style={{ fontSize: '18px', fontWeight: '800', color: '#334155', margin: '4px 0' }}>
+          <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: '4px 0' }}>
             IPC Section {selectedItem.ipc_section}
           </div>
-          <div style={{ fontSize: '12.5px', color: '#475569', fontWeight: '600', lineHeight: '1.4' }}>
+          <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', fontWeight: '600', lineHeight: '1.4' }}>
             {selectedItem.ipc_title}
           </div>
-          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
             {selectedItem.ipc_act}
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
 
       {/* Statutory Parameters Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
+        <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '10px' }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
             {isHindi ? 'अपराध की प्रकृति' : 'Offense Nature'}
           </span>
@@ -67,7 +67,7 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
             {selectedItem.nature}
           </span>
         </div>
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
+        <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '10px' }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
             {isHindi ? 'जमानत की स्थिति' : 'Bail Status'}
           </span>
@@ -75,7 +75,7 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
             {selectedItem.bailable}
           </span>
         </div>
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid var(--glass-border)', borderRadius: '8px', padding: '10px' }}>
+        <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '10px' }}>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
             {isHindi ? 'सुनवाई अदालत' : 'Triable By'}
           </span>
@@ -86,28 +86,28 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
       </div>
 
       {/* Punishment Details */}
-      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px' }}>
+      <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '10px', padding: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
           <Gavel size={16} color="#d97706" />
           <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main)' }}>
             {isHindi ? 'सजा व जुर्माना प्रावधान' : 'Punishment & Penalty Specification'}
           </span>
         </div>
-        <p style={{ margin: 0, fontSize: '13px', color: '#334155', lineHeight: '1.5' }}>
+        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
           {selectedItem.punishment}
         </p>
       </div>
 
       {/* BNSS Procedure Note */}
       {selectedItem.bnss_procedure && (
-        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px' }}>
+        <div style={{ background: 'var(--primary-light)', border: '1px solid var(--primary-border)', borderRadius: '10px', padding: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-            <Shield size={16} color="#2563eb" />
-            <span style={{ fontSize: '13px', fontWeight: '700', color: '#1e40af' }}>
+            <Shield size={16} color="var(--primary)" />
+            <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--primary)' }}>
               {isHindi ? 'BNSS प्रक्रिया व कानूनी सुरक्षा नियम' : 'BNSS 2023 Procedural Safeguard & Trial Note'}
             </span>
           </div>
-          <p style={{ margin: 0, fontSize: '12.5px', color: '#1e3a8a', lineHeight: '1.5' }}>
+          <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-main)', lineHeight: '1.5' }}>
             {selectedItem.bnss_procedure}
           </p>
         </div>
@@ -116,21 +116,21 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
       {/* Victim vs Accused Guidance */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {selectedItem.victim_guidance && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '10px 14px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '700', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+          <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '10px 14px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
               <Shield size={14} /> {isHindi ? 'पीड़ित / शिकायतकर्ता के अधिकार:' : 'Action Plan for Victim / Complainant:'}
             </span>
-            <span style={{ fontSize: '12px', color: '#14532d', lineHeight: '1.5' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-main)', lineHeight: '1.5' }}>
               {selectedItem.victim_guidance}
             </span>
           </div>
         )}
         {selectedItem.accused_guidance && (
-          <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 14px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '700', color: '#92400e', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+          <div style={{ background: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.3)', borderRadius: '8px', padding: '10px 14px' }}>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: '#d97706', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
               <Scale size={14} /> {isHindi ? 'आरोपी पक्ष हेतु सुरक्षा प्रावधान:' : 'Safeguards for Accused / Signer:'}
             </span>
-            <span style={{ fontSize: '12px', color: '#78350f', lineHeight: '1.5' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-main)', lineHeight: '1.5' }}>
               {selectedItem.accused_guidance}
             </span>
           </div>

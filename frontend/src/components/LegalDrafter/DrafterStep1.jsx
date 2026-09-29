@@ -20,8 +20,8 @@ export default function DrafterStep1({
           <div
             onClick={() => setDocumentType('FIR Application')}
             style={{
-              border: documentType === 'FIR Application' ? '2px solid var(--primary)' : '1px solid #e2e8f0',
-              background: documentType === 'FIR Application' ? 'rgba(59, 130, 246, 0.05)' : 'white',
+              border: documentType === 'FIR Application' ? '2px solid var(--primary)' : '1px solid var(--card-border)',
+              background: documentType === 'FIR Application' ? 'var(--primary-light)' : 'var(--card-bg)',
               borderRadius: '12px',
               padding: '16px',
               cursor: 'pointer',
@@ -30,7 +30,7 @@ export default function DrafterStep1({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
               <ShieldCheck size={20} color="var(--primary)" />
-              <strong style={{ fontSize: '15px' }}>
+              <strong style={{ fontSize: '15px', color: 'var(--text-main)' }}>
                 {isHindi ? 'पुलिस प्राथमिकी (FIR) शिकायत आवेदन' : 'Police FIR Complaint Application'}
               </strong>
             </div>
@@ -44,8 +44,8 @@ export default function DrafterStep1({
           <div
             onClick={() => setDocumentType('Legal Demand Notice')}
             style={{
-              border: documentType === 'Legal Demand Notice' ? '2px solid var(--primary)' : '1px solid #e2e8f0',
-              background: documentType === 'Legal Demand Notice' ? 'rgba(59, 130, 246, 0.05)' : 'white',
+              border: documentType === 'Legal Demand Notice' ? '2px solid var(--primary)' : '1px solid var(--card-border)',
+              background: documentType === 'Legal Demand Notice' ? 'var(--primary-light)' : 'var(--card-bg)',
               borderRadius: '12px',
               padding: '16px',
               cursor: 'pointer',
@@ -54,7 +54,7 @@ export default function DrafterStep1({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
               <Scale size={20} color="var(--primary)" />
-              <strong style={{ fontSize: '15px' }}>
+              <strong style={{ fontSize: '15px', color: 'var(--text-main)' }}>
                 {isHindi ? 'विधिक मांग नोटिस (Legal Demand Notice)' : 'Statutory Legal Demand Notice'}
               </strong>
             </div>
@@ -78,9 +78,9 @@ export default function DrafterStep1({
               key={cat.id}
               onClick={() => setIncidentCategory(cat.id)}
               style={{
-                background: incidentCategory === cat.id ? 'var(--primary)' : 'white',
+                background: incidentCategory === cat.id ? 'var(--primary)' : 'var(--card-bg)',
                 color: incidentCategory === cat.id ? 'white' : 'var(--text-main)',
-                border: incidentCategory === cat.id ? '1px solid var(--primary)' : '1px solid #cbd5e1',
+                border: incidentCategory === cat.id ? '1px solid var(--primary)' : '1px solid var(--card-border)',
                 borderRadius: '10px',
                 padding: '10px 14px',
                 fontSize: '13px',

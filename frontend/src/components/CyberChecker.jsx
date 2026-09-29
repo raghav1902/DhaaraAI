@@ -92,21 +92,42 @@ export default function CyberChecker({ language = 'English' }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #ef4444' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-            <ShieldAlert size={26} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
-              {isHindi ? 'साइबर क्राइम और डेटा लीक स्कैनर (Live Real Database)' : 'Cyber Crime & Data Breach Scanner (Live Real Database)'}
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+          padding: '10px',
+          borderRadius: '12px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+        }}>
+          <ShieldAlert size={22} />
+        </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              {isHindi ? 'साइबर क्राइम और डेटा लीक स्कैनर' : 'Cyber Crime & Data Breach Scanner'}
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
-              {isHindi
-                ? 'XposedOrNot ओपन-सोर्स डेटाबेस के ज़रिए लाइव जांचें कि क्या आपका ईमेल डार्क वेब (Dark Web) लीक्स में शामिल है।'
-                : 'Live query against verified global dark-web breaches using XposedOrNot open-source intelligence.'}
-            </p>
+            <span style={{ fontSize: '11px', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+              Live Breach DB
+            </span>
           </div>
+          <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
+            {isHindi
+              ? 'XposedOrNot डेटाबेस के ज़रिए लाइव जांचें कि क्या आपका ईमेल डार्क वेब लीक्स में शामिल है।'
+              : 'Live cross-reference against verified global data breaches using authentic open-source intelligence.'}
+          </p>
         </div>
       </div>
 
@@ -167,7 +188,7 @@ export default function CyberChecker({ language = 'English' }) {
                   {isHindi ? 'सुरक्षित! कोई डेटा लीक नहीं मिला।' : 'Good News! No Breaches Found.'}
                 </h4>
                 <p style={{ margin: 0, fontSize: '13px', color: '#15803d', lineHeight: '1.5' }}>
-                  {isHindi 
+                  {isHindi
                     ? `ईमेल (${result.email}) किसी भी ज्ञात सार्वजनिक या डार्क-वेब डेटा ब्रीच में नहीं पाया गया है।`
                     : `The email (${result.email}) was not found in any monitored global data breaches.`}
                 </p>
@@ -188,10 +209,10 @@ export default function CyberChecker({ language = 'English' }) {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '280px', overflowY: 'auto', paddingRight: '4px' }}>
                   {result.breaches.map((b, i) => (
-                    <div key={i} style={{ background: 'white', padding: '12px 14px', borderRadius: '8px', border: '1px solid #fecaca', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div key={i} style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--card-shadow)' }}>
                       <div>
-                        <strong style={{ fontSize: '14px', color: '#7f1d1d', display: 'block' }}>{b.name}</strong>
-                        <span style={{ fontSize: '11.5px', color: '#991b1b' }}>{isHindi ? 'लीक श्रेणी:' : 'Exposed Category:'} {b.data}</span>
+                        <strong style={{ fontSize: '14px', color: '#ef4444', display: 'block' }}>{b.name}</strong>
+                        <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{isHindi ? 'लीक श्रेणी:' : 'Exposed Category:'} {b.data}</span>
                       </div>
                       <span style={{ fontSize: '11px', background: '#fee2e2', color: '#b91c1c', padding: '3px 8px', borderRadius: '6px', fontWeight: '600' }}>
                         Breached
@@ -202,8 +223,8 @@ export default function CyberChecker({ language = 'English' }) {
 
                 <div style={{ marginTop: '16px', padding: '12px 14px', background: '#fee2e2', borderRadius: '8px', fontSize: '12.5px', color: '#7f1d1d', lineHeight: '1.5' }}>
                   <Lock size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
-                  {isHindi 
-                    ? 'सलाह: इन संबंधित खातों का पासवर्ड तुरंत बदलें तथा 2-Factor Authentication (2FA) ऑन करें। किसी भी वित्तीय ठगी पर तुरंत 1930 हेल्पलाइन पर कॉल करें।' 
+                  {isHindi
+                    ? 'सलाह: इन संबंधित खातों का पासवर्ड तुरंत बदलें तथा 2-Factor Authentication (2FA) ऑन करें। किसी भी वित्तीय ठगी पर तुरंत 1930 हेल्पलाइन पर कॉल करें।'
                     : 'Security Advisory: Immediately reset passwords for these services and enable Two-Factor Authentication (2FA). For financial cyber fraud, report promptly at 1930.'}
                 </div>
               </div>

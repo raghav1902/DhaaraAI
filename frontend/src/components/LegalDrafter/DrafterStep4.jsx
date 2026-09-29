@@ -18,8 +18,8 @@ export default function DrafterStep4({
 }) {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
-      <div style={{ background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '20px' }}>
-        <h3 style={{ margin: '0 0 14px', fontSize: '17px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ background: 'var(--subtle-bg)', borderRadius: '12px', border: '1px solid var(--card-border)', padding: '20px' }}>
+        <h3 style={{ margin: '0 0 14px', fontSize: '17px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <CheckCircle2 size={20} color="var(--primary)" />
           {isHindi ? 'विवरण की अंतिम समीक्षा (Draft Summary)' : 'Draft Parameters Summary'}
         </h3>
@@ -51,11 +51,11 @@ export default function DrafterStep4({
           </div>
         </div>
 
-        <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+        <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
           <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '12px', marginBottom: '4px' }}>
             {isHindi ? 'घटना के तथ्य:' : 'Factual Brief:'}
           </span>
-          <p style={{ margin: 0, fontSize: '13px', color: '#334155', background: 'white', padding: '10px 14px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-main)', background: 'var(--card-bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
             {facts}
           </p>
         </div>

@@ -60,24 +60,46 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #059669' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #059669, #10b981)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-            <ArrowRightLeft size={26} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
-              {isHindi ? 'BNS 2023 ↔ IPC 1860 धारा परिवर्तक (Live Concordance)' : 'BNS 2023 ↔ IPC 1860 Section Converter & Calculator'}
-            </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
-              {isHindi
-                ? 'पुरानी आईपीसी (IPC) की धारा अथवा नई भारतीय न्याय संहिता (BNS) की धारा दर्ज करें और सजा, जमानत व कानूनी बदलाव तुरंत देखें।'
-                : 'Instant cross-reference for the New Criminal Laws (effective 1 July 2024). Compare sections, bail status, sentences, and BNSS trial procedure.'}
-            </p>
-          </div>
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #059669, #10b981)',
+          padding: '10px',
+          borderRadius: '12px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
+        }}>
+          <ArrowRightLeft size={22} />
         </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              {isHindi ? 'BNS 2023 ↔ IPC 1860 धारा परिवर्तक' : 'BNS ↔ IPC Section Converter'}
+            </h2>
+            <span style={{ fontSize: '11px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+              Concordance Engine
+            </span>
+          </div>
+          <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
+            {isHindi
+              ? 'पुरानी आईपीसी अथवा नई BNS की धारा दर्ज करें और सजा, जमानत व कानूनी बदलाव तुरंत देखें।'
+              : 'Cross-reference IPC 1860 and BNS 2023. Compare sections, bail status, sentences, and BNSS trial procedure.'}
+          </p>
+        </div>
+      </div>
 
         {/* Quick Click Chips */}
         <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -103,7 +125,6 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
             </button>
           ))}
         </div>
-      </div>
 
       {/* Search Bar */}
       <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '14px' }}>
@@ -120,10 +141,11 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
               width: '100%',
               padding: '11px 16px 11px 42px',
               borderRadius: '10px',
-              border: '1px solid #cbd5e1',
+              border: '1px solid var(--card-border)',
               fontSize: '14px',
               outline: 'none',
-              background: '#fff',
+              background: 'var(--subtle-bg)',
+              color: 'var(--text-main)',
               boxSizing: 'border-box'
             }}
           />
@@ -143,7 +165,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {loading ? (
               [1, 2, 3, 4, 5].map(i => (
-                <div key={i} style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px' }}>
+                <div key={i} style={{ border: '1px solid var(--card-border)', borderRadius: '10px', padding: '12px' }}>
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
                     <div className="skeleton-box skeleton-text" style={{ width: '50px', height: '18px', borderRadius: '4px' }}></div>
                     <div className="skeleton-box skeleton-text" style={{ width: '50px', height: '18px', borderRadius: '4px' }}></div>
@@ -160,8 +182,8 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
                   onClick={() => setSelectedItem(item)}
                   className="hover-tactile"
                   style={{
-                    background: isSelected ? 'rgba(5, 150, 105, 0.08)' : '#fff',
-                    border: isSelected ? '1px solid #059669' : '1px solid #e2e8f0',
+                    background: isSelected ? 'rgba(5, 150, 105, 0.15)' : 'var(--card-bg)',
+                    border: isSelected ? '1px solid #10b981' : '1px solid var(--card-border)',
                     borderRadius: '10px',
                     padding: '12px',
                     cursor: 'pointer'

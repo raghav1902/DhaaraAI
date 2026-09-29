@@ -20,13 +20,13 @@ export default function DrafterStep5({
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Action Toolbar */}
-      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', background: 'rgba(255, 255, 255, 0.8)', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', background: 'var(--card-bg)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '13px', fontWeight: '600', color: '#166534', background: '#dcfce7', padding: '4px 10px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CheckCircle2 size={14} /> {isHindi ? 'ड्राफ्ट तैयार है' : 'Draft Generated'}
           </span>
           {generatedResult.sections_referenced && generatedResult.sections_referenced.length > 0 && (
-            <span style={{ fontSize: '12px', color: '#1e3a8a', background: '#eff6ff', padding: '4px 10px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--primary)', background: 'var(--primary-light)', padding: '4px 10px', borderRadius: '12px' }}>
               {generatedResult.sections_referenced.join(', ')}
             </span>
           )}
@@ -37,9 +37,9 @@ export default function DrafterStep5({
             type="button"
             onClick={handleCopy}
             style={{
-              background: copied ? '#10b981' : 'white',
+              background: copied ? '#10b981' : 'var(--subtle-bg)',
               color: copied ? 'white' : 'var(--text-main)',
-              border: '1px solid #cbd5e1',
+              border: '1px solid var(--card-border)',
               borderRadius: '8px',
               padding: '8px 14px',
               fontSize: '13px',

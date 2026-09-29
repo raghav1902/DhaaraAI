@@ -63,22 +63,51 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
   return (
     <div className="animate-fade-in" style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '18px' }}>
-        <div>
-          <h2 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-main)', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <BookOpen size={24} color="var(--primary)" />
-            {isHindi ? 'भारतीय कानून एवं धारा संग्रह (Legal Library)' : 'Indian Statutory Codes & Concordance Library'}
-          </h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>
-            {isHindi
-              ? 'भारतीय न्याय संहिता (BNS 2023), IPC 1860, BNSS एवं मुख्य अधिनियमों की प्रमाणित धाराएं व प्रक्रिया'
-              : 'Verified statutory directory of Bharatiya Nyaya Sanhita (BNS 2023), IPC 1860, and Landmark Safeguards'}
-          </p>
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '16px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            padding: '10px',
+            borderRadius: '12px',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          }}>
+            <BookOpen size={22} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                {isHindi ? 'भारतीय कानून एवं धारा संग्रह' : 'Indian Statutory Codes & Library'}
+              </h2>
+              <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+                BNS & IPC
+              </span>
+            </div>
+            <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
+              {isHindi
+                ? 'भारतीय न्याय संहिता (BNS 2023), IPC 1860, BNSS एवं मुख्य अधिनियमों की प्रमाणित धाराएं'
+                : 'Verified statutory directory of Bharatiya Nyaya Sanhita (BNS 2023), IPC 1860, and Special Acts'}
+            </p>
+          </div>
         </div>
 
         {/* Stats Pill */}
-        <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Scale size={16} />
+        <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', color: 'var(--primary)', padding: '6px 14px', borderRadius: '20px', fontSize: '12.5px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Scale size={15} />
           {filteredStatutes.length} {isHindi ? 'धाराएं उपलब्ध' : 'Sections Listed'}
         </div>
       </div>
@@ -113,8 +142,8 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
             style={{
               padding: '6px 14px',
               borderRadius: '20px',
-              border: selectedCategory === cat ? '1px solid var(--primary)' : '1px solid #e5e7eb',
-              background: selectedCategory === cat ? 'var(--primary)' : 'rgba(255,255,255,0.8)',
+              border: selectedCategory === cat ? '1px solid var(--primary)' : '1px solid var(--card-border)',
+              background: selectedCategory === cat ? 'var(--primary)' : 'var(--subtle-bg)',
               color: selectedCategory === cat ? 'white' : 'var(--text-main)',
               fontSize: '13px',
               fontWeight: '500',
@@ -148,7 +177,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
           <p>{error}</p>
         </div>
       ) : filteredStatutes.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.6)', borderRadius: '12px' }}>
+        <div style={{ textAlign: 'center', padding: '40px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '12px' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
             {isHindi ? 'कोई धारा नहीं मिली। कृपया कोई दूसरा शब्द या धारा नंबर खोजें।' : 'No matching sections found. Try a different keyword or section number.'}
           </p>
@@ -164,21 +193,21 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                 key={item.id}
                 className="hover-tactile"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.85)',
-                  border: '1px solid var(--glass-border)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--card-border)',
                   borderRadius: '14px',
                   padding: '18px 20px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                  boxShadow: 'var(--card-shadow)'
                 }}
               >
                 {/* Top Section Tags & Category */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ background: '#2563eb', color: 'white', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', letterSpacing: '0.3px' }}>
+                    <span style={{ background: 'var(--primary)', color: 'white', padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '700', letterSpacing: '0.3px' }}>
                       {item.bns_section}
                     </span>
                     {item.ipc_section && item.ipc_section !== 'Refer text' && (
-                      <span style={{ background: '#f3f4f6', color: '#4b5563', padding: '3px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', border: '1px solid #e5e7eb' }}>
+                      <span style={{ background: 'var(--subtle-bg)', color: 'var(--text-secondary)', padding: '3px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600', border: '1px solid var(--card-border)' }}>
                         Legacy: IPC Sec {item.ipc_section}
                       </span>
                     )}
@@ -193,7 +222,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                   {item.offense_en}
                 </h3>
                 {item.offense_hi && item.offense_hi !== item.offense_en && (
-                  <p style={{ fontSize: '14px', color: '#4b5563', margin: '0 0 10px', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '0 0 10px', fontStyle: 'italic' }}>
                     {item.offense_hi}
                   </p>
                 )}
@@ -211,7 +240,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                     </span>
                   )}
                   {item.punishment && (
-                    <span className="badge badge-info" style={{ background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0' }}>
+                    <span className="badge badge-info" style={{ background: 'var(--subtle-bg)', color: 'var(--text-secondary)', border: '1px solid var(--card-border)' }}>
                       {item.punishment}
                     </span>
                   )}
@@ -219,22 +248,22 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
 
                 {/* Expandable Details */}
                 {isExpanded && (
-                  <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid #f3f4f6', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', color: '#374151' }}>
+                  <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', color: 'var(--text-secondary)' }}>
                     {item.bnss_procedure && (
                       <div>
-                        <strong style={{ color: '#111827' }}>{isHindi ? 'प्रक्रिया व अधिकार (BNSS): ' : 'Procedure & Safeguards (BNSS): '}</strong>
+                        <strong style={{ color: 'var(--text-main)' }}>{isHindi ? 'प्रक्रिया व अधिकार (BNSS): ' : 'Procedure & Safeguards (BNSS): '}</strong>
                         <span>{item.bnss_procedure}</span>
                       </div>
                     )}
                     {item.victim_guidance && (
-                      <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
-                        <strong style={{ color: '#047857' }}>{isHindi ? 'पीड़ित / शिकायतकर्ता के लिए कदम: ' : 'Complainant Action: '}</strong>
+                      <div style={{ background: 'var(--subtle-bg)', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                        <strong style={{ color: '#10b981' }}>{isHindi ? 'पीड़ित / शिकायतकर्ता के लिए कदम: ' : 'Complainant Action: '}</strong>
                         <span>{item.victim_guidance}</span>
                       </div>
                     )}
                     {item.accused_guidance && (
-                      <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #3b82f6' }}>
-                        <strong style={{ color: '#1d4ed8' }}>{isHindi ? 'कानूनी सुरक्षा (Accused Rights): ' : 'Protective Safeguards: '}</strong>
+                      <div style={{ background: 'var(--subtle-bg)', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid var(--primary)' }}>
+                        <strong style={{ color: 'var(--primary)' }}>{isHindi ? 'कानूनी सुरक्षा (Accused Rights): ' : 'Protective Safeguards: '}</strong>
                         <span>{item.accused_guidance}</span>
                       </div>
                     )}
@@ -242,7 +271,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                 )}
 
                 {/* Bottom Actions Bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f9fafb' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--card-border)' }}>
                   <button
                     onClick={() => toggleExpand(item.id)}
                     style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}

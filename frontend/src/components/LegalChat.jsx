@@ -195,28 +195,81 @@ export default function LegalChat({
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '620px', flex: 1 }}>
-      {/* Header controls */}
-      <div className="chat-header-bar" style={{ padding: '14px 22px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
-          <Bot color="var(--primary)" size={20} />
-          {isHindi ? 'लीगल असिस्टेंट (AI Assistant)' : 'AI Legal Assistant'}
-        </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>भाषा / Lang:</span>
-          <select
-            value={language}
-            onChange={(e) => onLanguageChange(e.target.value)}
-            className="input-field"
-            style={{ width: '130px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
-          >
-            <option value="English">English</option>
-            <option value="Hindi">हिंदी (Hindi)</option>
-          </select>
+      {/* Refined Header */}
+      <div style={{
+        padding: '16px 20px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '16px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '14px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          }}>
+            <Bot size={22} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                {isHindi ? 'विधिक परामर्श सहायक' : 'AI Legal Assistant'}
+              </h2>
+              <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+                BNS 2023 Verified
+              </span>
+            </div>
+            <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+              {isHindi ? 'प्राथमिक कानूनों, प्रक्रियाओं व केस लॉ पर त्वरित विधिक समाधान' : 'Instant statutory answers under Bharatiya Nyaya Sanhita & Indian Laws'}
+            </p>
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMessages([{
+            role: 'assistant',
+            content: isHindi
+              ? 'नमस्ते! लीगलजीपीटी में आपका स्वागत है। आप भारतीय कानूनों के बारे में कोई भी सवाल पूछ सकते हैं।'
+              : 'Namaste! Welcome to LegalGPT. How can I assist you with Indian law or case procedures today?',
+            language
+          }])}
+          style={{
+            background: 'var(--subtle-bg)',
+            border: '1px solid var(--card-border)',
+            padding: '7px 14px',
+            borderRadius: '10px',
+            fontSize: '12.5px',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontWeight: '600',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--card-bg)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
+          title={isHindi ? "नया चैट शुरू करें" : "Reset Conversation"}
+        >
+          <RefreshCw size={14} />
+          {isHindi ? 'नया चैट' : 'New Chat'}
+        </button>
       </div>
 
       {/* Suggestion Chips */}
-      <div style={{ padding: '10px 16px', background: 'rgba(255, 255, 255, 0.4)', borderBottom: '1px solid rgba(0,0,0,0.03)', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+      <div style={{ padding: '4px 0 12px', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--primary)', fontWeight: '600', whiteSpace: 'nowrap', flexShrink: 0 }}>
           <Sparkles size={14} /> {isHindi ? 'त्वरित सवाल:' : 'Quick Questions:'}
         </span>
@@ -226,19 +279,20 @@ export default function LegalChat({
             onClick={() => handleSendWithText(item.query)}
             disabled={isLoading}
             style={{
-              background: 'white',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '4px 12px',
-              fontSize: '12.5px',
-              color: 'var(--text-main)',
+              background: 'var(--card-bg)',
+              border: '1px solid var(--card-border)',
+              borderRadius: '20px',
+              padding: '5px 14px',
+              fontSize: '12px',
+              fontWeight: '500',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = 'var(--text-main)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.background = 'var(--primary-light)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--card-bg)'; }}
           >
             {item.label}
           </button>
@@ -263,7 +317,7 @@ export default function LegalChat({
             <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
               <RefreshCw size={18} className="animate-spin" />
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.95)', padding: '14px 18px', borderRadius: '16px', borderTopLeftRadius: 0, border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+            <div style={{ background: 'var(--card-bg)', color: 'var(--text-main)', padding: '14px 18px', borderRadius: '16px', borderTopLeftRadius: 0, border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', fontSize: '14px', boxShadow: 'var(--card-shadow)' }}>
               <Loader2 size={16} className="animate-spin" style={{ marginRight: '8px', color: 'var(--primary)' }} />
               {isHindi ? 'कानूनी धाराएं और समाधान तैयार हो रहा है...' : 'Analyzing statutes & formulating quick response...'}
             </div>

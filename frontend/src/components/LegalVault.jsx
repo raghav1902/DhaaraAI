@@ -60,8 +60,8 @@ export default function LegalVault({ language = 'English' }) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <div className="glass-panel animate-fade-in" style={{ padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-          <div style={{ background: '#f3f4f6', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <Lock size={32} color="#1e293b" />
+          <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+            <Lock size={32} color="var(--primary)" />
           </div>
           <h2 style={{ margin: '0 0 8px', fontSize: '20px', color: 'var(--text-main)' }}>
             {isHindi ? 'सुरक्षित कानूनी वॉल्ट' : 'Secure Legal Vault'}
@@ -93,7 +93,7 @@ export default function LegalVault({ language = 'English' }) {
             type="button"
             className="btn-primary"
             onClick={handleLogin}
-            style={{ width: '100%', justifyContent: 'center', padding: '12px', background: '#0f172a' }}
+            style={{ width: '100%', justifyContent: 'center', padding: '12px', background: '#2563eb' }}
           >
             {hasPin ? (
               <><Unlock size={18} /> {isHindi ? 'अनलॉक करें' : 'Unlock Vault'}</>
@@ -112,26 +112,62 @@ export default function LegalVault({ language = 'English' }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #0f172a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '16px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: '#0f172a', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-            <Unlock size={26} />
+          <div style={{
+            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+            padding: '10px',
+            borderRadius: '12px',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          }}>
+            <Unlock size={22} />
           </div>
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
-              {isHindi ? 'आपका सुरक्षित वॉल्ट' : 'Your Secure Vault'}
+            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              {isHindi ? 'आपका सुरक्षित वॉल्ट' : 'Secure Legal Vault'}
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
+            <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
               {isHindi
-                ? 'आपके सहेजे गए सभी कानूनी दस्तावेज़ यहां मौजूद हैं।'
-                : 'All your saved legal drafts are stored securely here.'}
+                ? 'आपके सहेजे गए सभी कानूनी दस्तावेज़ यहां एन्क्रिप्टेड रूप में सुरक्षित हैं।'
+                : 'All your saved legal drafts and contracts are stored securely on-device.'}
             </p>
           </div>
         </div>
         <button
           onClick={() => { setIsAuthenticated(false); setPin(''); }}
-          style={{ background: 'none', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '500' }}
+          style={{
+            background: 'var(--subtle-bg)',
+            border: '1px solid var(--card-border)',
+            padding: '7px 14px',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12.5px',
+            fontWeight: '600',
+            color: 'var(--text-secondary)',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--card-bg)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
         >
           <Lock size={14} /> {isHindi ? 'वॉल्ट लॉक करें' : 'Lock Vault'}
         </button>
@@ -148,9 +184,9 @@ export default function LegalVault({ language = 'English' }) {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
             {savedDrafts.map((draft) => (
-              <div key={draft.id} className="hover-tactile" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', background: 'white' }}>
+              <div key={draft.id} className="hover-tactile" style={{ border: '1px solid var(--card-border)', borderRadius: '12px', padding: '16px', background: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '600', color: '#3b82f6', background: '#eff6ff', padding: '4px 8px', borderRadius: '6px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--primary)', background: 'var(--primary-light)', padding: '4px 8px', borderRadius: '6px' }}>
                     {draft.type}
                   </div>
                   <button onClick={() => handleDelete(draft.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }} title="Delete">
@@ -209,50 +245,51 @@ export default function LegalVault({ language = 'English' }) {
           padding: '20px'
         }}>
           <div style={{
-            background: '#ffffff',
+            background: 'var(--card-bg)',
             borderRadius: '16px',
             maxWidth: '750px',
             width: '100%',
             maxHeight: '85vh',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            boxShadow: 'var(--card-shadow)',
+            border: '1px solid var(--card-border)',
             overflow: 'hidden'
           }}>
             {/* Modal Header */}
             <div style={{
               padding: '16px 24px',
-              borderBottom: '1px solid #e2e8f0',
+              borderBottom: '1px solid var(--card-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: '#f8fafc'
+              background: 'var(--subtle-bg)'
             }}>
               <div>
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#2563eb', background: '#eff6ff', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--primary)', background: 'var(--primary-light)', padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
                   {previewDraft.type}
                 </span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '16px', color: '#0f172a', fontWeight: '700' }}>
+                <h3 style={{ margin: '4px 0 0', fontSize: '16px', color: 'var(--text-main)', fontWeight: '700' }}>
                   {previewDraft.title}
                 </h3>
               </div>
               <button
                 onClick={() => setPreviewDraft(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px', borderRadius: '6px' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', borderRadius: '6px' }}
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div style={{ padding: '24px', overflowY: 'auto', flex: 1, backgroundColor: '#ffffff' }}>
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1, backgroundColor: 'var(--card-bg)' }}>
               <pre style={{
                 fontFamily: 'Inter, system-ui, sans-serif',
                 fontSize: '13.5px',
                 lineHeight: '1.7',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
-                color: '#1e293b',
+                color: 'var(--text-main)',
                 margin: 0
               }}>
                 {previewDraft.content}
@@ -262,12 +299,12 @@ export default function LegalVault({ language = 'English' }) {
             {/* Modal Footer */}
             <div style={{
               padding: '14px 24px',
-              borderTop: '1px solid #e2e8f0',
+              borderTop: '1px solid var(--card-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
               gap: '12px',
-              background: '#f8fafc'
+              background: 'var(--subtle-bg)'
             }}>
               <button
                 className="btn-ghost"

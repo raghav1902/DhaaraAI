@@ -53,21 +53,42 @@ export default function CitizenRights({ language = 'English' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header Banner */}
-      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #2563eb' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-            <Shield size={26} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
-              {isHindi ? 'नागरिक कानूनी अधिकार व आपातकालीन सुरक्षा गाइड (Kanooni Adhikar)' : 'Citizen Legal Rights & Emergency Protection Playbook'}
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          padding: '10px',
+          borderRadius: '12px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+        }}>
+          <Shield size={22} />
+        </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              {isHindi ? 'नागरिक कानूनी अधिकार व सुरक्षा गाइड' : 'Citizen Legal Rights & Emergency Guide'}
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+              BNSS 2023
+            </span>
+          </div>
+          <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
               {isHindi
                 ? 'पुलिस पूछताछ, गिरफ्तारी, महिलाओं की सुरक्षा, ट्रैफिक चालान व साइबर धोखाधड़ी में आपके अनिवार्य संवैधानिक व विधिक अधिकार।'
                 : 'Your statutory rights under BNSS 2023, Constitution of India, Supreme Court directives, and Motor Vehicles Act.'}
-            </p>
-          </div>
+          </p>
         </div>
       </div>
 
@@ -86,8 +107,8 @@ export default function CitizenRights({ language = 'English' }) {
               key={idx}
               className="hover-tactile"
               style={{
-                border: '1px solid #e2e8f0',
-                background: '#fff',
+                border: '1px solid var(--card-border)',
+                background: 'var(--card-bg)',
                 borderRadius: '12px',
                 padding: '14px',
                 display: 'flex',
@@ -120,8 +141,8 @@ export default function CitizenRights({ language = 'English' }) {
                   style={{
                     flex: 1,
                     textAlign: 'center',
-                    background: '#eff6ff',
-                    border: '1px solid #bfdbfe',
+                    background: 'var(--primary-light)',
+                    border: '1px solid var(--card-border)',
                     color: 'var(--primary)',
                     textDecoration: 'none',
                     borderRadius: '6px',
@@ -135,7 +156,7 @@ export default function CitizenRights({ language = 'English' }) {
                     transition: 'all 0.2s'
                   }}
                   onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = 'var(--primary)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = 'var(--primary-light)'; e.currentTarget.style.color = 'var(--primary)'; }}
                 >
                   {isHindi ? 'कॉल करें' : 'Dial Now'}
                 </a>
@@ -143,8 +164,8 @@ export default function CitizenRights({ language = 'English' }) {
                   type="button"
                   onClick={() => copyHelpline(hl.number)}
                   style={{
-                    background: '#fff',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--subtle-bg)',
+                    border: '1px solid var(--card-border)',
                     borderRadius: '6px',
                     padding: '6px 10px',
                     fontSize: '12px',
@@ -211,8 +232,8 @@ export default function CitizenRights({ language = 'English' }) {
                 className="hover-tactile"
                 onClick={() => setActiveStep(activeStep === i ? null : i)}
                 style={{
-                  border: activeStep === i ? '1px solid var(--primary)' : '1px solid #e2e8f0',
-                  background: activeStep === i ? 'rgba(59, 130, 246, 0.06)' : '#fff',
+                  border: activeStep === i ? '1px solid var(--primary)' : '1px solid var(--card-border)',
+                  background: activeStep === i ? 'var(--primary-light)' : 'var(--card-bg)',
                   borderRadius: '10px',
                   padding: '12px',
                   cursor: 'pointer'
@@ -228,7 +249,7 @@ export default function CitizenRights({ language = 'English' }) {
                   <ChevronRight size={16} color={activeStep === i ? 'var(--primary)' : 'var(--text-muted)'} />
                 </div>
                 {activeStep === i && (
-                  <p style={{ margin: '8px 0 0', fontSize: '12px', color: '#1e3a8a', lineHeight: '1.5', background: '#eff6ff', padding: '8px', borderRadius: '6px' }}>
+                  <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-main)', lineHeight: '1.5', background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', padding: '8px', borderRadius: '6px' }}>
                     {scenario.advice}
                   </p>
                 )}
@@ -251,9 +272,9 @@ export default function CitizenRights({ language = 'English' }) {
                 type="button"
                 onClick={() => setSelectedTopic(topic.id)}
                 style={{
-                  background: isSelected ? 'var(--primary)' : 'rgba(241, 245, 249, 0.8)',
+                  background: isSelected ? 'var(--primary)' : 'var(--subtle-bg)',
                   color: isSelected ? '#fff' : 'var(--text-main)',
-                  border: isSelected ? '1px solid var(--primary)' : '1px solid #cbd5e1',
+                  border: isSelected ? '1px solid var(--primary)' : '1px solid var(--card-border)',
                   borderRadius: '10px',
                   padding: '9px 16px',
                   fontSize: '13.5px',
@@ -285,9 +306,10 @@ export default function CitizenRights({ language = 'English' }) {
               width: '100%',
               padding: '9px 14px 9px 36px',
               borderRadius: '8px',
-              border: '1px solid #cbd5e1',
+              border: '1px solid var(--card-border)',
               fontSize: '13.5px',
-              background: '#f8fafc',
+              background: 'var(--subtle-bg)',
+              color: 'var(--text-main)',
               outline: 'none',
               boxSizing: 'border-box'
             }}
@@ -303,14 +325,14 @@ export default function CitizenRights({ language = 'English' }) {
                 key={idx}
                 onClick={() => setExpandedRule(isExpanded ? null : idx)}
                 style={{
-                  background: '#fff',
-                  border: '1px solid #e2e8f0',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--card-border)',
                   borderLeft: `3px solid ${currentTopic.color}`,
                   borderRadius: '8px',
                   padding: '12px 16px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  boxShadow: isExpanded ? '0 2px 4px rgba(0,0,0,0.04)' : 'none'
+                  boxShadow: isExpanded ? 'var(--card-shadow)' : 'none'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -327,7 +349,7 @@ export default function CitizenRights({ language = 'English' }) {
                   />
                 </div>
                 {isExpanded && (
-                  <p style={{ margin: '10px 0 0', fontSize: '12.5px', color: '#475569', lineHeight: '1.6', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                  <p style={{ margin: '10px 0 0', fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: '1.6', borderTop: '1px solid var(--card-border)', paddingTop: '10px' }}>
                     {isHindi ? rule.desc_hi : rule.desc}
                   </p>
                 )}

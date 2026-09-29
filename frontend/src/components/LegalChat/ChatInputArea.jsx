@@ -37,19 +37,46 @@ export default function ChatInputArea({
         </div>
       )}
 
-      {/* Input Area */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.7)', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+      {/* Input Dock Area */}
+      <div style={{
+        padding: '8px 10px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '16px',
+        boxShadow: 'var(--card-shadow)',
+        position: 'relative'
+      }}>
         <form onSubmit={handleSend} style={{ display: 'flex', gap: '8px', position: 'relative', alignItems: 'center' }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={isHindi
-              ? "सवाल लिखें या माइक दबाएं..."
-              : "Type question or tap mic..."}
-            className="input-field"
+              ? "अपनी कानूनी समस्या लिखें (जैसे: ऑनलाइन ठगी, किरायेदार विवाद, एक्सीडेंट)..."
+              : "Describe legal issue (e.g. online fraud, tenant dispute, accident, FIR refusal)..."}
             disabled={isLoading}
-            style={{ paddingRight: '88px', height: '46px', fontSize: '14px', width: '100%' }}
+            style={{
+              width: '100%',
+              padding: '14px 96px 14px 18px',
+              fontSize: '14px',
+              border: '1px solid var(--card-border)',
+              borderRadius: '12px',
+              background: 'var(--subtle-bg)',
+              color: 'var(--text-main)',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              fontFamily: 'inherit'
+            }}
+            onFocus={e => {
+              e.currentTarget.style.background = 'var(--card-bg)';
+              e.currentTarget.style.borderColor = 'var(--primary)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-light)';
+            }}
+            onBlur={e => {
+              e.currentTarget.style.background = 'var(--subtle-bg)';
+              e.currentTarget.style.borderColor = 'var(--card-border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
 
           {/* Voice Input Microphone Button */}
@@ -59,20 +86,26 @@ export default function ChatInputArea({
             disabled={isLoading}
             style={{
               position: 'absolute',
-              right: '48px',
-              top: '5px',
-              bottom: '5px',
-              width: '36px',
+              right: '50px',
+              top: '7px',
+              bottom: '7px',
+              width: '38px',
               border: 'none',
-              borderRadius: '8px',
-              background: isListening ? '#ef4444' : 'rgba(59, 130, 246, 0.1)',
-              color: isListening ? 'white' : 'var(--primary)',
+              borderRadius: '10px',
+              background: isListening ? 'var(--danger)' : 'var(--card-bg)',
+              color: isListening ? 'white' : 'var(--text-muted)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: isListening ? '0 0 10px rgba(239, 68, 68, 0.5)' : 'none'
+              boxShadow: isListening ? '0 0 12px rgba(239, 68, 68, 0.6)' : 'none'
+            }}
+            onMouseEnter={e => {
+              if (!isListening) e.currentTarget.style.background = 'var(--primary-light)';
+            }}
+            onMouseLeave={e => {
+              if (!isListening) e.currentTarget.style.background = 'var(--card-bg)';
             }}
             title={isListening ? (isHindi ? 'रिकॉर्डिंग बंद करें' : 'Stop listening') : (isHindi ? 'बोलकर सवाल पूछें (माइक्रोफ़ोन)' : 'Click to speak query')}
           >
@@ -82,19 +115,24 @@ export default function ChatInputArea({
           {/* Send Button */}
           <button
             type="submit"
-            className="btn-primary"
             disabled={isLoading || !input.trim()}
             style={{
               position: 'absolute',
-              right: '5px',
-              top: '5px',
-              bottom: '5px',
-              width: '38px',
+              right: '6px',
+              top: '6px',
+              bottom: '6px',
+              width: '40px',
               padding: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: '8px'
+              borderRadius: '10px',
+              border: 'none',
+              background: input.trim() ? 'var(--primary)' : 'var(--subtle-border)',
+              color: input.trim() ? '#ffffff' : 'var(--text-muted)',
+              cursor: input.trim() && !isLoading ? 'pointer' : 'default',
+              boxShadow: input.trim() ? '0 4px 12px rgba(37, 99, 235, 0.3)' : 'none',
+              transition: 'all 0.2s ease'
             }}
           >
             <Send size={16} />

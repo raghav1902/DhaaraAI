@@ -74,14 +74,14 @@ export default function FeeCalculator({ language = 'English' }) {
         </div>
 
         {val > 0 && (
-          <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #cbd5e1' }}>
-              <span style={{ color: '#475569', fontSize: '14px' }}>{isHindi ? 'स्टाम्प ड्यूटी' : 'Stamp Duty'} ({stampRate}%)</span>
-              <span style={{ fontWeight: '600', color: '#0f172a' }}>{formatCurrency(stampDuty)}</span>
+          <div style={{ background: 'var(--subtle-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--card-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--card-border)' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{isHindi ? 'स्टाम्प ड्यूटी' : 'Stamp Duty'} ({stampRate}%)</span>
+              <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{formatCurrency(stampDuty)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #cbd5e1' }}>
-              <span style={{ color: '#475569', fontSize: '14px' }}>{isHindi ? 'पंजीकरण शुल्क' : 'Registration Fee'} ({regRate}%)</span>
-              <span style={{ fontWeight: '600', color: '#0f172a' }}>{formatCurrency(regFee)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--card-border)' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{isHindi ? 'पंजीकरण शुल्क' : 'Registration Fee'} ({regRate}%)</span>
+              <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{formatCurrency(regFee)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: '#059669', fontSize: '15px', fontWeight: '700' }}>{isHindi ? 'कुल अनुमानित खर्च' : 'Total Estimated Cost'}</span>
@@ -224,7 +224,7 @@ export default function FeeCalculator({ language = 'English' }) {
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {TRAFFIC_VIOLATIONS.map(v => (
-              <label key={v.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '10px', background: selectedViolations.includes(v.id) ? '#fef2f2' : '#f8fafc', border: `1px solid ${selectedViolations.includes(v.id) ? '#fecaca' : '#e2e8f0'}`, borderRadius: '8px', transition: 'all 0.2s ease' }}>
+              <label key={v.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '10px', background: selectedViolations.includes(v.id) ? 'rgba(239, 68, 68, 0.12)' : 'var(--subtle-bg)', border: `1px solid ${selectedViolations.includes(v.id) ? 'rgba(239, 68, 68, 0.3)' : 'var(--card-border)'}`, borderRadius: '8px', transition: 'all 0.2s ease' }}>
                 <input 
                   type="checkbox" 
                   checked={selectedViolations.includes(v.id)}
@@ -258,25 +258,47 @@ export default function FeeCalculator({ language = 'English' }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid #eab308' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #ca8a04, #eab308)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-            <Calculator size={26} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        boxShadow: 'var(--card-shadow)'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #d97706, #b45309)',
+          padding: '10px',
+          borderRadius: '12px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(217, 119, 6, 0.2)'
+        }}>
+          <Calculator size={22} />
+        </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
               {isHindi ? 'शुल्क और जुर्माना कैलकुलेटर' : 'Fees & Fines Calculator'}
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
-              {isHindi
-                ? 'नवीनतम दरों के आधार पर अपनी संपत्ति, न्यायालय, या यातायात जुर्माने के खर्चों का अनुमान लगाएं।'
-                : 'Estimate your legal costs, court fees, or traffic fines based on the latest statutory rates.'}
-            </p>
+            <span style={{ fontSize: '11px', background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid rgba(217, 119, 6, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+              Statutory Schedule
+            </span>
           </div>
+          <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
+            {isHindi
+              ? 'नवीनतम दरों के आधार पर अपनी संपत्ति, न्यायालय, या यातायात जुर्माने के खर्चों का अनुमान लगाएं।'
+              : 'Estimate your legal costs, court fees, or traffic fines based on the latest statutory rates.'}
+          </p>
         </div>
+      </div>
 
-        <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+      <div style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
           <button
             type="button"
             onClick={() => setCalcType('property')}
@@ -326,7 +348,6 @@ export default function FeeCalculator({ language = 'English' }) {
             <Car size={16} /> {isHindi ? 'चालान' : 'Traffic'}
           </button>
         </div>
-      </div>
 
       {calcType === 'property' && renderPropertyCalc()}
       {calcType === 'court' && renderCourtCalc()}

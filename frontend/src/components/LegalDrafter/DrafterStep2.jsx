@@ -14,14 +14,14 @@ export default function DrafterStep2({
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
       {/* Complainant Section */}
-      <div style={{ background: 'white', borderRadius: '12px', padding: '18px', border: '1px solid #e2e8f0' }}>
-        <h4 style={{ margin: '0 0 14px', fontSize: '15px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ background: 'var(--card-bg)', borderRadius: '12px', padding: '18px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
+        <h4 style={{ margin: '0 0 14px', fontSize: '15px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <User size={18} color="var(--primary)" />
           {isHindi ? 'परिवादी / आवेदक का विवरण (Complainant Particulars)' : 'Complainant / Sender Particulars'}
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '12px' }}>
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
               {isHindi ? 'आवेदक का पूरा नाम *' : 'Full Name *'}
             </label>
             <input
@@ -35,7 +35,7 @@ export default function DrafterStep2({
           </div>
 
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
               {isHindi ? 'पिता / पति का नाम' : 'Father / Spouse Name'}
             </label>
             <input
@@ -49,7 +49,7 @@ export default function DrafterStep2({
           </div>
 
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
               {isHindi ? 'मोबाइल नंबर *' : 'Contact Mobile No. *'}
             </label>
             <input
@@ -63,7 +63,7 @@ export default function DrafterStep2({
           </div>
 
           <div>
-            <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
               {isHindi ? 'संबंधित पुलिस थाना / शहर *' : 'Jurisdictional Police Station / City *'}
             </label>
             <input
@@ -77,7 +77,7 @@ export default function DrafterStep2({
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={{ fontSize: '12.5px', fontWeight: '500', color: '#475569', marginBottom: '4px', display: 'block' }}>
+            <label style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
               {isHindi ? 'आवेदक का पूरा स्थायी/वर्तमान पता *' : 'Full Residential Address *'}
             </label>
             <input
@@ -93,14 +93,14 @@ export default function DrafterStep2({
       </div>
 
       {/* Accused Section */}
-      <div style={{ background: 'white', borderRadius: '12px', padding: '18px', border: '1px solid #e2e8f0' }}>
+      <div style={{ background: 'var(--card-bg)', borderRadius: '12px', padding: '18px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-          <h4 style={{ margin: 0, fontSize: '15px', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <UserX size={18} color="#dc2626" />
             {isHindi ? 'आरोपी / प्रतिवादी का विवरण (Accused Particulars)' : 'Accused / Respondent Particulars'}
           </h4>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', color: '#475569' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', color: 'var(--text-secondary)' }}>
             <input
               type="checkbox"
               checked={isAccusedUnknown}
@@ -142,7 +142,7 @@ export default function DrafterStep2({
             </div>
           </div>
         ) : (
-          <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '13px', color: '#64748b' }}>
+          <div style={{ background: 'var(--subtle-bg)', padding: '12px 16px', borderRadius: '8px', border: '1px dashed var(--card-border)', fontSize: '13px', color: 'var(--text-muted)' }}>
             {isHindi
               ? 'आरोपी को "अज्ञात व्यक्ति (Unknown Culprit)" के रूप में चिह्नित किया गया है। पुलिस धारा 173 BNSS के तहत तकनीकी विश्लेषण, बैंक UTR व कॉल रिकॉर्ड के आधार पर आरोपी की शिनाख्त करेगी।'
               : 'Accused will be formally addressed as "Unknown Person(s)". Investigating officers will trace the culprits using cyber/banking audit trails under Section 173 BNSS.'}

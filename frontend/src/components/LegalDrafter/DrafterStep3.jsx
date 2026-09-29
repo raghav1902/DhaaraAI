@@ -122,8 +122,8 @@ export default function DrafterStep3({
                 key={item.id}
                 onClick={() => handleEvidenceToggle(item.id)}
                 style={{
-                  background: isSelected ? 'rgba(59, 130, 246, 0.08)' : 'white',
-                  border: isSelected ? '1px solid var(--primary)' : '1px solid #e2e8f0',
+                  background: isSelected ? 'var(--primary-light)' : 'var(--card-bg)',
+                  border: isSelected ? '1px solid var(--primary)' : '1px solid var(--card-border)',
                   borderRadius: '8px',
                   padding: '8px 12px',
                   cursor: 'pointer',
@@ -138,8 +138,8 @@ export default function DrafterStep3({
                   width: '16px',
                   height: '16px',
                   borderRadius: '4px',
-                  border: isSelected ? 'none' : '1px solid #94a3b8',
-                  background: isSelected ? 'var(--primary)' : 'white',
+                  border: isSelected ? 'none' : '1px solid var(--card-border)',
+                  background: isSelected ? 'var(--primary)' : 'var(--card-bg)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -147,7 +147,7 @@ export default function DrafterStep3({
                 }}>
                   {isSelected && <Check size={12} />}
                 </div>
-                <span>{isHindi ? item.hi : item.en}</span>
+                <span style={{ color: 'var(--text-main)' }}>{isHindi ? item.hi : item.en}</span>
               </div>
             );
           })}

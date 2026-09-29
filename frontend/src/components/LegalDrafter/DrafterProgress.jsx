@@ -3,31 +3,44 @@ import { FileText, Check, Sparkles } from 'lucide-react';
 
 export function DrafterHeader({ language, onLanguageChange, isHindi }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+    <div style={{
+      padding: '16px 20px',
+      borderRadius: '16px',
+      background: 'var(--card-bg)',
+      border: '1px solid var(--card-border)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '12px',
+      boxShadow: 'var(--card-shadow)'
+    }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)', color: 'white', padding: '10px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+        }}>
           <FileText size={22} />
         </div>
         <div>
-          <h2 style={{ fontSize: '19px', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>
-            {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस जनरेटर' : 'Automated FIR & Legal Notice Drafter'}
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '2px 0 0' }}>
-            {isHindi ? 'धारा 173 BNSS एवं भारतीय न्याय संहिता (BNS 2023) के प्रमाणित कानूनी प्रारूप' : 'Statutory procedural formats under Section 173 BNSS & BNS 2023'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
+              {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस जनरेटर' : 'Automated FIR & Legal Notice Drafter'}
+            </h2>
+            <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+              Sec 173 BNSS
+            </span>
+          </div>
+          <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+            {isHindi ? 'धारा 173 BNSS एवं भारतीय न्याय संहिता (BNS 2023) के प्रमाणित प्रारूप' : 'Statutory procedural formats under Section 173 BNSS & BNS 2023'}
           </p>
         </div>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <select
-          value={language}
-          onChange={(e) => onLanguageChange(e.target.value)}
-          className="input-field"
-          style={{ width: '135px', padding: '6px 10px', fontSize: '13px', height: '36px' }}
-        >
-          <option value="English">English</option>
-          <option value="Hindi">हिंदी (Hindi)</option>
-        </select>
       </div>
     </div>
   );
@@ -50,21 +63,21 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
         <button
           type="button"
           onClick={() => onLoadPreset('cyber')}
-          style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
         >
           {isHindi ? 'साइबर ठगी FIR' : 'Cyber Fraud FIR'}
         </button>
         <button
           type="button"
           onClick={() => onLoadPreset('cheque')}
-          style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
         >
           {isHindi ? 'चेक बाउंस नोटिस' : 'Cheque Bounce Notice'}
         </button>
         <button
           type="button"
           onClick={() => onLoadPreset('tenant')}
-          style={{ background: 'white', border: '1px solid #cbd5e1', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: '#1e293b' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
         >
           {isHindi ? 'किराया डिपॉजिट नोटिस' : 'Tenant Deposit Notice'}
         </button>
@@ -78,7 +91,7 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
             left: '24px',
             right: '24px',
             height: '3px',
-            background: '#e2e8f0',
+            background: 'var(--card-border)',
             zIndex: 0
           }}
         />
@@ -114,15 +127,15 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: step >= s.num ? 'var(--primary)' : 'white',
-              border: step >= s.num ? 'none' : '2px solid #cbd5e1',
-              color: step >= s.num ? 'white' : '#64748b',
+              background: step >= s.num ? 'var(--primary)' : 'var(--card-bg)',
+              border: step >= s.num ? 'none' : '2px solid var(--card-border)',
+              color: step >= s.num ? 'white' : 'var(--text-muted)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '700',
               fontSize: '13px',
-              boxShadow: step === s.num ? '0 0 0 4px rgba(59, 130, 246, 0.2)' : 'none',
+              boxShadow: step === s.num ? '0 0 0 4px var(--primary-light)' : 'none',
               transition: 'all 0.2s ease',
               flexShrink: 0
             }}>

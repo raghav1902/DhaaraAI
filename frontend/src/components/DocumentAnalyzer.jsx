@@ -115,22 +115,42 @@ export default function DocumentAnalyzer({ language = 'English' }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div className="" style={{ padding: '24px', borderRadius: '16px', borderLeft: '5px solid var(--primary)' }}>
+      <div style={{
+        padding: '16px 20px',
+        borderRadius: '16px',
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        boxShadow: 'var(--card-shadow)'
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', padding: '12px', borderRadius: '14px', color: '#fff' }}>
-              <FileSearch size={26} />
+            <div style={{
+              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+              padding: '10px',
+              borderRadius: '12px',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+            }}>
+              <FileSearch size={22} />
             </div>
             <div>
-              <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>
-                {isHindi ? 'AI विधिक दस्तावेज व अनुबंध समीक्षक (Contract Audit)' : 'AI Legal Document & Contract Risk Analyzer'}
-              </h2>
-              <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                  {isHindi ? 'विधिक दस्तावेज व अनुबंध समीक्षक' : 'Contract & Legal Document Audit'}
+                </h2>
+                <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+                  Contract Act 1872
+                </span>
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
                 {isHindi
-                  ? 'भारतीय अनुबंध कानून (Indian Contract Act 1872), मॉडल टेनेंसी एक्ट व उपभोक्ता संरक्षण कानूनों के तहत एकतरफा व गैर-कानूनी शर्तों की जांच करें।'
-                  : 'Screen rental deeds, employment bonds, and freelance agreements for unfair clauses, unlawful forfeiture, and Indian statutory compliance.'}
+                  ? 'किरायानामा, एम्प्लॉयमेंट बॉन्ड व सर्विस एग्रीमेंट में गैर-कानूनी या एकतरफा शर्तों की तत्काल जांच करें।'
+                  : 'Screen rent deeds, employment bonds, and freelance agreements for unfair clauses and Indian law compliance.'}
               </p>
             </div>
           </div>
@@ -206,8 +226,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 width: '100%',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                background: '#fff',
+                border: '1px solid var(--card-border)',
+                background: 'var(--subtle-bg)',
                 fontSize: '14px',
                 outline: 'none',
                 color: 'var(--text-main)'
@@ -225,10 +245,10 @@ export default function DocumentAnalyzer({ language = 'English' }) {
 
         {/* Document Upload Area */}
         <div style={{
-          border: '2px dashed #cbd5e1',
+          border: '2px dashed var(--card-border)',
           borderRadius: '12px',
           padding: '16px 20px',
-          background: '#f8fafc',
+          background: 'var(--subtle-bg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -262,8 +282,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             <label
               htmlFor="contract-file-upload"
               style={{
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
+                background: 'var(--subtle-bg)',
+                border: '1px solid var(--card-border)',
                 padding: '7px 16px',
                 borderRadius: '8px',
                 fontSize: '13px',
@@ -318,11 +338,12 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               width: '100%',
               padding: '14px',
               borderRadius: '10px',
-              border: '1px solid #cbd5e1',
+              border: '1px solid var(--card-border)',
               fontSize: '13.5px',
               fontFamily: 'monospace',
               lineHeight: '1.5',
-              background: '#f8fafc',
+              background: 'var(--subtle-bg)',
+              color: 'var(--text-main)',
               resize: 'vertical',
               outline: 'none',
               boxSizing: 'border-box'
