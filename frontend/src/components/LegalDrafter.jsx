@@ -10,6 +10,8 @@ import DrafterStep2 from './LegalDrafter/DrafterStep2';
 import DrafterStep3 from './LegalDrafter/DrafterStep3';
 import DrafterStep4 from './LegalDrafter/DrafterStep4';
 import DrafterStep5 from './LegalDrafter/DrafterStep5';
+import DraftContextPanel from './LegalDrafter/DraftContextPanel';
+import './LegalDrafter/LegalDrafter.css';
 
 export default function LegalDrafter({ language = 'English', onLanguageChange = () => { } }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
@@ -163,11 +165,12 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, height: '100%' }}>
+    <div className="legal-drafter animate-fade-in">
       <DrafterHeader
         language={language}
         onLanguageChange={onLanguageChange}
         isHindi={isHindi}
+        onNewDraft={() => { setStep(1); setGeneratedResult(null); setDraftError(null); }}
       />
 
       {step < 5 && (
@@ -179,6 +182,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         />
       )}
 
+      {step < 5 && <div className="drafter-workspace">
+      <div className="drafter-config-column">
       {step === 1 && (
         <DrafterStep1
           documentType={documentType}
@@ -241,6 +246,20 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           isHindi={isHindi}
         />
       )}
+      </div>
+      <DraftContextPanel
+        step={step}
+        documentType={documentType}
+        incidentCategory={incidentCategory}
+        complainant={complainant}
+        incidentDatetime={incidentDatetime}
+        incidentLocation={incidentLocation}
+        facts={facts}
+        selectedEvidences={selectedEvidences}
+        reliefSought={reliefSought}
+        isHindi={isHindi}
+      />
+      </div>}
 
       {step === 5 && generatedResult && (
         <DrafterStep5

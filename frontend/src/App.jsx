@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LegalChat from './components/LegalChat';
 import LegalLibrary from './components/LegalLibrary';
 import LegalDrafter from './components/LegalDrafter';
@@ -11,6 +11,7 @@ import FeeCalculator from './components/FeeCalculator';
 import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
+import './WorkspaceVisuals.css';
 import {
   Scale,
   BookOpen,
@@ -130,13 +131,35 @@ function App() {
     setActiveTab('chat');
   };
 
+  const [globalSearch, setGlobalSearch] = useState('');
+  const searchInputRef = useRef(null);
+
+  // Global Ctrl + K search shortcut
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleGlobalSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!globalSearch.trim()) return;
+    handleAskAiFromExternal(globalSearch.trim());
+    setGlobalSearch('');
+  };
+
   const navItems = [
-    { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Search },
-    { id: 'drafting', label: isHindi ? 'ड्राफ्टिंग (FIR/नोटिस)' : 'Drafting', icon: FileText },
-    { id: 'analyzer', label: isHindi ? 'अनुबंध समीक्षक' : 'Contract Audit', icon: FileSearch },
-    { id: 'rights', label: isHindi ? 'नागरिक अधिकार & SOS' : 'Citizen Rights & SOS', icon: ShieldAlert },
-    { id: 'converter', label: isHindi ? 'BNS ↔ IPC' : 'BNS ↔ IPC', icon: ArrowRightLeft },
-    { id: 'library', label: isHindi ? 'लाइब्रेरी' : 'Legal Library', icon: BookOpen },
+    { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Search, badge: 'AI' },
+    { id: 'drafting', label: isHindi ? 'ड्राफ्टिंग' : 'Drafting', icon: FileText, badge: 'Sec 173' },
+    { id: 'analyzer', label: isHindi ? 'अनुबंध समीक्षक' : 'Contract Audit', icon: FileSearch, badge: 'Risk' },
+    { id: 'rights', label: isHindi ? 'नागरिक अधिकार & SOS' : 'Citizen Rights & SOS', icon: ShieldAlert, badge: 'Emergency' },
+    { id: 'converter', label: isHindi ? 'BNS ↔ IPC' : 'BNS ↔ IPC', icon: ArrowRightLeft, badge: '2024' },
+    { id: 'library', label: isHindi ? 'कानूनी लाइब्रेरी' : 'Legal Library', icon: BookOpen },
     { id: 'vault', label: isHindi ? 'सुरक्षित वॉल्ट' : 'Legal Vault', icon: Lock },
     { id: 'calculator', label: isHindi ? 'शुल्क कैलकुलेटर' : 'Fee Calculator', icon: Calculator },
     { id: 'cyber', label: isHindi ? 'साइबर स्कैनर' : 'Cyber Scanner', icon: Globe },
@@ -182,14 +205,14 @@ function App() {
         />
       )}
 
-      {/* Modern Responsive Sidebar */}
+      {/* Modern Refined Sidebar */}
       <nav className={`no-print app-sidebar ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{
-        width: isSidebarOpen ? '270px' : '78px',
-        minWidth: isSidebarOpen ? '270px' : '78px',
-        padding: '20px 14px',
+        width: isSidebarOpen ? '255px' : '72px',
+        minWidth: isSidebarOpen ? '255px' : '72px',
+        padding: '18px 12px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '14px',
+        gap: '12px',
         position: 'sticky',
         top: '0',
         height: '100vh',
@@ -198,22 +221,22 @@ function App() {
         borderRight: '1px solid var(--card-border)',
         boxShadow: 'var(--card-shadow)',
         zIndex: 50,
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
       }}>
         {/* Brand Header */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: isSidebarOpen ? 'space-between' : 'center',
-          paddingBottom: '16px',
+          paddingBottom: '14px',
           borderBottom: '1px solid var(--card-border)',
-          minHeight: '56px'
+          minHeight: '52px'
         }}>
           <div
             style={{
               display: isSidebarOpen ? 'flex' : 'none',
               alignItems: 'center',
-              gap: '12px',
+              gap: '10px',
               cursor: 'pointer',
               overflow: 'hidden'
             }}
@@ -223,25 +246,25 @@ function App() {
             }}
           >
             <div style={{
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-              padding: '10px',
-              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
+              padding: '9px',
+              borderRadius: '10px',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              minWidth: '40px',
-              minHeight: '40px',
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
+              minWidth: '36px',
+              minHeight: '36px',
+              boxShadow: '0 3px 10px rgba(29, 78, 216, 0.3)'
             }}>
-              <Scale size={20} />
+              <Scale size={18} />
             </div>
             <div style={{ whiteSpace: 'nowrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h1 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>LegalGPT</h1>
-                <span style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', padding: '1px 6px', borderRadius: '4px', fontWeight: '700' }}>AI</span>
+                <h1 style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>DhaaraAI</h1>
+                <span style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>LegalGPT</span>
               </div>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>DhaaraAI Legal Suite</p>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>Indian Legal Intelligence</p>
             </div>
           </div>
 
@@ -252,30 +275,30 @@ function App() {
               border: '1px solid var(--card-border)',
               cursor: 'pointer',
               color: 'var(--text-main)',
-              padding: '8px',
+              padding: '7px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: '10px',
-              minWidth: '38px',
-              minHeight: '38px',
+              borderRadius: '8px',
+              minWidth: '34px',
+              minHeight: '34px',
               transition: 'all 0.2s ease'
             }}
             title={isSidebarOpen ? (isHindi ? "साइडबार बंद करें" : "Collapse Sidebar") : (isHindi ? "साइडबार खोलें" : "Expand Sidebar")}
           >
-            {isSidebarOpen ? <X size={18} /> : <Menu size={20} />}
+            {isSidebarOpen ? <X size={16} /> : <Menu size={18} />}
           </button>
         </div>
 
         {/* Section Label */}
         {isSidebarOpen && (
-          <div style={{ padding: '0 8px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#94a3b8' }}>
-            {isHindi ? 'विधिक मॉड्यूल' : 'Modules'}
+          <div style={{ padding: '0 8px', fontSize: '10.5px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-dim)' }}>
+            {isHindi ? 'विधिक मॉड्यूल' : 'Legal Modules'}
           </div>
         )}
 
         {/* Navigation Tabs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}>
           {navItems.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -293,14 +316,14 @@ function App() {
                   background: isActive ? 'var(--primary-light)' : 'transparent',
                   border: isActive ? '1px solid var(--primary-border)' : '1px solid transparent',
                   color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-                  fontWeight: isActive ? '600' : '500',
-                  fontSize: '13.5px',
+                  fontWeight: isActive ? '700' : '500',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                  gap: '12px',
-                  padding: isSidebarOpen ? '10px 14px' : '10px 0',
+                  gap: '10px',
+                  padding: isSidebarOpen ? '9px 12px' : '9px 0',
                   borderRadius: '10px',
                   transition: 'all 0.15s ease',
                   textAlign: 'left',
@@ -325,15 +348,32 @@ function App() {
                   <div style={{
                     position: 'absolute',
                     left: '0',
-                    top: '20%',
-                    bottom: '20%',
-                    width: '3px',
+                    top: '18%',
+                    bottom: '18%',
+                    width: '3.5px',
                     borderRadius: '0 4px 4px 0',
-                    background: '#2563eb'
+                    background: 'var(--primary)'
                   }} />
                 )}
-                <Icon size={isSidebarOpen ? 18 : 20} style={{ minWidth: isSidebarOpen ? '18px' : '20px', color: isActive ? '#2563eb' : 'inherit' }} />
-                {isSidebarOpen && <span>{tab.label}</span>}
+                <Icon size={isSidebarOpen ? 17 : 19} style={{ minWidth: isSidebarOpen ? '17px' : '19px', color: isActive ? 'var(--primary)' : 'inherit' }} />
+                {isSidebarOpen && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span>{tab.label}</span>
+                    {tab.badge && (
+                      <span style={{
+                        fontSize: '9.5px',
+                        fontWeight: '700',
+                        padding: '1px 6px',
+                        borderRadius: '999px',
+                        background: tab.id === 'rights' ? 'var(--danger-light)' : 'var(--primary-light)',
+                        color: tab.id === 'rights' ? 'var(--danger)' : 'var(--primary)',
+                        border: `1px solid ${tab.id === 'rights' ? 'var(--danger-border)' : 'var(--primary-border)'}`
+                      }}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </div>
+                )}
               </button>
             );
           })}
@@ -341,28 +381,28 @@ function App() {
 
         {/* PWA Install Button */}
         {isInstallable && (
-          <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+          <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid var(--card-border)' }}>
             <button
               onClick={handleInstallApp}
               title={isHindi ? "ऐप इंस्टॉल करें" : "Install App"}
               style={{
                 width: '100%',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
+                background: 'linear-gradient(135deg, #059669, #047857)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '10px',
-                padding: isSidebarOpen ? '9px 12px' : '9px 0',
+                borderRadius: '8px',
+                padding: isSidebarOpen ? '8px 12px' : '8px 0',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                gap: '10px',
-                fontSize: '12.5px',
+                gap: '8px',
+                fontSize: '12px',
                 fontWeight: '600',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
+                boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
               }}
             >
-              <Smartphone size={17} style={{ minWidth: '17px' }} />
+              <Smartphone size={16} style={{ minWidth: '16px' }} />
               {isSidebarOpen && <span>{isHindi ? 'ऐप इंस्टॉल करें' : 'Install App'}</span>}
             </button>
           </div>
@@ -372,42 +412,44 @@ function App() {
       {/* Main Content Area */}
       <main className="app-main" style={{
         flex: 1,
-        margin: '12px 14px 12px 0',
-        padding: '24px 32px',
+        margin: '10px 12px 10px 0',
+        padding: '20px 28px',
         background: 'var(--card-bg)',
-        borderRadius: '20px',
+        borderRadius: '16px',
         border: '1px solid var(--card-border)',
         boxShadow: 'var(--card-shadow)',
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: isSidebarOpen ? 'calc(100% - 284px)' : 'calc(100% - 92px)',
-        height: 'calc(100vh - 24px)',
+        maxWidth: isSidebarOpen ? 'calc(100% - 267px)' : 'calc(100% - 84px)',
+        height: 'calc(100vh - 20px)',
         overflowY: 'auto',
         color: 'var(--text-main)',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.25s ease',
         zIndex: 1,
         position: 'relative'
       }}>
-        {/* Top Control Bar */}
-        <div className="app-top-header" style={{
+        {/* Top Header with Breadcrumbs, Global Search, and Quick Actions */}
+        <header className="app-top-header" style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingBottom: '16px',
+          paddingBottom: '14px',
           marginBottom: '16px',
           borderBottom: '1px solid var(--card-border)',
-          position: 'relative'
+          gap: '16px',
+          flexWrap: 'wrap'
         }}>
-          {/* Mobile hamburger toggle & title */}
-          <div className="mobile-header-bar" style={{ display: 'none', alignItems: 'center', gap: '10px' }}>
+          {/* Left: Mobile Toggle & Active Module Breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
+              className="mobile-header-bar"
               onClick={() => setIsSidebarOpen(true)}
               style={{
+                display: 'none',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 borderRadius: '8px',
-                padding: '8px',
-                display: 'flex',
+                padding: '7px',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'var(--text-main)',
@@ -415,42 +457,75 @@ function App() {
               }}
               aria-label="Open menu"
             >
-              <Menu size={20} />
+              <Menu size={18} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', padding: '6px', borderRadius: '8px', color: 'white', display: 'flex' }}>
-                <Scale size={16} />
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'var(--subtle-bg)',
+                border: '1px solid var(--card-border)',
+                padding: '5px 12px',
+                borderRadius: '999px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '7px',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                color: 'var(--text-main)'
+              }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px rgba(16, 185, 129, 0.4)' }} />
+                {navItems.find(n => n.id === activeTab)?.label || 'Workspace'}
               </div>
-              <span style={{ fontWeight: '800', fontSize: '16px', color: 'var(--text-main)' }}>LegalGPT</span>
+              <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>•</span>
+                <span>BNS 2023 / BNSS Verified</span>
+              </div>
             </div>
           </div>
 
-          {/* Active Tab Breadcrumb & Live Status */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Center: Global Search Bar with Ctrl+K shortcut */}
+          <form onSubmit={handleGlobalSearchSubmit} style={{ flex: '1 1 280px', maxWidth: '440px', position: 'relative' }}>
+            <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={globalSearch}
+              onChange={e => setGlobalSearch(e.target.value)}
+              placeholder={isHindi ? "धारा, केस या कानूनी प्रश्न खोजें..." : "Search sections, cases, or legal queries..."}
+              className="input-field"
+              style={{
+                paddingLeft: '34px',
+                paddingRight: '64px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                fontSize: '13px',
+                height: '36px',
+                borderRadius: '999px',
+                background: 'var(--subtle-bg)'
+              }}
+            />
             <div style={{
-              background: 'var(--subtle-bg)',
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '10px',
+              fontWeight: '700',
+              color: 'var(--text-dim)',
+              background: 'var(--card-bg)',
               border: '1px solid var(--card-border)',
-              padding: '6px 14px',
-              borderRadius: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '13px',
-              fontWeight: '600',
-              color: 'var(--text-secondary)'
+              padding: '2px 6px',
+              borderRadius: '6px',
+              pointerEvents: 'none',
+              letterSpacing: '0.04em'
             }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px rgba(16, 185, 129, 0.4)' }} />
-              {navItems.find(n => n.id === activeTab)?.label || 'Workspace'}
+              Ctrl K
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>•</span>
-              <span>BNS 2023 / BNSS Verified</span>
-            </div>
-          </div>
+          </form>
 
-          {/* User Profile Pill & Quick Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto', position: 'relative' }}>
-            {/* Theme Toggle Button (Dark / Light) */}
+          {/* Right: Language, Theme, Profile */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
@@ -459,87 +534,83 @@ function App() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '6px 10px',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 color: 'var(--text-main)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 gap: '6px',
-                fontSize: '12.5px',
+                fontSize: '12px',
                 fontWeight: '600'
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-border)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--card-border)'}
             >
               {theme === 'dark' ? (
                 <>
-                  <Sun size={15} color="#f59e0b" />
+                  <Sun size={14} color="#f59e0b" />
                   <span style={{ display: 'inline-block' }}>Light</span>
                 </>
               ) : (
                 <>
-                  <Moon size={15} color="#6366f1" />
+                  <Moon size={14} color="#6366f1" />
                   <span style={{ display: 'inline-block' }}>Dark</span>
                 </>
               )}
             </button>
 
-            {/* Language Quick Switch */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', padding: '4px 8px', borderRadius: '10px' }}>
-              <Globe size={14} color="var(--text-muted)" />
+            {/* Language Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', padding: '3px 8px', borderRadius: '8px' }}>
+              <Globe size={13} color="var(--text-muted)" />
               <select
                 value={language}
                 onChange={e => setLanguage(e.target.value)}
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  fontSize: '12.5px',
+                  fontSize: '12px',
                   fontWeight: '600',
                   color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   outline: 'none'
                 }}
               >
-                <option value="English" style={{ background: 'var(--card-bg)', color: 'var(--text-main)' }}>English</option>
-                <option value="Hindi" style={{ background: 'var(--card-bg)', color: 'var(--text-main)' }}>हिंदी (Hindi)</option>
+                <option value="English">English</option>
+                <option value="Hindi">हिंदी (Hindi)</option>
               </select>
             </div>
 
-            {/* Profile Dropdown */}
+            {/* Profile Menu Trigger */}
             <div
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '4px 10px 4px 5px',
-                borderRadius: '24px',
+                gap: '7px',
+                padding: '3px 9px 3px 4px',
+                borderRadius: '999px',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 userSelect: 'none'
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary-border)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--card-border)'}
             >
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold',
-                fontSize: '14px',
-                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
+                fontSize: '12px',
+                boxShadow: '0 2px 6px rgba(29, 78, 216, 0.25)'
               }}>
                 {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
               </div>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-main)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user?.name || 'Citizen'}
               </span>
             </div>
@@ -547,35 +618,35 @@ function App() {
             {showProfileMenu && (
               <div style={{
                 position: 'absolute',
-                top: '46px',
+                top: '42px',
                 right: '0',
                 background: 'var(--card-bg)',
-                padding: '16px',
-                borderRadius: '16px',
-                boxShadow: 'var(--card-shadow)',
+                padding: '14px',
+                borderRadius: '14px',
+                boxShadow: 'var(--modal-shadow)',
                 zIndex: 100,
-                minWidth: '220px',
+                minWidth: '210px',
                 border: '1px solid var(--card-border)',
                 animation: 'fadeIn 0.2s ease'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--card-border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid var(--card-border)' }}>
                   <div style={{
-                    width: '38px',
-                    height: '38px',
+                    width: '34px',
+                    height: '34px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                    background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 'bold',
-                    fontSize: '16px'
+                    fontSize: '14px'
                   }}>
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-main)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name || 'User'}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email || 'user@example.com'}</div>
+                    <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-main)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name || 'User'}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email || 'user@example.com'}</div>
                   </div>
                 </div>
 
@@ -588,20 +659,20 @@ function App() {
                     width: '100%',
                     background: 'transparent',
                     border: 'none',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    fontSize: '13px',
+                    padding: '7px 10px',
+                    borderRadius: '6px',
+                    fontSize: '12.5px',
                     color: 'var(--text-secondary)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                     cursor: 'pointer',
-                    marginBottom: '6px'
+                    marginBottom: '4px'
                   }}
                   onMouseEnter={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <SettingsIcon size={15} color="var(--text-muted)" /> {isHindi ? 'प्रोफ़ाइल सेटिंग्स' : 'Account Settings'}
+                  <SettingsIcon size={14} color="var(--text-muted)" /> {isHindi ? 'प्रोफ़ाइल सेटिंग्स' : 'Account Settings'}
                 </button>
 
                 <button
@@ -615,32 +686,29 @@ function App() {
                   }}
                   style={{
                     width: '100%',
-                    background: '#fef2f2',
-                    color: '#dc2626',
-                    border: '1px solid #fee2e2',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
+                    background: 'var(--danger-light)',
+                    color: 'var(--danger)',
+                    border: '1px solid var(--danger-border)',
+                    padding: '7px 10px',
+                    borderRadius: '6px',
                     cursor: 'pointer',
                     fontWeight: '600',
-                    fontSize: '13px',
+                    fontSize: '12.5px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
+                    gap: '6px',
                     transition: 'all 0.15s ease'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
-                  onMouseLeave={e => e.currentTarget.style.background = '#fef2f2'}
                 >
-                  <LogOut size={15} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
+                  <LogOut size={14} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
                 </button>
               </div>
             )}
           </div>
-        </div>
+        </header>
 
-
-        <div style={{ maxWidth: '1040px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '24px', flex: 1, height: '100%' }}>
+        <div className={activeTab === 'chat' ? 'workspace-content workspace-content-chat' : 'workspace-content'} style={{ maxWidth: activeTab === 'chat' ? 'none' : '1120px', margin: activeTab === 'chat' ? '0' : '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minHeight: 0, height: '100%' }}>
           {activeTab === 'chat' && (
             <LegalChat
               initialQuery={injectedQuery}

@@ -18,7 +18,7 @@ export default function DrafterStep5({
   isHindi
 }) {
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div className="drafter-result-step animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Action Toolbar */}
       <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', background: 'var(--card-bg)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -154,7 +154,7 @@ export default function DrafterStep5({
       {/* Printable Official Paper Container */}
       <div
         id="printable-legal-document"
-        className="official-legal-document"
+        className="official-legal-document drafter-paper-preview"
         style={{
           background: '#ffffff',
           color: '#0f172a',

@@ -17,7 +17,7 @@ export default function DrafterStep4({
   isHindi
 }) {
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+    <div className="drafter-step-content drafter-review-step animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
       <div style={{ background: 'var(--subtle-bg)', borderRadius: '12px', border: '1px solid var(--card-border)', padding: '20px' }}>
         <h3 style={{ margin: '0 0 14px', fontSize: '17px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <CheckCircle2 size={20} color="var(--primary)" />

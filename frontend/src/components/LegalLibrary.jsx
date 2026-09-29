@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, BookOpen, Scale, ArrowRight, ShieldCheck, AlertCircle, Sparkles, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import './LegalLibrary.css';
 
 export default function LegalLibrary({ onAskAi, language = 'English' }) {
   const [statutes, setStatutes] = useState([]);
@@ -61,9 +62,9 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="legal-library animate-fade-in" style={{ padding: '0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div style={{
+      <div className="legal-library__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -91,7 +92,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                {isHindi ? 'भारतीय कानून एवं धारा संग्रह' : 'Indian Statutory Codes & Library'}
+                {isHindi ? 'कानूनी पुस्तकालय' : 'Legal Library'}
               </h2>
               <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
                 BNS & IPC
@@ -113,7 +114,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
       </div>
 
       {/* Search Input */}
-      <div style={{ position: 'relative' }}>
+      <div className="legal-library__search" style={{ position: 'relative' }}>
         <Search size={20} color="var(--text-muted)" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
         <input
           type="text"
@@ -134,7 +135,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
       </div>
 
       {/* Category Pills */}
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px', scrollbarWidth: 'thin' }}>
+      <div className="legal-library__categories" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '6px', scrollbarWidth: 'thin' }}>
         {categories.map((cat) => (
           <button
             key={cat}
@@ -158,7 +159,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
       </div>
 
       {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="legal-library__loading" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="glass-panel" style={{ padding: '18px 20px', border: '1px solid var(--glass-border)' }}>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
@@ -177,13 +178,40 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
           <p>{error}</p>
         </div>
       ) : filteredStatutes.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '12px' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
-            {isHindi ? 'कोई धारा नहीं मिली। कृपया कोई दूसरा शब्द या धारा नंबर खोजें।' : 'No matching sections found. Try a different keyword or section number.'}
+        <div className="glass-panel" style={{ textAlign: 'center', padding: '48px 24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: 'var(--primary-light)',
+            border: '1px solid var(--primary-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--primary)'
+          }}>
+            <BookOpen size={28} />
+          </div>
+          <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: 'var(--text-main)' }}>
+            {isHindi ? 'कोई धारा नहीं मिली' : 'No Matching Sections Found'}
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', maxWidth: '440px', margin: 0, lineHeight: '1.5' }}>
+            {isHindi
+              ? 'कृपया धारा संख्या (जैसे: 302, 420, 103, 318) अथवा अपराध का प्रकार (चोरी, साइबर, मारपीट) खोज कर देखें।'
+              : 'Try searching by exact section number (e.g. 420, 302, 103, 318) or general offense keyword (theft, cyber, accident).'}
           </p>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="btn-ghost"
+              style={{ marginTop: '8px' }}
+            >
+              {isHindi ? 'खोज साफ़ करें' : 'Clear Search Query'}
+            </button>
+          )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="legal-library__results" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {filteredStatutes.map((item) => {
             const isExpanded = expandedId === item.id;
             const isBailable = item.bailable && item.bailable.toLowerCase().includes('bailable') && !item.bailable.toLowerCase().startsWith('non');

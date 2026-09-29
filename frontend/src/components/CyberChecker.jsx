@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ShieldAlert, Mail, Search, AlertTriangle, ShieldCheck, Lock, Globe, Database, ExternalLink } from 'lucide-react';
+import './CyberChecker.css';
 
 export default function CyberChecker({ language = 'English' }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
@@ -91,8 +92,8 @@ export default function CyberChecker({ language = 'English' }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{
+    <div className="cyber-scanner" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="cyber-scanner__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -103,35 +104,35 @@ export default function CyberChecker({ language = 'English' }) {
         boxShadow: 'var(--card-shadow)'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
           padding: '10px',
           borderRadius: '12px',
           color: '#fff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
         }}>
           <ShieldAlert size={22} />
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'साइबर क्राइम और डेटा लीक स्कैनर' : 'Cyber Crime & Data Breach Scanner'}
+              {isHindi ? 'साइबर फ्रॉड शील्ड' : 'Cyber Fraud Shield'}
             </h2>
-            <span style={{ fontSize: '11px', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '11px', background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--accent-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
               Live Breach DB
             </span>
           </div>
           <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
             {isHindi
               ? 'XposedOrNot डेटाबेस के ज़रिए लाइव जांचें कि क्या आपका ईमेल डार्क वेब लीक्स में शामिल है।'
-              : 'Live cross-reference against verified global data breaches using authentic open-source intelligence.'}
+              : 'Check an email against the configured public breach-record source.'}
           </p>
         </div>
       </div>
 
-      <div className="glass-panel animate-fade-in" style={{ padding: '32px', borderRadius: '16px', textAlign: 'center' }}>
+      <div className="glass-panel cyber-scanner__workspace animate-fade-in" style={{ padding: '32px', borderRadius: '16px', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(37, 99, 235, 0.08)', color: '#2563eb', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600', marginBottom: '14px' }}>
           <Database size={13} /> Powered by Live Breach Intelligence
         </div>
@@ -142,7 +143,7 @@ export default function CyberChecker({ language = 'English' }) {
         <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '440px', margin: '0 auto 24px', lineHeight: '1.5' }}>
           {isHindi
             ? 'हम आपका ईमेल किसी भी सर्वर पर स्टोर नहीं करते। यह सीधे आधिकारिक डार्क-वेब ब्रीच रिकॉर्ड्स से लाइव मैच होता है।'
-            : 'Your email address is directly cross-referenced against authentic public data breaches. Search records are never logged.'}
+            : 'Your email address is checked against public breach records to help you assess potential exposure.'}
         </p>
 
         <div style={{ display: 'flex', gap: '12px', maxWidth: '520px', margin: '0 auto' }}>
@@ -163,7 +164,7 @@ export default function CyberChecker({ language = 'English' }) {
             className="btn-primary"
             onClick={handleScan}
             disabled={isScanning || !email}
-            style={{ height: '48px', padding: '0 24px', background: isScanning ? '#94a3b8' : '#dc2626' }}
+            style={{ height: '48px', padding: '0 24px', background: isScanning ? '#94a3b8' : 'var(--ai-purple)' }}
           >
             {isScanning ? (
               isHindi ? 'लाइव स्कैन...' : 'Scanning...'

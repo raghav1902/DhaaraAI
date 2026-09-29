@@ -1,0 +1,27 @@
+.bns-concordance { max-width: 1440px; margin: 0 auto; width: 100%; }
+.bns-concordance__header { background: linear-gradient(105deg, var(--card-bg), var(--accent-light)) !important; position: relative; overflow: hidden; }
+.bns-concordance__header::after { content: '↔'; position: absolute; right: 28px; top: 50%; transform: translateY(-50%); color: var(--accent); opacity: .12; font-size: 84px; font-weight: 700; line-height: 1; pointer-events: none; }
+.bns-concordance .glass-panel { background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; box-shadow: var(--card-shadow); }
+.bns-concordance__search { border-top: 3px solid var(--accent) !important; }
+.bns-concordance__search input { transition: border-color .18s ease, box-shadow .18s ease; }
+.bns-concordance__search input:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light); }
+.bns-concordance__layout { grid-template-columns: minmax(260px, .78fr) minmax(0, 1.55fr) !important; align-items: start; }
+.bns-concordance__layout > .glass-panel:first-child { position: sticky; top: 16px; }
+.bns-concordance__layout .hover-tactile { transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease; }
+.bns-concordance__layout .hover-tactile:hover { transform: translateY(-1px); box-shadow: var(--card-shadow-hover); }
+.bns-concordance__layout .badge { border-radius: 8px; }
+.bns-concordance__layout > .glass-panel:last-child { min-width: 0; }
+.bns-concordance button { transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+.bns-concordance button:hover:not(:disabled) { filter: brightness(1.03); transform: translateY(-1px); }
+@media (max-width: 900px) {
+  .bns-concordance__layout { grid-template-columns: 1fr !important; }
+  .bns-concordance__layout > .glass-panel:first-child { position: static; max-height: 360px !important; }
+}
+@media (max-width: 600px) {
+  .bns-concordance { gap: 14px !important; }
+  .bns-concordance__header { padding: 16px !important; }
+  .bns-concordance__header h2 { font-size: 17px !important; }
+  .bns-concordance__header::after { right: 8px; font-size: 54px; }
+  .bns-concordance__search { padding: 14px !important; }
+  .bns-concordance__layout > .glass-panel:first-child { padding: 12px !important; }
+}

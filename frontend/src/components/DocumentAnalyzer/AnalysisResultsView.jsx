@@ -21,7 +21,7 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
       const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
       const formattedAudit = [
         `CONTRACT RISK AUDIT REPORT`,
-        `Overall Risk: ${analysis.risk_score} (${analysis.risk_percentage || 50}%)`,
+        `Overall Risk: ${analysis.risk_score}${analysis.risk_percentage != null ? ` (${analysis.risk_percentage}%)` : ''}`,
         `Engine: ${analysis.source || 'Indian Legal Audit Engine'}`,
         `Date: ${new Date().toLocaleString()}`,
         `\n--- EXECUTIVE SUMMARY ---\n${analysis.summary || 'N/A'}`,
@@ -51,7 +51,7 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="contract-audit__results" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Scorecard */}
       <div className="glass-panel" style={{ padding: '24px', borderRadius: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
@@ -69,7 +69,7 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
                 fontWeight: '700',
                 fontSize: '15px'
               }}>
-                {analysis.risk_score} Risk ({analysis.risk_percentage || 50}%)
+                {analysis.risk_score} Risk{analysis.risk_percentage != null ? ` (${analysis.risk_percentage}%)` : ''}
               </span>
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                 {analysis.red_flags?.length || 0} {isHindi ? 'आपत्तिजनक धाराएं पाई गईं' : 'problematic clauses flagged'}

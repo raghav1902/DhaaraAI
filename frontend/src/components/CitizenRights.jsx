@@ -21,6 +21,7 @@ import {
   Home
 } from 'lucide-react';
 import { HELPLINES, RIGHTS_TOPICS } from '../data/citizenRightsData';
+import './CitizenRights.css';
 
 
 export default function CitizenRights({ language = 'English' }) {
@@ -51,9 +52,9 @@ export default function CitizenRights({ language = 'English' }) {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="citizen-rights" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header Banner */}
-      <div style={{
+      <div className="citizen-rights__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -78,7 +79,7 @@ export default function CitizenRights({ language = 'English' }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'नागरिक कानूनी अधिकार व सुरक्षा गाइड' : 'Citizen Legal Rights & Emergency Guide'}
+              {isHindi ? 'नागरिक अधिकार और SOS' : 'Citizen Rights & SOS'}
             </h2>
             <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
               BNSS 2023
@@ -93,7 +94,7 @@ export default function CitizenRights({ language = 'English' }) {
       </div>
 
       {/* Emergency Helpline Grid */}
-      <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
+      <div className="glass-panel citizen-rights__helplines" style={{ padding: '20px', borderRadius: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
           <PhoneCall size={20} color="#dc2626" />
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-main)' }}>
@@ -186,7 +187,7 @@ export default function CitizenRights({ language = 'English' }) {
       </div>
 
       {/* Interactive Situation Navigator */}
-      <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
+      <div className="glass-panel citizen-rights__wizard" style={{ padding: '20px', borderRadius: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
           <Sparkles size={18} color="var(--primary)" />
           <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: 'var(--text-main)' }}>
@@ -260,7 +261,7 @@ export default function CitizenRights({ language = 'English' }) {
       </div>
 
       {/* Main Rights Handbook Tabs */}
-      <div className="glass-panel" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel citizen-rights__handbook" style={{ padding: '24px', borderRadius: '16px' }}>
         {/* Topic Selector Tabs */}
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '16px' }}>
           {RIGHTS_TOPICS.map((topic) => {

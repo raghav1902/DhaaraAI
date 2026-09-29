@@ -1,9 +1,9 @@
 import React from 'react';
 import { FileText, Check, Sparkles } from 'lucide-react';
 
-export function DrafterHeader({ language, onLanguageChange, isHindi }) {
+export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft }) {
   return (
-    <div style={{
+    <div className="drafter-header" style={{
       padding: '16px 20px',
       borderRadius: '16px',
       background: 'var(--card-bg)',
@@ -17,21 +17,21 @@ export function DrafterHeader({ language, onLanguageChange, isHindi }) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div style={{
-          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
           color: 'white',
           padding: '10px',
           borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          boxShadow: '0 4px 12px rgba(29, 78, 216, 0.25)'
         }}>
           <FileText size={22} />
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
-              {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस जनरेटर' : 'Automated FIR & Legal Notice Drafter'}
+              {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस ड्राफ्टर' : 'Automated FIR & Legal Notice Drafter'}
             </h2>
             <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
               Sec 173 BNSS
@@ -42,6 +42,7 @@ export function DrafterHeader({ language, onLanguageChange, isHindi }) {
           </p>
         </div>
       </div>
+      <button type="button" className="drafter-new-button" onClick={onNewDraft}><FileText size={15} /> {isHindi ? 'नया ड्राफ्ट' : 'New Draft'}</button>
     </div>
   );
 }
@@ -56,40 +57,40 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
 
   return (
     <>
-      <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px dashed rgba(59, 130, 246, 0.25)', borderRadius: '12px', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+      <div className="drafter-presets" style={{ background: 'var(--primary-light)', border: '1px dashed var(--primary-border)', borderRadius: '12px', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '12.5px', fontWeight: '700', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '5px' }}>
           <Sparkles size={15} /> {isHindi ? 'त्वरित नमूना भरें:' : 'Quick Sample Autofill:'}
         </span>
         <button
           type="button"
           onClick={() => onLoadPreset('cyber')}
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)', fontWeight: '500' }}
         >
           {isHindi ? 'साइबर ठगी FIR' : 'Cyber Fraud FIR'}
         </button>
         <button
           type="button"
           onClick={() => onLoadPreset('cheque')}
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)', fontWeight: '500' }}
         >
           {isHindi ? 'चेक बाउंस नोटिस' : 'Cheque Bounce Notice'}
         </button>
         <button
           type="button"
           onClick={() => onLoadPreset('tenant')}
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)' }}
+          style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', padding: '5px 12px', borderRadius: '16px', fontSize: '12px', cursor: 'pointer', color: 'var(--text-main)', fontWeight: '500' }}
         >
           {isHindi ? 'किराया डिपॉजिट नोटिस' : 'Tenant Deposit Notice'}
         </button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '10px 0 16px', padding: '0 10px' }}>
+      <div className="drafter-stepper" style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', margin: '14px 0 20px', padding: '0 12px' }}>
         <div
           style={{
             position: 'absolute',
-            top: '16px',
-            left: '24px',
-            right: '24px',
+            top: '17px',
+            left: '32px',
+            right: '32px',
             height: '3px',
             background: 'var(--card-border)',
             zIndex: 0
@@ -98,9 +99,9 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
         <div
           style={{
             position: 'absolute',
-            top: '16px',
-            left: '24px',
-            width: `${((step - 1) / 3) * 85}%`,
+            top: '17px',
+            left: '32px',
+            width: `${((step - 1) / 3) * 82}%`,
             height: '3px',
             background: 'var(--primary)',
             zIndex: 0,
@@ -111,6 +112,7 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
         {steps.map(s => (
           <div
             key={s.num}
+            className={`drafter-step ${step === s.num ? 'is-current' : step > s.num ? 'is-complete' : ''}`}
             onClick={() => s.num < step && setStep(s.num)}
             style={{
               zIndex: 1,
@@ -119,15 +121,15 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
               alignItems: 'center',
               gap: '6px',
               cursor: s.num < step ? 'pointer' : 'default',
-              maxWidth: '75px',
+              maxWidth: '85px',
               textAlign: 'center'
             }}
           >
             <div style={{
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               borderRadius: '50%',
-              background: step >= s.num ? 'var(--primary)' : 'var(--card-bg)',
+              background: step > s.num ? 'var(--accent)' : step === s.num ? 'var(--primary)' : 'var(--card-bg)',
               border: step >= s.num ? 'none' : '2px solid var(--card-border)',
               color: step >= s.num ? 'white' : 'var(--text-muted)',
               display: 'flex',
@@ -141,7 +143,7 @@ export function DrafterProgress({ step, setStep, isHindi, onLoadPreset }) {
             }}>
               {step > s.num ? <Check size={16} /> : s.num}
             </div>
-            <span style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: step === s.num ? '700' : '500', color: step === s.num ? 'var(--primary)' : '#64748b' }}>
+            <span style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: step === s.num ? '700' : '500', color: step === s.num ? 'var(--primary)' : 'var(--text-muted)' }}>
               {isHindi ? s.labelHi : s.labelEn}
             </span>
           </div>

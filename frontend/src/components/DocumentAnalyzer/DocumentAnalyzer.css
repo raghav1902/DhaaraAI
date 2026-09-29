@@ -1,0 +1,25 @@
+.contract-audit { max-width: 1440px; margin: 0 auto; width: 100%; }
+.contract-audit__header { position: relative; overflow: hidden; background: linear-gradient(110deg, var(--card-bg), var(--primary-light)) !important; }
+.contract-audit__header::after { content: ''; position: absolute; width: 240px; height: 240px; border: 1px solid var(--primary-border); border-radius: 50%; right: -100px; top: -160px; pointer-events: none; }
+.contract-audit .glass-panel { background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; box-shadow: var(--card-shadow); }
+.contract-audit__workspace { gap: 18px !important; }
+.contract-audit__dropzone { border-color: var(--primary-border) !important; background: linear-gradient(115deg, var(--subtle-bg), var(--primary-light)) !important; min-height: 92px; }
+.contract-audit__dropzone.is-dragging { border-color: var(--primary) !important; background: var(--primary-light) !important; box-shadow: 0 0 0 4px var(--primary-light); }
+.contract-audit__dropzone.is-uploading { opacity: .72; }
+.contract-audit textarea, .contract-audit select { font: inherit !important; transition: border-color .18s ease, box-shadow .18s ease; }
+.contract-audit textarea:focus, .contract-audit select:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light); }
+.contract-audit button, .contract-audit label[for="contract-file-upload"] { transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+.contract-audit button:hover:not(:disabled), .contract-audit label[for="contract-file-upload"]:hover { filter: brightness(1.03); transform: translateY(-1px); }
+.contract-audit__results > .glass-panel { background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; }
+.contract-audit__results > .glass-panel:first-child { border-top: 3px solid var(--accent) !important; }
+.contract-audit__results > .glass-panel > div[style*="margin-top: 18px"] { background: var(--primary-light) !important; border-radius: 12px !important; }
+.contract-audit__results [style*="borderRadius: '12px'"] { overflow-wrap: anywhere; }
+.contract-audit__results [style*="fontFamily: 'monospace'"] { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .contract-audit { gap: 14px !important; }
+  .contract-audit__workspace { padding: 16px !important; }
+  .contract-audit__header { padding: 16px !important; }
+  .contract-audit__header h2 { font-size: 17px !important; }
+  .contract-audit__dropzone { align-items: flex-start !important; padding: 14px !important; }
+  .contract-audit__results > .glass-panel { padding: 16px !important; }
+}

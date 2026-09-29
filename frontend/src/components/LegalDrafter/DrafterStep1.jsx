@@ -11,13 +11,15 @@ export default function DrafterStep1({
   isHindi
 }) {
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+    <div className="drafter-step-content drafter-step-template animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
       <div>
         <label style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '8px', display: 'block' }}>
           {isHindi ? '1. आप कौन सा दस्तावेज़ तैयार करना चाहते हैं?' : '1. Which document do you want to generate?'}
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-          <div
+          <button
+            type="button"
+            className={`drafter-template-card ${documentType === 'FIR Application' ? 'is-selected' : ''}`}
             onClick={() => setDocumentType('FIR Application')}
             style={{
               border: documentType === 'FIR Application' ? '2px solid var(--primary)' : '1px solid var(--card-border)',
@@ -39,9 +41,11 @@ export default function DrafterStep1({
                 ? 'थाना प्रभारी (SHO) को धारा 173 BNSS के तहत संज्ञेय अपराधों की जांच व कार्रवाई हेतु आवेदन पत्र।'
                 : 'Formal application to Jurisdictional SHO under Section 173 BNSS for cognizable offenses, investigation & arrest.'}
             </p>
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
+            className={`drafter-template-card ${documentType === 'Legal Demand Notice' ? 'is-selected' : ''}`}
             onClick={() => setDocumentType('Legal Demand Notice')}
             style={{
               border: documentType === 'Legal Demand Notice' ? '2px solid var(--primary)' : '1px solid var(--card-border)',
@@ -63,7 +67,7 @@ export default function DrafterStep1({
                 ? 'दूसरी पार्टी को 15 दिन की वैधानिक मोहलत, क्षतिपूर्ति या चेक बाउंस/अनुबंध उल्लंघन की औपचारिक चेतावनी।'
                 : 'Formal legal warning giving 15-day cure period before initiating civil suit or criminal prosecution.'}
             </p>
-          </div>
+          </button>
         </div>
       </div>
 

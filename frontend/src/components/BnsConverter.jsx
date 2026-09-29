@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ArrowRightLeft, Search } from 'lucide-react';
 import { FALLBACK_CONCORDANCE_DB, POPULAR_QUERIES } from '../data/concordanceData';
 import BnsComparisonCard from './BnsConverter/BnsComparisonCard';
+import './BnsConverter/BnsConverter.css';
 
 export default function BnsConverter({ language = 'English', onAskAi = null }) {
   const isHindi = language === 'Hindi';
@@ -60,9 +61,9 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="bns-concordance" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div style={{
+      <div className="bns-concordance__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -87,7 +88,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'BNS 2023 ↔ IPC 1860 धारा परिवर्तक' : 'BNS ↔ IPC Section Converter'}
+              {isHindi ? 'BNS 2023 ↔ IPC 1860 विधिक संदर्भ' : 'BNS ↔ IPC Concordance'}
             </h2>
             <span style={{ fontSize: '11px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
               Concordance Engine
@@ -127,7 +128,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
         </div>
 
       {/* Search Bar */}
-      <div className="glass-panel" style={{ padding: '16px 20px', borderRadius: '14px' }}>
+      <div className="glass-panel bns-concordance__search" style={{ padding: '16px 20px', borderRadius: '14px' }}>
         <div style={{ position: 'relative' }}>
           <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '13px' }} />
           <input
@@ -153,7 +154,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
       </div>
 
       {/* Main Comparative View */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      <div className="bns-concordance__layout" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
         {/* Left: Search Results List */}
         <div className="glass-panel" style={{ padding: '16px', borderRadius: '16px', maxHeight: '580px', overflowY: 'auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '0 4px' }}>

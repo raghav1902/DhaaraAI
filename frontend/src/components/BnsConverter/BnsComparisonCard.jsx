@@ -25,24 +25,24 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
       {/* Split Comparison Boxes */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
         {/* Active Law: BNS */}
-        <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '12px', padding: '14px' }}>
-          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: '#166534' }}>
+        <div style={{ background: 'var(--accent-light)', border: '1px solid var(--accent-border)', borderRadius: '12px', padding: '14px' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--accent)', letterSpacing: '0.04em' }}>
             {isHindi ? 'लागू नया कानून (1 जुलाई 2024 से)' : 'Current Active Law (Post July 1, 2024)'}
           </span>
-          <div style={{ fontSize: '18px', fontWeight: '800', color: '#15803d', margin: '4px 0' }}>
+          <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--accent)', margin: '4px 0' }}>
             BNS Section {selectedItem.bns_section}
           </div>
-          <div style={{ fontSize: '12.5px', color: '#14532d', fontWeight: '600', lineHeight: '1.4' }}>
+          <div style={{ fontSize: '12.5px', color: 'var(--text-main)', fontWeight: '600', lineHeight: '1.4' }}>
             {selectedItem.bns_title}
           </div>
-          <div style={{ fontSize: '11px', color: '#166534', marginTop: '4px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
             {selectedItem.bns_act}
           </div>
         </div>
 
         {/* Legacy Law: IPC */}
         <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '14px' }}>
-          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
             {isHindi ? 'पुराना निरस्त कानून (30 जून 2024 तक)' : 'Legacy Law (Pre July 1, 2024)'}
           </span>
           <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: '4px 0' }}>

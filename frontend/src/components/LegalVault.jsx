@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, Save, FileText, Trash2, Key, AlertCircle, Download, Eye, Copy, Check, X } from 'lucide-react';
+import './LegalVault.css';
 
 export default function LegalVault({ language = 'English' }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
@@ -58,8 +59,8 @@ export default function LegalVault({ language = 'English' }) {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <div className="glass-panel animate-fade-in" style={{ padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+      <div className="legal-vault legal-vault--locked" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <div className="glass-panel legal-vault__unlock animate-fade-in" style={{ padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
           <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <Lock size={32} color="var(--primary)" />
           </div>
@@ -68,7 +69,7 @@ export default function LegalVault({ language = 'English' }) {
           </h2>
           <p style={{ margin: '0 0 24px', fontSize: '13px', color: 'var(--text-muted)' }}>
             {hasPin
-              ? (isHindi ? 'अपने सुरक्षित दस्तावेज़ देखने के लिए अपना पिन दर्ज करें।' : 'Enter your PIN to access your encrypted documents.')
+              ? (isHindi ? 'अपने सहेजे गए दस्तावेज़ देखने के लिए अपना पिन दर्ज करें।' : 'Enter your PIN to access your saved documents.')
               : (isHindi ? 'अपने दस्तावेज़ों को सुरक्षित करने के लिए एक नया पिन बनाएं।' : 'Create a new PIN to secure your private legal drafts.')}
           </p>
 
@@ -93,7 +94,7 @@ export default function LegalVault({ language = 'English' }) {
             type="button"
             className="btn-primary"
             onClick={handleLogin}
-            style={{ width: '100%', justifyContent: 'center', padding: '12px', background: '#2563eb' }}
+            style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
           >
             {hasPin ? (
               <><Unlock size={18} /> {isHindi ? 'अनलॉक करें' : 'Unlock Vault'}</>
@@ -112,8 +113,8 @@ export default function LegalVault({ language = 'English' }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{
+    <div className="legal-vault" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="legal-vault__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -140,7 +141,7 @@ export default function LegalVault({ language = 'English' }) {
           </div>
           <div>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'आपका सुरक्षित वॉल्ट' : 'Secure Legal Vault'}
+              {isHindi ? 'कानूनी वॉल्ट' : 'Legal Vault'}
             </h2>
             <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
               {isHindi
@@ -173,7 +174,7 @@ export default function LegalVault({ language = 'English' }) {
         </button>
       </div>
 
-      <div className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel legal-vault__workspace animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
         {savedDrafts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
             <FileText size={48} color="#cbd5e1" style={{ marginBottom: '16px' }} />

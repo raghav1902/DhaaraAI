@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calculator, MapPin, Building, Landmark, AlertCircle, FileText, IndianRupee, Car, ShoppingCart } from 'lucide-react';
 
 import { STAMP_DUTY_RATES, TRAFFIC_VIOLATIONS } from '../data/feeCalculatorData';
+import './FeeCalculator.css';
 
 export default function FeeCalculator({ language = 'English' }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
@@ -31,7 +32,7 @@ export default function FeeCalculator({ language = 'English' }) {
     const total = stampDuty + regFee;
 
     return (
-      <div className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel fee-calculator__panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: 'var(--text-main)' }}>
           {isHindi ? 'संपत्ति पंजीकरण और स्टाम्प ड्यूटी' : 'Property Registration & Stamp Duty'}
         </h3>
@@ -105,7 +106,7 @@ export default function FeeCalculator({ language = 'English' }) {
     if (courtFee > 300000) courtFee = 300000;
 
     return (
-      <div className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel fee-calculator__panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: 'var(--text-main)' }}>
           {isHindi ? 'दीवानी मुकदमा न्यायालय शुल्क' : 'Civil Suit Court Fee Estimation'}
         </h3>
@@ -159,7 +160,7 @@ export default function FeeCalculator({ language = 'English' }) {
     else fee = 7500;
 
     return (
-      <div className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel fee-calculator__panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: 'var(--text-main)' }}>
           {isHindi ? 'उपभोक्ता फोरम शिकायत शुल्क' : 'Consumer Court Filing Fee'}
         </h3>
@@ -213,7 +214,7 @@ export default function FeeCalculator({ language = 'English' }) {
     }, 0);
 
     return (
-      <div className="glass-panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
+      <div className="glass-panel fee-calculator__panel animate-fade-in" style={{ padding: '24px', borderRadius: '16px' }}>
         <h3 style={{ margin: '0 0 16px', fontSize: '16px', color: 'var(--text-main)' }}>
           {isHindi ? 'यातायात चालान जुर्माना' : 'Traffic Challan Fines (MV Act 2024)'}
         </h3>
@@ -258,8 +259,8 @@ export default function FeeCalculator({ language = 'English' }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{
+    <div className="fee-calculator" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="fee-calculator__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -284,7 +285,7 @@ export default function FeeCalculator({ language = 'English' }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'शुल्क और जुर्माना कैलकुलेटर' : 'Fees & Fines Calculator'}
+              {isHindi ? 'न्यायालय शुल्क और स्टाम्प ड्यूटी कैलकुलेटर' : 'Court Fee & Stamp Duty Calculator'}
             </h2>
             <span style={{ fontSize: '11px', background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid rgba(217, 119, 6, 0.3)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
               Statutory Schedule
@@ -298,7 +299,7 @@ export default function FeeCalculator({ language = 'English' }) {
         </div>
       </div>
 
-      <div style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+      <div className="fee-calculator__types" style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
           <button
             type="button"
             onClick={() => setCalcType('property')}

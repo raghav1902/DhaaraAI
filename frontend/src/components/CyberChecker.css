@@ -1,0 +1,12 @@
+.cyber-scanner { max-width: 1040px; margin: 0 auto; width: 100%; }
+.cyber-scanner__header { position: relative; overflow: hidden; background: linear-gradient(110deg, var(--card-bg), var(--ai-purple-light)) !important; }
+.cyber-scanner__header::after { content: ''; position: absolute; width: 210px; height: 210px; border: 1px solid var(--ai-purple-border); right: -80px; top: -130px; border-radius: 50%; pointer-events: none; }
+.cyber-scanner__workspace { border-top: 3px solid var(--ai-purple) !important; background: linear-gradient(160deg, var(--card-bg), var(--subtle-bg)) !important; box-shadow: var(--card-shadow); }
+.cyber-scanner__workspace .input-field { background: var(--card-bg); border-color: var(--card-border); border-radius: 12px; }
+.cyber-scanner__workspace .input-field:focus { border-color: var(--ai-purple); box-shadow: 0 0 0 3px var(--ai-purple-light); }
+.cyber-scanner__workspace .btn-primary { border-radius: 12px; box-shadow: 0 6px 18px rgba(220, 38, 38, .2); transition: transform .16s ease, filter .16s ease; }
+.cyber-scanner__workspace .btn-primary:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); }
+.cyber-scanner__workspace > div[style*="inline-flex"] { background: var(--ai-purple-light) !important; color: var(--ai-purple) !important; border: 1px solid var(--ai-purple-border); }
+body.dark-theme .cyber-scanner__workspace [style*="background: '#f0fdf4'"] { background: var(--accent-light) !important; border-color: var(--accent-border) !important; }
+body.dark-theme .cyber-scanner__workspace [style*="background: '#fef2f2'"] { background: var(--danger-light) !important; border-color: var(--danger-border) !important; }
+@media (max-width: 600px) { .cyber-scanner { gap: 14px !important; } .cyber-scanner__header, .cyber-scanner__workspace { padding: 16px !important; } .cyber-scanner__header h2 { font-size: 17px !important; } .cyber-scanner__workspace > div[style*="display: 'flex'"] { flex-direction: column; } .cyber-scanner__workspace .btn-primary { width: 100%; justify-content: center; } }

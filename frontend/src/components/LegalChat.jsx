@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Bot, Loader2, RefreshCw, Sparkles } from 'lucide-react';
+import { Bot, Loader2, RefreshCw, Sparkles, ShieldCheck, Scale, FileSearch, Landmark, MessageCircleQuestion, ChevronRight, Clock3, MessageSquare, Home, CarFront, FileQuestion, ScrollText, BookOpen, ChevronDown } from 'lucide-react';
 import { sanitizeMarkdownForSpeech, getPromptSuggestions } from './LegalChat/speechUtils';
 import ChatMessageItem from './LegalChat/ChatMessageItem';
 import ChatInputArea from './LegalChat/ChatInputArea';
+import './LegalChat/LegalChat.css';
 
 export default function LegalChat({
   initialQuery = null,
@@ -192,49 +193,43 @@ export default function LegalChat({
   };
 
   const promptSuggestions = getPromptSuggestions(isHindi);
+  const suggestedQuestions = isHindi ? [
+    { icon: CarFront, query: 'बीएनएस के तहत रोड रेज की सजा क्या है?', label: 'बीएनएस के तहत रोड रेज की सजा क्या है?' },
+    { icon: FileQuestion, query: 'पुलिस FIR दर्ज न करे तो FIR दर्ज कराने की प्रक्रिया क्या है?', label: 'पुलिस मना करे तो FIR दर्ज कराने की प्रक्रिया?' },
+    { icon: Home, query: 'किरायेदार के रूप में मेरे क्या अधिकार हैं?', label: 'किरायेदार के रूप में मेरे क्या अधिकार हैं?' },
+    { icon: ScrollText, query: 'चेक बाउंस कानून कैसे काम करता है?', label: 'चेक बाउंस कानून कैसे काम करता है?' },
+    { icon: ShieldCheck, query: 'पुलिस नोटिस का जवाब कैसे देना चाहिए?', label: 'पुलिस नोटिस का जवाब कैसे दें?' },
+    { icon: Scale, query: 'चोरी के लिए IPC और BNS की तुलना दिखाएं।', label: 'चोरी के लिए IPC और BNS की तुलना दिखाएं' }
+  ] : [
+    { icon: CarFront, query: 'What is the punishment for road rage under BNS?', label: 'What is the punishment for road rage under BNS?' },
+    { icon: FileQuestion, query: 'What is the procedure for filing an FIR if police refuse?', label: 'Procedure for filing an FIR if police refuse?' },
+    { icon: Home, query: 'What are my rights as a tenant?', label: 'What are my rights as a tenant?' },
+    { icon: ScrollText, query: 'How does cheque bounce law work under Section 138?', label: 'How does cheque bounce law work?' },
+    { icon: ShieldCheck, query: 'How should I respond to a police notice?', label: 'How should I respond to a police notice?' },
+    { icon: Scale, query: 'Show IPC to BNS comparison for theft.', label: 'Show IPC to BNS comparison for theft' }
+  ];
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '620px', flex: 1 }}>
+    <div className="ask-ai animate-fade-in">
+      <div className="ask-ai-main-column">
       {/* Refined Header */}
-      <div style={{
-        padding: '16px 20px',
-        background: 'var(--card-bg)',
-        border: '1px solid var(--card-border)',
-        borderRadius: '16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '14px',
-        boxShadow: 'var(--card-shadow)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
-          }}>
-            <Bot size={22} />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h2 style={{ margin: 0, fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                {isHindi ? 'विधिक परामर्श सहायक' : 'AI Legal Assistant'}
-              </h2>
-              <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
-                BNS 2023 Verified
-              </span>
+      <section className="ask-ai-hero" aria-labelledby="ask-ai-title">
+        <div className="ask-ai-hero-copy">
+          <div className="ask-ai-brand"><span className="ask-ai-brand-mark"><Scale size={17} /></span><span>LegalGPT AI</span><span className="ask-ai-bns-badge">BNS 2023 Verified</span></div>
+          <div className="ask-ai-heading-row">
+            <div>
+              <h2 id="ask-ai-title">{isHindi ? <>आपका AI विधिक सहायक<br />एक <em>जागरूक भारत</em> के लिए</> : <>Your AI Legal Assistant<br />for a More <em>Informed India</em></>}</h2>
+              <p className="ask-ai-description">{isHindi ? 'भारतीय कानूनों और प्रक्रियाओं पर सरल भाषा में स्पष्ट उत्तर पाएं।' : 'Get clear, cited answers from Indian laws, cases, and legal procedures.'}</p>
             </div>
-            <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
-              {isHindi ? 'प्राथमिक कानूनों, प्रक्रियाओं व केस लॉ पर त्वरित विधिक समाधान' : 'Instant statutory answers under Bharatiya Nyaya Sanhita & Indian Laws'}
-            </p>
+            <div className="ask-ai-hero-scene" aria-hidden="true"><span className="ask-ai-scene-sun" /><span className="ask-ai-scene-dome"><Scale size={24} /></span><span className="ask-ai-scene-pill" /><span className="ask-ai-scene-ground" /></div>
+          </div>
+          <div className="ask-ai-feature-row">
+            <div className="ask-ai-feature-card feature-green"><span><BookOpen size={18} /></span><div><b>BNS / BNSS</b><small>{isHindi ? 'नवीनतम अपडेट' : 'Latest updates'}</small></div></div>
+            <div className="ask-ai-feature-card feature-blue"><span><Scale size={18} /></span><div><b>{isHindi ? 'केस लॉ' : 'Case Law'}</b><small>{isHindi ? 'निर्णय और मिसालें' : 'Judgments & precedents'}</small></div></div>
+            <div className="ask-ai-feature-card feature-purple"><span><ScrollText size={18} /></span><div><b>{isHindi ? 'प्रक्रियाएं' : 'Procedures'}</b><small>{isHindi ? 'चरण-दर-चरण मार्गदर्शन' : 'Step-by-step guidance'}</small></div></div>
+            <div className="ask-ai-feature-card feature-orange"><span><ShieldCheck size={18} /></span><div><b>{isHindi ? 'आपके अधिकार' : 'Your Rights'}</b><small>{isHindi ? 'सरल नागरिक उत्तर' : 'Citizen-friendly answers'}</small></div></div>
           </div>
         </div>
-
         <button
           type="button"
           onClick={() => setMessages([{
@@ -244,63 +239,39 @@ export default function LegalChat({
               : 'Namaste! Welcome to LegalGPT. How can I assist you with Indian law or case procedures today?',
             language
           }])}
-          style={{
-            background: 'var(--subtle-bg)',
-            border: '1px solid var(--card-border)',
-            padding: '7px 14px',
-            borderRadius: '10px',
-            fontSize: '12.5px',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontWeight: '600',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-            transition: 'all 0.15s ease'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'var(--card-bg)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
+          className="ask-ai-reset"
           title={isHindi ? "नया चैट शुरू करें" : "Reset Conversation"}
+          aria-label={isHindi ? 'नई बातचीत शुरू करें' : 'Start a new conversation'}
         >
           <RefreshCw size={14} />
           {isHindi ? 'नया चैट' : 'New Chat'}
         </button>
-      </div>
+      </section>
 
       {/* Suggestion Chips */}
-      <div style={{ padding: '4px 0 12px', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--primary)', fontWeight: '600', whiteSpace: 'nowrap', flexShrink: 0 }}>
-          <Sparkles size={14} /> {isHindi ? 'त्वरित सवाल:' : 'Quick Questions:'}
-        </span>
-        {promptSuggestions.map((item, idx) => (
+      <section className="ask-ai-prompts" aria-label={isHindi ? 'त्वरित सवाल' : 'Quick questions'}>
+        <div className="ask-ai-section-heading"><span className="ask-ai-section-icon"><Sparkles size={16} /></span><h3>{isHindi ? 'त्वरित सवाल:' : 'Quick Questions:'}</h3></div>
+        <div className="ask-ai-prompt-list">
+        {promptSuggestions.map((item, idx) => {
+          const PromptIcon = [Landmark, ShieldCheck, FileSearch, Scale][idx % 4];
+          return (
           <button
+            className="ask-ai-prompt-chip"
             key={idx}
             onClick={() => handleSendWithText(item.query)}
             disabled={isLoading}
-            style={{
-              background: 'var(--card-bg)',
-              border: '1px solid var(--card-border)',
-              borderRadius: '20px',
-              padding: '5px 14px',
-              fontSize: '12px',
-              fontWeight: '500',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s ease',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.background = 'var(--primary-light)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--card-bg)'; }}
           >
+            <span className="ask-ai-prompt-icon"><PromptIcon size={15} /></span>
             {item.label}
           </button>
-        ))}
-      </div>
+          );
+        })}
+        <button className="ask-ai-scroll-next" type="button" aria-label={isHindi ? 'और सवाल' : 'More questions'}><ChevronRight size={17} /></button>
+        </div>
+      </section>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      <div className="ask-ai-transcript" aria-live="polite">
         {messages.map((msg, idx) => (
           <ChatMessageItem
             key={idx}
@@ -313,18 +284,18 @@ export default function LegalChat({
         ))}
 
         {isLoading && (
-          <div style={{ display: 'flex', gap: '14px', alignSelf: 'flex-start', maxWidth: '85%' }}>
-            <div style={{ background: 'var(--primary)', padding: '8px', borderRadius: '50%', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-              <RefreshCw size={18} className="animate-spin" />
-            </div>
-            <div style={{ background: 'var(--card-bg)', color: 'var(--text-main)', padding: '14px 18px', borderRadius: '16px', borderTopLeftRadius: 0, border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', fontSize: '14px', boxShadow: 'var(--card-shadow)' }}>
-              <Loader2 size={16} className="animate-spin" style={{ marginRight: '8px', color: 'var(--primary)' }} />
+          <div className="ask-ai-loading-row">
+            <div className="ask-ai-avatar"><Bot size={19} /></div>
+            <div className="ask-ai-loading-card">
+              <Loader2 size={16} />
               {isHindi ? 'कानूनी धाराएं और समाधान तैयार हो रहा है...' : 'Analyzing statutes & formulating quick response...'}
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {messages.length === 1 && !isLoading && <section className="ask-ai-suggested"><div className="ask-ai-suggested-heading"><h3><span>💡</span> {isHindi ? 'ऐसे सवाल पूछकर देखें:' : 'Try asking something like:'}</h3><span className="ask-ai-view-prompts">{isHindi ? 'सुझाव' : 'Suggestions'} <ChevronRight size={14} /></span></div><div className="ask-ai-suggested-grid">{suggestedQuestions.map(({ icon: QuestionIcon, query, label }) => <button type="button" key={query} className="ask-ai-suggested-card" onClick={() => handleSendWithText(query)} disabled={isLoading}><span><QuestionIcon size={17} /></span><b>{label}</b><ChevronRight className="ask-ai-suggested-arrow" size={16} /></button>)}</div></section>}
 
       {/* Input Area */}
       <ChatInputArea
@@ -337,6 +308,13 @@ export default function LegalChat({
         speechError={speechError}
         isHindi={isHindi}
       />
+      {messages.length === 1 && !isLoading && <p className="ask-ai-disclaimer">{isHindi ? 'AI द्वारा तैयार उत्तरों को महत्वपूर्ण निर्णयों से पहले मूल स्रोतों से सत्यापित करें।' : 'Verify AI-generated answers against primary sources before making important decisions.'}</p>}
+      </div>
+      <aside className="ask-ai-context-rail" aria-label={isHindi ? 'सहायक पैनल' : 'Ask AI contextual panel'}>
+        <section className="ask-ai-rail-card ask-ai-settings-card"><h3><span className="rail-icon rail-blue"><Sparkles size={16} /></span>{isHindi ? 'उत्तर प्राथमिकताएं' : 'Response preferences'}</h3><div className="ask-ai-setting-item"><div><b>{isHindi ? 'स्रोत दिखाएं' : 'Show law citations'}</b><small>{isHindi ? 'स्रोत सर्वर से प्राप्त होने पर दिखेंगे' : 'Citations appear when returned by the server'}</small></div><span className="ask-ai-static-switch" aria-label={isHindi ? 'स्रोत दिखाए जाते हैं' : 'Citations are displayed'}><i /></span></div><div className="ask-ai-setting-item"><div><b>{isHindi ? 'उत्तर भाषा' : 'Answer language'}</b><small>{isHindi ? 'शीर्ष बार से भाषा बदलें' : 'Change language from the top bar'}</small></div><span className="ask-ai-current-language">{isHindi ? 'हिंदी' : 'English'} <ChevronDown size={14} /></span></div><div className="ask-ai-setting-item"><div><b>{isHindi ? 'उत्तर शैली' : 'Response style'}</b><small>{isHindi ? 'सरल भाषा में स्पष्ट उत्तर' : 'Clear answers in plain language'}</small></div></div><div className="ask-ai-style-pills"><span className="selected">{isHindi ? 'सरल' : 'Simple'}</span><span>{isHindi ? 'विस्तृत' : 'Detailed'}</span><span>{isHindi ? 'उदाहरण' : 'Examples'}</span></div></section>
+        <section className="ask-ai-rail-card ask-ai-recent-card"><h3><span className="rail-icon rail-blue"><Clock3 size={16} /></span>{isHindi ? 'इस चैट में सवाल' : 'In this conversation'}</h3>{messages.filter(msg => msg.role === 'user').length ? <div className="ask-ai-recent-list">{messages.filter(msg => msg.role === 'user').slice(-5).reverse().map((msg, index) => <div key={`${index}-${msg.content}`} className="ask-ai-recent-item"><MessageSquare size={14} /><span>{msg.content}</span></div>)}</div> : <p className="ask-ai-rail-empty">{isHindi ? 'आपके सवाल यहां दिखाई देंगे।' : 'Your questions will appear here as you chat.'}</p>}</section>
+        <section className="ask-ai-rail-card ask-ai-tips-card"><h3><span className="rail-icon rail-warm">💡</span>{isHindi ? 'सहायता और सुझाव' : 'Help & tips'}</h3><div className="ask-ai-tip"><span className="rail-icon rail-blue"><MessageCircleQuestion size={15} /></span><div><b>{isHindi ? 'सरल भाषा में पूछें' : 'Ask in simple language'}</b><small>{isHindi ? 'अपने शब्दों में सवाल लिखें' : 'Use your own words, no legal jargon needed'}</small></div></div><div className="ask-ai-tip"><span className="rail-icon rail-green"><ScrollText size={15} /></span><div><b>{isHindi ? 'चरण-दर-चरण मार्गदर्शन' : 'Get step-by-step guidance'}</b><small>{isHindi ? 'प्रक्रियाओं के बारे में पूछें' : 'Ask about legal procedures'}</small></div></div><div className="ask-ai-tip"><span className="rail-icon rail-purple"><Scale size={15} /></span><div><b>{isHindi ? 'स्रोतों सहित उत्तर' : 'Answers with sources'}</b><small>{isHindi ? 'प्राप्त वैधानिक संदर्भ देखें' : 'Review statutory references when provided'}</small></div></div></section>
+      </aside>
     </div>
   );
 }

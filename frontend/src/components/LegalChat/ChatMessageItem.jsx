@@ -1,13 +1,25 @@
-import React from 'react';
-import { Bot, Volume2, Square } from 'lucide-react';
+import { Bot, Volume2, Square, ShieldCheck, Copy, Check } from 'lucide-react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleSpeak, isHindi }) {
+  const [copied, setCopied] = useState(false);
   const isUser = msg.role === 'user';
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(msg.content);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch (error) {
+      console.warn('Could not copy response:', error);
+    }
+  };
 
   return (
     <div
       className="chat-msg-row"
+      className={`ask-ai-message-row ${isUser ? 'is-user' : 'is-assistant'}`}
       style={{
         display: 'flex',
         gap: '12px',
@@ -34,7 +46,7 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
       )}
 
       <div
-        className="chat-msg-bubble"
+        className={`chat-msg-bubble ask-ai-message ${isUser ? 'is-user' : 'is-assistant'}`}
         style={{
           background: isUser ? 'var(--primary)' : 'var(--card-bg)',
           color: isUser ? '#ffffff' : 'var(--text-main)',
@@ -55,28 +67,16 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
         ) : (
           <div>
             {/* Audio Reader Control Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid var(--card-border)', paddingBottom: '6px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--primary)' }}>
-                LegalGPT AI
-              </span>
-
-              <button
+            <div className="ask-ai-message-toolbar">
+              <span className="ask-ai-message-brand"><span className="ask-ai-message-mini-avatar"><Bot size={14} /></span><span>LegalGPT AI</span>{msg.sources?.length > 0 && <span className="ask-ai-source-badge"><ShieldCheck size={12} />{isHindi ? 'स्रोत शामिल' : 'Sources included'}</span>}</span>
+              <div className="ask-ai-message-actions">
+                <button type="button" className="ask-ai-action-button" onClick={handleCopy} title={isHindi ? 'उत्तर कॉपी करें' : 'Copy response'} aria-label={isHindi ? 'उत्तर कॉपी करें' : 'Copy response'}>
+                  {copied ? <Check size={14} /> : <Copy size={14} />}<span>{copied ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'कॉपी' : 'Copy')}</span>
+                </button>
+                <button
                 type="button"
                 onClick={() => handleToggleSpeak(idx, msg.content)}
-                style={{
-                  background: speakingIndex === idx ? 'rgba(239, 68, 68, 0.15)' : 'var(--primary-light)',
-                  color: speakingIndex === idx ? 'var(--danger)' : 'var(--primary)',
-                  border: speakingIndex === idx ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--primary-border)',
-                  borderRadius: '14px',
-                  padding: '3px 10px',
-                  fontSize: '11.5px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  transition: 'all 0.15s ease'
-                }}
+                className={`ask-ai-action-button ${speakingIndex === idx ? 'is-speaking' : ''}`}
                 title={speakingIndex === idx ? (isHindi ? 'आवाज़ बंद करें' : 'Stop voice') : (isHindi ? 'उत्तर सुनें' : 'Listen to response')}
               >
                 {speakingIndex === idx ? (
@@ -91,7 +91,8 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
                     <span>{isHindi ? 'सुनें (Audio)' : 'Listen (Audio)'}</span>
                   </>
                 )}
-              </button>
+                </button>
+              </div>
             </div>
 
             <div className="markdown-content" style={{ fontSize: '14.5px', color: msg.isError ? 'var(--danger)' : 'inherit' }}>
@@ -99,11 +100,12 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
 
               {msg.sources && msg.sources.length > 0 && (
                 <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.5px' }}>
+                  <p className="ask-ai-citations-heading">
+                    <ShieldCheck size={13} />
                     {isHindi ? 'वैधानिक स्रोत (IndiaCode Verified Sources)' : 'VERIFIED STATUTORY SOURCES (IndiaCode)'}
                   </p>
                   {msg.sources.slice(0, 2).map((src, i) => (
-                    <div key={i} style={{ fontSize: '12px', background: 'var(--subtle-bg)', padding: '6px 10px', borderRadius: '6px', marginBottom: '5px', color: 'var(--text-secondary)', border: '1px solid var(--subtle-border)' }}>
+                    <div key={i} className="ask-ai-citation">
                       <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Reference Provision'}
                     </div>
                   ))}

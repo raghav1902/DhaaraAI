@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { SAMPLE_CONTRACTS } from '../data/contractAnalyzerData';
 import AnalysisResultsView from './DocumentAnalyzer/AnalysisResultsView';
+import './DocumentAnalyzer/DocumentAnalyzer.css';
 
 export default function DocumentAnalyzer({ language = 'English' }) {
   const isHindi = language === 'Hindi';
@@ -30,6 +31,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
   const loadSample = (key) => {
@@ -45,9 +47,12 @@ export default function DocumentAnalyzer({ language = 'English' }) {
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const uploadFile = async (file) => {
     if (!file) return;
+    if (!/\.(pdf|txt|md)$/i.test(file.name)) {
+      setError(isHindi ? 'कृपया PDF, TXT या MD फ़ाइल चुनें।' : 'Choose a PDF, TXT, or MD file.');
+      return;
+    }
 
     setUploading(true);
     setError(null);
@@ -75,6 +80,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
+
+  const handleFileUpload = (e) => uploadFile(e.target.files?.[0]);
 
   const handleAnalyze = async () => {
     if (!documentText.trim()) {
@@ -115,9 +122,9 @@ export default function DocumentAnalyzer({ language = 'English' }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="contract-audit" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div style={{
+      <div className="contract-audit__header" style={{
         padding: '16px 20px',
         borderRadius: '16px',
         background: 'var(--card-bg)',
@@ -141,7 +148,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                  {isHindi ? 'विधिक दस्तावेज व अनुबंध समीक्षक' : 'Contract & Legal Document Audit'}
+                  {isHindi ? 'अनुबंध ऑडिट' : 'Contract Audit'}
                 </h2>
                 <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
                   Contract Act 1872
@@ -213,7 +220,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       </div>
 
       {/* Input Section */}
-      <div className="glass-panel" style={{ padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="glass-panel contract-audit__workspace" style={{ padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 240px' }}>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-main)' }}>
@@ -244,7 +251,12 @@ export default function DocumentAnalyzer({ language = 'English' }) {
         </div>
 
         {/* Document Upload Area */}
-        <div style={{
+        <div className={`contract-audit__dropzone${isDragging ? ' is-dragging' : ''}${uploading ? ' is-uploading' : ''}`}
+          onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragOver={(e) => e.preventDefault()}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDragging(false); }}
+          onDrop={(e) => { e.preventDefault(); setIsDragging(false); uploadFile(e.dataTransfer.files?.[0]); }}
+          style={{
           border: '2px dashed var(--card-border)',
           borderRadius: '12px',
           padding: '16px 20px',
@@ -265,7 +277,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 {isHindi ? 'PDF या टेक्स्ट दस्तावेज अपलोड करें' : 'Upload Contract / Legal PDF'}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                {isHindi ? 'समर्थित प्रारूप: .pdf, .txt (स्वचालित टेक्स्ट निष्कर्षण)' : 'Supported formats: .pdf, .txt (auto text extraction)'}
+                {isHindi ? 'समर्थित प्रारूप: .pdf, .txt, .md (स्वचालित टेक्स्ट निष्कर्षण)' : 'Supported formats: .pdf, .txt, .md (auto text extraction)'}
               </div>
             </div>
           </div>
@@ -304,7 +316,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               ) : (
                 <>
                   <Upload size={15} />
-                  {isHindi ? 'फाइल चुनें (.pdf / .txt)' : 'Browse File'}
+                  {isHindi ? 'फाइल चुनें (.pdf / .txt / .md)' : 'Browse File'}
                 </>
               )}
             </label>

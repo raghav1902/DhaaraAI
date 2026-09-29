@@ -1,0 +1,12 @@
+.legal-vault { max-width: 1440px; margin: 0 auto; width: 100%; }
+.legal-vault--locked { max-width: none; background: radial-gradient(circle at 50% 12%, var(--primary-light), transparent 38%); }
+.legal-vault__unlock { border-top: 3px solid var(--primary) !important; box-shadow: var(--modal-shadow) !important; }
+.legal-vault__unlock .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.legal-vault__header { position: relative; overflow: hidden; background: linear-gradient(105deg, var(--card-bg), var(--accent-light)) !important; }
+.legal-vault__header::after { content: ''; position: absolute; right: -52px; top: -76px; width: 170px; height: 170px; border: 1px solid var(--accent-border); border-radius: 50%; pointer-events: none; }
+.legal-vault__workspace { min-height: 320px; border-top: 3px solid var(--accent) !important; }
+.legal-vault__workspace > div[style*="gridTemplateColumns"] > div { border-radius: 16px !important; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+.legal-vault__workspace > div[style*="gridTemplateColumns"] > div:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover) !important; border-color: var(--primary-border) !important; }
+.legal-vault button { transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+.legal-vault button:hover { filter: brightness(1.03); }
+@media (max-width: 600px) { .legal-vault__header, .legal-vault__workspace { padding: 16px !important; } .legal-vault__header h2 { font-size: 17px !important; } .legal-vault__unlock { margin: 16px; padding: 24px !important; } }
