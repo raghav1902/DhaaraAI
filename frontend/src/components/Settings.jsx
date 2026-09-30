@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Key, Languages, Moon, Sun, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Key, Languages, Moon, Sun, CheckCircle2, AlertCircle, User, Shield, Info, Smartphone, Database } from 'lucide-react';
+import './Settings.css';
 
 export default function Settings({ language, onLanguageChange, theme, onThemeChange, user, onUserChange }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
-  
+
   const [nameInput, setNameInput] = useState(user?.name || '');
   const [passwordInput, setPasswordInput] = useState('');
   const [profileMessage, setProfileMessage] = useState(null);
 
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
-  const [pinMessage, setPinMessage] = useState(null); // { type: 'success' | 'error', text: '' }
+  const [pinMessage, setPinMessage] = useState(null);
 
   const hasPin = localStorage.getItem('dhaara_vault_pin') !== null;
 
@@ -18,252 +19,407 @@ export default function Settings({ language, onLanguageChange, theme, onThemeCha
     setPinMessage(null);
 
     if (!newPin || newPin.length < 4) {
-      setPinMessage({ type: 'error', text: isHindi ? 'नया पिन कम से कम 4 अंकों का होना चाहिए।' : 'New PIN must be at least 4 digits.' });
+      setPinMessage({
+        type: 'error',
+        text: isHindi ? 'नया पिन कम से कम 4 अंकों का होना चाहिए।' : 'New PIN must be at least 4 digits.'
+      });
       return;
     }
 
     if (hasPin) {
       const storedPin = localStorage.getItem('dhaara_vault_pin');
       if (oldPin !== storedPin) {
-        setPinMessage({ type: 'error', text: isHindi ? 'पुराना पिन गलत है।' : 'Incorrect Old PIN.' });
+        setPinMessage({
+          type: 'error',
+          text: isHindi ? 'पुराना पिन गलत है।' : 'Incorrect old PIN.'
+        });
         return;
       }
     }
 
     localStorage.setItem('dhaara_vault_pin', newPin);
-    setPinMessage({ type: 'success', text: isHindi ? 'वॉल्ट पिन सफलतापूर्वक बदल दिया गया!' : 'Vault PIN successfully updated!' });
+    setPinMessage({
+      type: 'success',
+      text: isHindi ? 'वॉल्ट पिन सफलतापूर्वक बदल दिया गया!' : 'Vault PIN successfully updated!'
+    });
     setOldPin('');
     setNewPin('');
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => setPinMessage(null), 3000);
+
+    setTimeout(() => setPinMessage(null), 3500);
   };
 
   const handleResetPin = () => {
-    if (window.confirm(isHindi ? 'क्या आप वाकई अपना पिन भूल गए हैं और इसे रीसेट करना चाहते हैं? इससे वॉल्ट का डेटा डिलीट नहीं होगा।' : 'Are you sure you want to force reset your PIN? This will not delete your saved drafts.')) {
+    if (
+      window.confirm(
+        isHindi
+          ? 'क्या आप वाकई अपना पिन भूल गए हैं और इसे रीसेट करना चाहते हैं? इससे वॉल्ट के ड्राफ्ट डिलीट नहीं होंगे।'
+          : 'Are you sure you want to force reset your PIN? This will not delete your saved drafts.'
+      )
+    ) {
       localStorage.removeItem('dhaara_vault_pin');
       setOldPin('');
       setNewPin('');
-      setPinMessage({ type: 'success', text: isHindi ? 'पिन हटा दिया गया है। आप नया पिन बना सकते हैं।' : 'PIN has been removed. You can now set a new one.' });
+      setPinMessage({
+        type: 'success',
+        text: isHindi ? 'पिन हटा दिया गया है। आप नया पिन बना सकते हैं।' : 'PIN has been removed. You can now set a new one.'
+      });
     }
   };
 
   const handleUpdateProfile = () => {
     if (nameInput.trim().length === 0) {
-      setProfileMessage({ type: 'error', text: isHindi ? 'नाम खाली नहीं हो सकता।' : 'Name cannot be empty.' });
+      setProfileMessage({
+        type: 'error',
+        text: isHindi ? 'नाम खाली नहीं हो सकता।' : 'Name cannot be empty.'
+      });
       return;
     }
-    
-    // In a real app, this would be an API call to change the password
+
     let updatedUser = { ...user, name: nameInput };
     if (passwordInput.trim().length > 0) {
       updatedUser.password = passwordInput;
     }
-    
+
     if (onUserChange) onUserChange(updatedUser);
-    
-    setProfileMessage({ type: 'success', text: isHindi ? 'प्रोफाइल सफलतापूर्वक अपडेट हो गई!' : 'Profile updated successfully!' });
+
+    setProfileMessage({
+      type: 'success',
+      text: isHindi ? 'प्रोफाइल सफलतापूर्वक अपडेट हो गई!' : 'Profile updated successfully!'
+    });
     setPasswordInput('');
-    setTimeout(() => setProfileMessage(null), 3000);
+    setTimeout(() => setProfileMessage(null), 3500);
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '32px', flex: 1, height: '100%', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+    <div className="settings-hub animate-fade-in">
       {/* Top Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px' }}>
-        <div style={{ background: 'linear-gradient(135deg, #475569, #1e293b)', color: 'white', padding: '10px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <SettingsIcon size={24} />
-        </div>
-        <div>
-          <h2 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
-            {isHindi ? 'सेटिंग्स (Settings)' : 'App Settings'}
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '4px 0 0' }}>
-            {isHindi ? 'अपनी भाषा, थीम और वॉल्ट सुरक्षा प्रबंधित करें' : 'Manage your language, theme, and vault security'}
-          </p>
-        </div>
-      </div>
-
-      {/* General Preferences */}
-      <div style={{ background: 'var(--card-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
-        <h3 style={{ margin: '0 0 20px', fontSize: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Languages size={18} color="var(--primary)" />
-          {isHindi ? 'सामान्य प्राथमिकताएं (General Preferences)' : 'General Preferences'}
-        </h3>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Profile Setting */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>{isHindi ? 'प्रोफ़ाइल अपडेट करें' : 'Update Profile'}</div>
-              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{isHindi ? 'अपना नाम या पासवर्ड बदलें' : 'Change your name or account password'}</div>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ flex: '1 1 200px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px', display: 'block' }}>{isHindi ? 'नाम (Name)' : 'Name'}</label>
-                <input type="text" value={nameInput} onChange={e => setNameInput(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--card-border)', background: 'var(--subtle-bg)', color: 'var(--text-main)' }} placeholder={isHindi ? 'अपना नाम दर्ज करें' : 'Enter your name'} />
-              </div>
-              <div style={{ flex: '1 1 200px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px', display: 'block' }}>{isHindi ? 'नया पासवर्ड (New Password)' : 'New Password'}</label>
-                <input type="password" value={passwordInput} onChange={e => setPasswordInput(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--card-border)', background: 'var(--subtle-bg)', color: 'var(--text-main)' }} placeholder={isHindi ? 'खाली छोड़ें यदि नहीं बदलना है' : 'Leave empty to keep current'} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-               <button onClick={handleUpdateProfile} className="btn-primary" style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '13px' }}>
-                 {isHindi ? 'अपडेट करें' : 'Update Profile'}
-               </button>
-               {profileMessage && (
-                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: profileMessage.type === 'error' ? '#ef4444' : '#10b981' }}>
-                   {profileMessage.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
-                   {profileMessage.text}
-                 </div>
-               )}
-            </div>
+      <div className="settings-hub__header">
+        <div className="settings-hub__header-left">
+          <div className="settings-hub__icon-badge">
+            <SettingsIcon size={22} />
           </div>
-
-          <div style={{ height: '1px', background: 'var(--card-border)', width: '100%' }}></div>
-          {/* Language Setting */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>{isHindi ? 'भाषा (Language)' : 'Language'}</div>
-              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{isHindi ? 'संपूर्ण एप्लिकेशन की भाषा चुनें' : 'Select the language for the entire application'}</div>
+          <div>
+            <div className="settings-hub__title-row">
+              <h2 className="settings-hub__title">
+                {isHindi ? 'कार्यक्षेत्र सेटिंग्स' : 'Workspace Settings'}
+              </h2>
+              <span className="badge badge-neutral">
+                Preferences
+              </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--subtle-bg)', borderRadius: '10px', padding: '6px', border: '1px solid var(--card-border)' }}>
-              <button
-                type="button"
-                onClick={() => onLanguageChange('English')}
-                style={{
-                  border: 'none', background: language === 'English' ? 'var(--card-bg)' : 'transparent',
-                  color: language === 'English' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: language === 'English' ? '700' : '500',
-                  padding: '8px 20px', borderRadius: '8px', fontSize: '14px', cursor: 'pointer',
-                  boxShadow: language === 'English' ? 'var(--card-shadow)' : 'none', transition: 'all 0.2s ease'
-                }}
-              >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => onLanguageChange('Hindi')}
-                style={{
-                  border: 'none', background: language === 'Hindi' ? 'var(--card-bg)' : 'transparent',
-                  color: language === 'Hindi' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: language === 'Hindi' ? '700' : '500',
-                  padding: '8px 20px', borderRadius: '8px', fontSize: '14px', cursor: 'pointer',
-                  boxShadow: language === 'Hindi' ? 'var(--card-shadow)' : 'none', transition: 'all 0.2s ease'
-                }}
-              >
-                हिंदी
-              </button>
-            </div>
-          </div>
-
-          <div style={{ height: '1px', background: 'var(--card-border)', width: '100%' }}></div>
-
-          {/* Theme Setting */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>{isHindi ? 'थीम (Theme)' : 'Theme'}</div>
-              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{isHindi ? 'लाइट या डार्क मोड चुनें' : 'Choose between light or dark mode'}</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--subtle-bg)', borderRadius: '10px', padding: '6px', border: '1px solid var(--card-border)' }}>
-              <button
-                type="button"
-                onClick={() => onThemeChange('light')}
-                style={{
-                  border: 'none', background: theme === 'light' ? 'var(--card-bg)' : 'transparent',
-                  color: theme === 'light' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: theme === 'light' ? '700' : '500',
-                  padding: '8px 16px', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                  boxShadow: theme === 'light' ? 'var(--card-shadow)' : 'none', transition: 'all 0.2s ease'
-                }}
-              >
-                <Sun size={16} /> {isHindi ? 'लाइट' : 'Light'}
-              </button>
-              <button
-                type="button"
-                onClick={() => onThemeChange('dark')}
-                style={{
-                  border: 'none', background: theme === 'dark' ? 'var(--card-bg)' : 'transparent',
-                  color: theme === 'dark' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: theme === 'dark' ? '700' : '500',
-                  padding: '8px 16px', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                  boxShadow: theme === 'dark' ? 'var(--card-shadow)' : 'none', transition: 'all 0.2s ease'
-                }}
-              >
-                <Moon size={16} /> {isHindi ? 'डार्क' : 'Dark'}
-              </button>
-            </div>
+            <p className="settings-hub__subtitle">
+              {isHindi
+                ? 'अपनी प्रोफ़ाइल, भाषा, थीम और स्थानीय वॉल्ट सुरक्षा प्रबंधित करें'
+                : 'Configure user profile, bilingual interface, appearance, and local device security'}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Security & Vault Settings */}
-      <div style={{ background: 'var(--card-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--card-border)', boxShadow: 'var(--card-shadow)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-          <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Key size={18} color="#f59e0b" />
-            {isHindi ? 'सुरक्षा और वॉल्ट (Security & Vault)' : 'Security & Vault Settings'}
-          </h3>
-          {hasPin && (
-            <button onClick={handleResetPin} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
-              {isHindi ? 'पिन भूल गए? (रीसेट)' : 'Forgot PIN? (Force Reset)'}
-            </button>
-          )}
-        </div>
+      <div className="settings-hub__grid">
+        {/* Section 1: User Profile */}
+        <div className="settings-hub__card">
+          <div className="settings-hub__card-header">
+            <div className="settings-hub__card-icon-wrap">
+              <User size={18} />
+            </div>
+            <div>
+              <h3 className="settings-hub__card-title">
+                {isHindi ? 'उपयोगकर्ता प्रोफ़ाइल' : 'User Profile'}
+              </h3>
+              <p className="settings-hub__card-desc">
+                {isHindi ? 'अपना प्रदर्शन नाम और लॉगिन क्रेडेंशियल बदलें' : 'Update your display name and login credentials'}
+              </p>
+            </div>
+          </div>
 
-        <div style={{ background: 'var(--subtle-bg)', padding: '20px', borderRadius: '12px', border: '1px dashed var(--card-border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
-            {hasPin 
-              ? (isHindi ? 'नीचे अपना पुराना पिन और नया पिन दर्ज करके अपना लीगल वॉल्ट पासवर्ड बदलें।' : 'Change your Legal Vault PIN by entering your old and new PIN below.')
-              : (isHindi ? 'आपने अभी तक लीगल वॉल्ट के लिए कोई पिन सेट नहीं किया है। अपना पहला पिन दर्ज करें।' : 'You have not set a PIN for the Legal Vault yet. Enter a new PIN to secure it.')}
-          </p>
+          <div className="settings-hub__form-grid">
+            <div className="form-group">
+              <label className="form-label">
+                {isHindi ? 'पूरा नाम' : 'Full Name'}
+              </label>
+              <input
+                type="text"
+                className="input-field"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder={isHindi ? 'उदा. एडवोकेट राहुल वर्मा' : 'e.g. Adv. Rahul Verma'}
+              />
+            </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-            {hasPin && (
-              <div style={{ flex: '1 1 200px' }}>
-                <label style={{ fontSize: '12.5px', fontWeight: '600', color: '#475569', marginBottom: '6px', display: 'block' }}>
-                  {isHindi ? 'पुराना पिन' : 'Old PIN'}
-                </label>
-                <input
-                  type="password"
-                  className="input-field"
-                  value={oldPin}
-                  onChange={e => setOldPin(e.target.value)}
-                  maxLength={6}
-                  placeholder="••••"
-                  style={{ height: '42px', fontSize: '16px', letterSpacing: '4px' }}
-                />
-              </div>
-            )}
-            
-            <div style={{ flex: '1 1 200px' }}>
-              <label style={{ fontSize: '12.5px', fontWeight: '600', color: '#475569', marginBottom: '6px', display: 'block' }}>
-                {isHindi ? 'नया पिन' : 'New PIN'}
+            <div className="form-group">
+              <label className="form-label">
+                {isHindi ? 'ईमेल एड्रेस (अपरिवर्तनीय)' : 'Email ID (Registered)'}
+              </label>
+              <input
+                type="text"
+                className="input-field"
+                value={user?.email || 'user@dhaara.ai'}
+                disabled
+                style={{ opacity: 0.7 }}
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label className="form-label">
+                {isHindi ? 'नया पासवर्ड' : 'Update Password'}
               </label>
               <input
                 type="password"
                 className="input-field"
-                value={newPin}
-                onChange={e => setNewPin(e.target.value)}
-                maxLength={6}
-                placeholder={isHindi ? 'नया 4-6 अंकों का पिन' : 'New 4-6 digit PIN'}
-                style={{ height: '42px', fontSize: '16px', letterSpacing: '2px' }}
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder={isHindi ? 'खाली छोड़ें यदि नहीं बदलना है' : 'Leave blank to keep existing password'}
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '4px' }}>
+          <div className="settings-hub__card-footer">
             <button
-              onClick={handleChangePin}
+              onClick={handleUpdateProfile}
               className="btn-primary"
-              style={{ padding: '10px 24px', borderRadius: '8px' }}
+              type="button"
             >
-              {hasPin ? (isHindi ? 'पिन बदलें' : 'Update PIN') : (isHindi ? 'पिन सेट करें' : 'Set PIN')}
+              {isHindi ? 'प्रोफ़ाइल सहेजें' : 'Save Changes'}
             </button>
-            
-            {pinMessage && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: pinMessage.type === 'error' ? '#ef4444' : '#10b981' }}>
-                {pinMessage.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
-                {pinMessage.text}
+
+            {profileMessage && (
+              <div className={`settings-hub__feedback settings-hub__feedback--${profileMessage.type}`}>
+                {profileMessage.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}
+                <span>{profileMessage.text}</span>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Section 2: Preferences (Language & Theme) */}
+        <div className="settings-hub__card">
+          <div className="settings-hub__card-header">
+            <div className="settings-hub__card-icon-wrap" style={{ background: 'var(--royal-100)', color: 'var(--royal-600)' }}>
+              <Languages size={18} />
+            </div>
+            <div>
+              <h3 className="settings-hub__card-title">
+                {isHindi ? 'भाषा व स्वरूप (Language & Theme)' : 'Language & Appearance'}
+              </h3>
+              <p className="settings-hub__card-desc">
+                {isHindi ? 'एप्लिकेशन इंटरफ़ेस की भाषा और डार्क मोड चुनें' : 'Choose bilingual interface language and visual theme'}
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-hub__preference-list">
+            {/* Language Segmented Control */}
+            <div className="settings-hub__pref-item">
+              <div>
+                <span className="settings-hub__pref-label">
+                  {isHindi ? 'कार्यक्षेत्र की भाषा' : 'Workspace Language'}
+                </span>
+                <p className="settings-hub__pref-sub">
+                  {isHindi ? 'कानूनी शब्दावली और इंटरफ़ेस की मुख्य भाषा' : 'Select English or Hindi for legal queries and drafts'}
+                </p>
+              </div>
+
+              <div className="settings-hub__segmented-control">
+                <button
+                  type="button"
+                  onClick={() => onLanguageChange('English')}
+                  className={`settings-hub__segment-btn ${language === 'English' ? 'is-active' : ''}`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onLanguageChange('Hindi')}
+                  className={`settings-hub__segment-btn ${language === 'Hindi' || language === 'हिंदी' ? 'is-active' : ''}`}
+                >
+                  हिंदी
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-hub__divider"></div>
+
+            {/* Theme Segmented Control */}
+            <div className="settings-hub__pref-item">
+              <div>
+                <span className="settings-hub__pref-label">
+                  {isHindi ? 'इंटरफ़ेस थीम' : 'Display Mode'}
+                </span>
+                <p className="settings-hub__pref-sub">
+                  {isHindi ? 'उच्च-कंट्रास्ट लाइट अथवा प्रीमियम डार्क मोड' : 'Switch between High-Contrast Light and Deep Navy Dark'}
+                </p>
+              </div>
+
+              <div className="settings-hub__segmented-control">
+                <button
+                  type="button"
+                  onClick={() => onThemeChange('light')}
+                  className={`settings-hub__segment-btn ${theme === 'light' ? 'is-active' : ''}`}
+                >
+                  <Sun size={14} />
+                  <span>Light</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onThemeChange('dark')}
+                  className={`settings-hub__segment-btn ${theme === 'dark' ? 'is-active' : ''}`}
+                >
+                  <Moon size={14} />
+                  <span>Dark</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Vault Security */}
+        <div className="settings-hub__card">
+          <div className="settings-hub__card-header">
+            <div className="settings-hub__card-icon-wrap" style={{ background: 'var(--amber-100)', color: 'var(--amber-600)' }}>
+              <Key size={18} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <h3 className="settings-hub__card-title">
+                  {isHindi ? 'लीगल वॉल्ट पिन सुरक्षा' : 'Legal Vault Security'}
+                </h3>
+              </div>
+              <p className="settings-hub__card-desc">
+                {isHindi
+                  ? 'पिन-संरक्षित स्थानीय डिवाइस स्टोरेज प्रबंधित करें'
+                  : 'Manage your PIN-Protected Local Device Storage access key'}
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-hub__vault-box">
+            <p className="settings-hub__vault-notice">
+              {hasPin
+                ? (isHindi
+                    ? 'नीचे अपना पुराना पिन और नया पिन दर्ज करके वॉल्ट सुरक्षा कुंजी बदलें।'
+                    : 'Enter your current PIN along with a new 4-6 digit PIN to update your vault access.')
+                : (isHindi
+                    ? 'आपने अभी तक वॉल्ट के लिए पिन सेट नहीं किया है। सुरक्षित करने के लिए पिन बनाएं।'
+                    : 'No PIN is currently configured. Create a 4-6 digit PIN to secure your local drafts.')}
+            </p>
+
+            <div className="settings-hub__form-grid">
+              {hasPin && (
+                <div className="form-group">
+                  <label className="form-label">
+                    {isHindi ? 'वर्तमान पिन' : 'Current PIN'}
+                  </label>
+                  <input
+                    type="password"
+                    className="input-field"
+                    value={oldPin}
+                    onChange={(e) => setOldPin(e.target.value)}
+                    maxLength={6}
+                    placeholder="••••"
+                    style={{ letterSpacing: '4px', textAlign: 'center' }}
+                  />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label className="form-label">
+                  {isHindi ? 'नया सुरक्षा पिन' : 'New Security PIN'}
+                </label>
+                <input
+                  type="password"
+                  className="input-field"
+                  value={newPin}
+                  onChange={(e) => setNewPin(e.target.value)}
+                  maxLength={6}
+                  placeholder="••••"
+                  style={{ letterSpacing: '4px', textAlign: 'center' }}
+                />
+              </div>
+            </div>
+
+            <div className="settings-hub__vault-actions">
+              <button
+                onClick={handleChangePin}
+                className="btn-primary"
+                type="button"
+              >
+                {hasPin ? (isHindi ? 'पिन अपडेट करें' : 'Update Vault PIN') : (isHindi ? 'पिन सेट करें' : 'Set Vault PIN')}
+              </button>
+
+              {hasPin && (
+                <button
+                  onClick={handleResetPin}
+                  className="btn-ghost"
+                  type="button"
+                  style={{ color: 'var(--crimson-600)' }}
+                >
+                  {isHindi ? 'पिन रीसेट करें' : 'Force Reset PIN'}
+                </button>
+              )}
+
+              {pinMessage && (
+                <div className={`settings-hub__feedback settings-hub__feedback--${pinMessage.type}`}>
+                  {pinMessage.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}
+                  <span>{pinMessage.text}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: System Information */}
+        <div className="settings-hub__card">
+          <div className="settings-hub__card-header">
+            <div className="settings-hub__card-icon-wrap" style={{ background: 'var(--purple-light)', color: 'var(--purple-600)' }}>
+              <Info size={18} />
+            </div>
+            <div>
+              <h3 className="settings-hub__card-title">
+                {isHindi ? 'सिस्टम व वैधानिक जानकारी' : 'System & Statutory Compliance'}
+              </h3>
+              <p className="settings-hub__card-desc">
+                {isHindi ? 'DhaaraAI प्लेटफ़ॉर्म आर्किटेक्चर एवं कानूनी डेटाबेस संदर्भ' : 'Platform architecture, concordance sources, and storage model'}
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-hub__system-info-list">
+            <div className="settings-hub__system-item">
+              <span className="settings-hub__system-key">
+                {isHindi ? 'वैधानिक आपराधिक कोड' : 'Statutory Criminal Concordance'}
+              </span>
+              <span className="badge badge-primary font-mono">
+                BNS 2023 • BNSS 2023 • BSA 2023
+              </span>
+            </div>
+
+            <div className="settings-hub__system-item">
+              <span className="settings-hub__system-key">
+                {isHindi ? 'पारंपरिक संदर्भ संहिता' : 'Legacy Penal Code'}
+              </span>
+              <span className="badge badge-neutral font-mono">
+                IPC 1860 • CrPC 1973
+              </span>
+            </div>
+
+            <div className="settings-hub__system-item">
+              <span className="settings-hub__system-key">
+                {isHindi ? 'डेटा संप्रभुता व संग्रहण' : 'Client Storage Model'}
+              </span>
+              <span className="settings-hub__system-val">
+                PIN-Protected Local Device Storage (Client Sandbox)
+              </span>
+            </div>
+
+            <div className="settings-hub__system-item">
+              <span className="settings-hub__system-key">
+                {isHindi ? 'साइबर ब्रीच डेटा स्रोत' : 'Breach Record Intelligence'}
+              </span>
+              <span className="settings-hub__system-val">
+                XposedOrNot Public Security Index
+              </span>
+            </div>
           </div>
         </div>
       </div>

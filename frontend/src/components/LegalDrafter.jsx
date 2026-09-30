@@ -252,10 +252,13 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         documentType={documentType}
         incidentCategory={incidentCategory}
         complainant={complainant}
+        accused={accused}
+        isAccusedUnknown={isAccusedUnknown}
         incidentDatetime={incidentDatetime}
         incidentLocation={incidentLocation}
         facts={facts}
         selectedEvidences={selectedEvidences}
+        customEvidence={customEvidence}
         reliefSought={reliefSought}
         isHindi={isHindi}
       />

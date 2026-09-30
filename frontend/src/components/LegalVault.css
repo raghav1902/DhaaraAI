@@ -1,12 +1,453 @@
-.legal-vault { max-width: 1440px; margin: 0 auto; width: 100%; }
-.legal-vault--locked { max-width: none; background: radial-gradient(circle at 50% 12%, var(--primary-light), transparent 38%); }
-.legal-vault__unlock { border-top: 3px solid var(--primary) !important; box-shadow: var(--modal-shadow) !important; }
-.legal-vault__unlock .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-.legal-vault__header { position: relative; overflow: hidden; background: linear-gradient(105deg, var(--card-bg), var(--accent-light)) !important; }
-.legal-vault__header::after { content: ''; position: absolute; right: -52px; top: -76px; width: 170px; height: 170px; border: 1px solid var(--accent-border); border-radius: 50%; pointer-events: none; }
-.legal-vault__workspace { min-height: 320px; border-top: 3px solid var(--accent) !important; }
-.legal-vault__workspace > div[style*="gridTemplateColumns"] > div { border-radius: 16px !important; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
-.legal-vault__workspace > div[style*="gridTemplateColumns"] > div:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover) !important; border-color: var(--primary-border) !important; }
-.legal-vault button { transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
-.legal-vault button:hover { filter: brightness(1.03); }
-@media (max-width: 600px) { .legal-vault__header, .legal-vault__workspace { padding: 16px !important; } .legal-vault__header h2 { font-size: 17px !important; } .legal-vault__unlock { margin: 16px; padding: 24px !important; } }
+.legal-vault {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Locked Screen Container */
+.legal-vault--locked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 32px 16px;
+}
+
+.legal-vault__unlock-card {
+  padding: 36px 32px !important;
+  border-radius: var(--radius-lg) !important;
+  max-width: 440px !important;
+  width: 100%;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.legal-vault__unlock-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(90deg, var(--royal-600), var(--purple-600));
+}
+
+.legal-vault__lock-icon-wrap {
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--royal-600);
+}
+
+.legal-vault__unlock-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.legal-vault__unlock-subtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.legal-vault__pin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.legal-vault__pin-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.legal-vault__key-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.legal-vault__pin-input {
+  padding-left: 44px !important;
+  padding-right: 16px !important;
+  text-align: center;
+  letter-spacing: 6px;
+  font-size: 18px !important;
+  font-weight: 700;
+  height: 48px !important;
+  background: var(--subtle-bg) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.legal-vault__pin-input:focus {
+  border-color: var(--royal-500) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.legal-vault__error-text {
+  color: var(--crimson-600);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.legal-vault__submit-btn {
+  width: 100%;
+  justify-content: center;
+  height: 46px;
+  font-size: 13.5px;
+  border-radius: var(--radius-sm);
+}
+
+.legal-vault__disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
+}
+
+/* Authenticated Header */
+.legal-vault__header {
+  padding: 16px 20px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.legal-vault__header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--emerald-600), var(--royal-600));
+}
+
+.legal-vault__header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.legal-vault__icon-badge {
+  background: linear-gradient(135deg, var(--emerald-600), var(--emerald-800));
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+.legal-vault__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legal-vault__title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.legal-vault__subtitle {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.legal-vault__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-vault__count-pill {
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legal-vault__lock-btn {
+  font-size: 12px !important;
+  padding: 7px 14px !important;
+}
+
+/* Workspace Grid */
+.legal-vault__workspace {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  min-height: 380px;
+  box-shadow: var(--shadow-sm);
+}
+
+.legal-vault__empty {
+  text-align: center;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-vault__empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.legal-vault__empty-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.legal-vault__empty-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 440px;
+  line-height: 1.5;
+}
+
+.legal-vault__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 16px;
+}
+
+.legal-vault__card {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-vault__card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--royal-400);
+}
+
+.legal-vault__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.legal-vault__delete-btn {
+  background: none;
+  border: none;
+  color: var(--crimson-500);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.legal-vault__delete-btn:hover {
+  background: var(--danger-light);
+  color: var(--crimson-700);
+}
+
+.legal-vault__card-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.legal-vault__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.legal-vault__card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.legal-vault__action-btn {
+  flex: 1;
+  justify-content: center;
+  font-size: 12.5px !important;
+  padding: 7px 10px !important;
+}
+
+/* Modal */
+.legal-vault__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 13, 26, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: 16px;
+}
+
+.legal-vault__modal-dialog {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  max-width: 800px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+}
+
+.legal-vault__modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--subtle-bg);
+}
+
+.legal-vault__modal-title {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.legal-vault__modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legal-vault__modal-close:hover {
+  background: var(--subtle-bg);
+  color: var(--text-main);
+}
+
+.legal-vault__modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  background: var(--card-bg);
+}
+
+.legal-vault__document-text {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.legal-vault__modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--subtle-bg);
+}
+
+@media (max-width: 600px) {
+  .legal-vault__header {
+    padding: 14px !important;
+  }
+  .legal-vault__unlock-card {
+    padding: 24px 16px !important;
+  }
+  .legal-vault__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,12 +1,380 @@
-.fee-calculator { max-width: 1440px; width: 100%; margin: 0 auto; }
-.fee-calculator__header { position: relative; overflow: hidden; background: linear-gradient(108deg, var(--card-bg), var(--warning-light)) !important; }
-.fee-calculator__header::after { content: '₹'; position: absolute; right: 28px; top: 50%; transform: translateY(-50%); color: var(--warning); opacity: .11; font-size: 80px; font-weight: 800; pointer-events: none; }
-.fee-calculator__types { padding: 4px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; box-shadow: var(--card-shadow); }
-.fee-calculator__types button { border-radius: 11px !important; transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
-.fee-calculator__types button:hover { transform: translateY(-1px); filter: brightness(1.03); }
-.fee-calculator__panel { border-top: 3px solid var(--warning) !important; background: var(--card-bg) !important; box-shadow: var(--card-shadow); }
-.fee-calculator__panel .input-field { background: var(--subtle-bg); border-color: var(--card-border); }
-.fee-calculator__panel .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-.fee-calculator__panel > div > div[style*="background"] { border-radius: 14px !important; }
-.fee-calculator label { letter-spacing: .01em; }
-@media (max-width: 600px) { .fee-calculator__header { padding: 16px !important; } .fee-calculator__header h2 { font-size: 17px !important; max-width: 270px; } .fee-calculator__header::after { font-size: 54px; right: 12px; } .fee-calculator__panel { padding: 16px !important; } .fee-calculator__types { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+.fee-calculator {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Header */
+.fee-calculator__header {
+  padding: 16px 20px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.fee-calculator__header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--amber-600), var(--royal-600));
+}
+
+.fee-calculator__header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.fee-calculator__icon-badge {
+  background: linear-gradient(135deg, var(--amber-600), #b45309);
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.fee-calculator__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fee-calculator__title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.fee-calculator__subtitle {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* Tabs Bar */
+.fee-calculator__tabs-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: var(--subtle-bg);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+}
+
+.fee-calculator__tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.fee-calculator__tab-btn:hover {
+  color: var(--text-main);
+  background: var(--card-bg);
+}
+
+.fee-calculator__tab-btn.is-active {
+  background: var(--card-bg);
+  color: var(--royal-600);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-xs);
+  font-weight: 700;
+}
+
+/* Panel Layout */
+.fee-calculator__panel {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  align-items: start;
+}
+
+.fee-calculator__panel-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.fee-calculator__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.fee-calculator__form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.fee-calculator__input-wrap {
+  position: relative;
+}
+
+.fee-calculator__currency-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Violations List */
+.fee-calculator__violations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.fee-calculator__violation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.fee-calculator__violation-item:hover {
+  background: var(--card-bg);
+  border-color: var(--royal-400);
+}
+
+.fee-calculator__violation-item.is-selected {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.fee-calculator__violation-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--crimson-600);
+  cursor: pointer;
+}
+
+.fee-calculator__violation-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.fee-calculator__violation-fine {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--crimson-600);
+}
+
+/* Legal Receipt Card */
+.fee-calculator__receipt {
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.fee-calculator__receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--card-border);
+}
+
+.fee-calculator__receipt-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--royal-600);
+}
+
+.fee-calculator__receipt-copy {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.fee-calculator__receipt-copy:hover {
+  background: var(--card-bg);
+  color: var(--text-main);
+}
+
+.fee-calculator__receipt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fee-calculator__receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.fee-calculator__receipt-label {
+  color: var(--text-secondary);
+}
+
+.fee-calculator__receipt-val {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.fee-calculator__receipt-divider {
+  height: 1px;
+  border-bottom: 1px dashed var(--card-border);
+  margin: 4px 0;
+}
+
+.fee-calculator__receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.fee-calculator__receipt-total-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--emerald-600);
+}
+
+.fee-calculator__receipt-total-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--emerald-600);
+}
+
+.fee-calculator__receipt-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-border);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Placeholder Receipt */
+.fee-calculator__receipt-placeholder {
+  background: var(--subtle-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 36px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fee-calculator__placeholder-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--royal-600);
+  margin-bottom: 6px;
+}
+
+.fee-calculator__placeholder-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.fee-calculator__placeholder-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .fee-calculator__panel {
+    grid-template-columns: 1fr;
+  }
+  .fee-calculator__tabs-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .fee-calculator__header {
+    padding: 14px !important;
+  }
+  .fee-calculator__title {
+    font-size: 16px !important;
+  }
+  .fee-calculator__form-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -4,18 +4,13 @@ import {
   FileSearch,
   AlertTriangle,
   CheckCircle2,
-  ShieldAlert,
   Copy,
-  Check,
   Sparkles,
-  FileText,
-  Scale,
-  Lightbulb,
-  Info,
   RefreshCw,
   Upload,
   FileCheck,
-  Loader2
+  Loader2,
+  ShieldCheck
 } from 'lucide-react';
 import { SAMPLE_CONTRACTS } from '../data/contractAnalyzerData';
 import AnalysisResultsView from './DocumentAnalyzer/AnalysisResultsView';
@@ -113,132 +108,86 @@ export default function DocumentAnalyzer({ language = 'English' }) {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const getRiskBadgeColor = (score) => {
-    const s = String(score).toLowerCase();
-    if (s.includes('critical')) return { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' };
-    if (s.includes('high')) return { bg: '#ffedd5', text: '#9a3412', border: '#fdba74' };
-    if (s.includes('medium')) return { bg: '#fef9c3', text: '#854d0e', border: '#fde047' };
-    return { bg: '#dcfce7', text: '#166534', border: '#86efac' };
-  };
-
   return (
-    <div className="contract-audit" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="contract-audit animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
-      <div className="contract-audit__header" style={{
-        padding: '16px 20px',
-        borderRadius: '16px',
-        background: 'var(--card-bg)',
-        border: '1px solid var(--card-border)',
-        boxShadow: 'var(--card-shadow)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="contract-audit__header module-header-banner">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+              background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
               padding: '10px',
-              borderRadius: '12px',
+              borderRadius: 'var(--radius-sm)',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+              boxShadow: '0 4px 12px rgba(29, 78, 216, 0.25)'
             }}>
               <FileSearch size={22} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                  {isHindi ? 'अनुबंध ऑडिट' : 'Contract Audit'}
+                  {isHindi ? 'अनुबंध जोखिम ऑडिट' : 'Contract Risk & Unfair Clause Audit'}
                 </h2>
-                <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
-                  Contract Act 1872
+                <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                  Indian Contract Act 1872
                 </span>
               </div>
               <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
                 {isHindi
                   ? 'किरायानामा, एम्प्लॉयमेंट बॉन्ड व सर्विस एग्रीमेंट में गैर-कानूनी या एकतरफा शर्तों की तत्काल जांच करें।'
-                  : 'Screen rent deeds, employment bonds, and freelance agreements for unfair clauses and Indian law compliance.'}
+                  : 'Screen rent deeds, employment bonds, and commercial agreements for unfair terms, non-competes, and statutory violations.'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Quick Sample Chips */}
-        <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>
-            {isHindi ? 'नमूना अनुबंध लोड करें:' : 'Load Sample Contract:'}
+        {/* Quick Sample Selector Chips */}
+        <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', width: '100%', borderTop: '1px solid var(--card-border)', paddingTop: '12px' }}>
+          <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Sparkles size={14} color="var(--primary)" />
+            {isHindi ? 'त्वरित नमूना अनुबंध लोड करें:' : 'Try Sample Legal Agreements:'}
           </span>
           <button
             type="button"
             onClick={() => loadSample('rent')}
-            style={{
-              background: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              color: 'var(--primary)',
-              borderRadius: '20px',
-              padding: '5px 12px',
-              fontSize: '12.5px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
+            className="btn-ghost"
+            style={{ borderRadius: 'var(--radius-full)' }}
           >
-            {isHindi ? 'आवासीय किराया अनुबंध' : 'Rental Agreement'}
+            {isHindi ? 'आवासीय किराया अनुबंध (Rent Deed)' : 'Rent Deed (11 Months)'}
           </button>
           <button
             type="button"
             onClick={() => loadSample('employment')}
-            style={{
-              background: 'rgba(234, 88, 12, 0.08)',
-              border: '1px solid rgba(234, 88, 12, 0.25)',
-              color: '#ea580c',
-              borderRadius: '20px',
-              padding: '5px 12px',
-              fontSize: '12.5px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
+            className="btn-ghost"
+            style={{ borderRadius: 'var(--radius-full)' }}
           >
-            {isHindi ? 'जॉब व सर्विस बॉन्ड' : 'Employment Bond'}
+            {isHindi ? 'जॉब व सर्विस बॉन्ड (Employment Bond)' : 'Employment Service Bond'}
           </button>
           <button
             type="button"
             onClick={() => loadSample('freelance')}
-            style={{
-              background: 'rgba(16, 185, 129, 0.08)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
-              color: '#059669',
-              borderRadius: '20px',
-              padding: '5px 12px',
-              fontSize: '12.5px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
+            className="btn-ghost"
+            style={{ borderRadius: 'var(--radius-full)' }}
           >
-            {isHindi ? 'फ्रीलांस सर्विस अनुबंध' : 'Freelance Agreement'}
+            {isHindi ? 'फ्रीलांस सर्विस अनुबंध (Consultancy)' : 'Freelance Agreement'}
           </button>
         </div>
       </div>
 
       {/* Input Section */}
-      <div className="glass-panel contract-audit__workspace" style={{ padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="glass-panel contract-audit__workspace" style={{ padding: '24px', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 240px' }}>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-main)' }}>
-              {isHindi ? 'दस्तावेज का प्रकार' : 'Document Category'}
+              {isHindi ? 'दस्तावेज का प्रकार (Document Category)' : 'Document Category'}
             </label>
             <select
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: '1px solid var(--card-border)',
-                background: 'var(--subtle-bg)',
-                fontSize: '14px',
-                outline: 'none',
-                color: 'var(--text-main)'
-              }}
+              className="input-field"
             >
               <option value="Rental / Lease Agreement">Residential / Commercial Rental Agreement</option>
               <option value="Employment Contract / Bond">Employment Offer, Service Bond & Non-Compete</option>
@@ -250,26 +199,28 @@ export default function DocumentAnalyzer({ language = 'English' }) {
           </div>
         </div>
 
-        {/* Document Upload Area */}
-        <div className={`contract-audit__dropzone${isDragging ? ' is-dragging' : ''}${uploading ? ' is-uploading' : ''}`}
+        {/* Document Upload Dropzone */}
+        <div
+          className={`contract-audit__dropzone${isDragging ? ' is-dragging' : ''}${uploading ? ' is-uploading' : ''}`}
           onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragOver={(e) => e.preventDefault()}
           onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDragging(false); }}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); uploadFile(e.dataTransfer.files?.[0]); }}
           style={{
-          border: '2px dashed var(--card-border)',
-          borderRadius: '12px',
-          padding: '16px 20px',
-          background: 'var(--subtle-bg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-          transition: 'all 0.2s ease'
-        }}>
+            border: '2px dashed var(--primary-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: '16px 20px',
+            background: 'var(--subtle-bg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            transition: 'all 0.2s ease'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ background: '#eff6ff', padding: '10px', borderRadius: '10px', color: 'var(--primary)', display: 'flex' }}>
+            <div style={{ background: 'var(--primary-light)', padding: '10px', borderRadius: 'var(--radius-sm)', color: 'var(--primary)', display: 'flex' }}>
               <Upload size={20} />
             </div>
             <div>
@@ -294,10 +245,10 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             <label
               htmlFor="contract-file-upload"
               style={{
-                background: 'var(--subtle-bg)',
+                background: 'var(--card-bg)',
                 border: '1px solid var(--card-border)',
-                padding: '7px 16px',
-                borderRadius: '8px',
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-xs)',
                 fontSize: '13px',
                 fontWeight: '600',
                 color: 'var(--primary)',
@@ -305,7 +256,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                boxShadow: 'var(--card-shadow)'
               }}
             >
               {uploading ? (
@@ -324,7 +275,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
         </div>
 
         {uploadedFileName && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 14px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: '#166534', fontSize: '12.5px' }}>
+          <div style={{ background: 'var(--accent-light)', border: '1px solid var(--accent-border)', padding: '8px 14px', borderRadius: 'var(--radius-xs)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent)', fontSize: '12.5px' }}>
             <FileCheck size={16} />
             <span><strong>{uploadedFileName}</strong> {isHindi ? 'सफलतापूर्वक लोड किया गया!' : 'successfully loaded!'}</span>
           </div>
@@ -349,7 +300,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             style={{
               width: '100%',
               padding: '14px',
-              borderRadius: '10px',
+              borderRadius: 'var(--radius-sm)',
               border: '1px solid var(--card-border)',
               fontSize: '13.5px',
               fontFamily: 'monospace',
@@ -364,7 +315,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
         </div>
 
         {error && (
-          <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#991b1b', padding: '12px 16px', borderRadius: '8px', fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ background: 'var(--danger-light)', border: '1px solid var(--danger-border)', color: 'var(--danger)', padding: '12px 16px', borderRadius: 'var(--radius-xs)', fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertTriangle size={18} /> {error}
           </div>
         )}
@@ -390,31 +341,22 @@ export default function DocumentAnalyzer({ language = 'English' }) {
             type="button"
             onClick={handleAnalyze}
             disabled={loading}
+            className="btn-primary"
             style={{
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
               padding: '11px 24px',
-              fontSize: '14.5px',
-              fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+              fontSize: '14px',
               opacity: loading ? 0.75 : 1
             }}
           >
             {loading ? (
               <>
-                <RefreshCw size={18} className="spin" />
-                {isHindi ? 'कानूनी ऑडिट जारी है...' : 'Auditing Contract...'}
+                <RefreshCw size={17} className="ask-ai-send-loading" />
+                {isHindi ? 'कानूनी ऑडिट जारी है...' : 'Auditing Contract Clauses...'}
               </>
             ) : (
               <>
-                <Sparkles size={18} />
-                {isHindi ? 'अनुबंध की कानूनी समीक्षा करें' : 'Audit Document for Red Flags'}
+                <Sparkles size={17} />
+                {isHindi ? 'अनुबंध की कानूनी समीक्षा करें' : 'Audit Document for Legal Red Flags'}
               </>
             )}
           </button>
@@ -428,7 +370,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       {copiedIndex !== null && (
         <div className="toast-container">
           <div className="toast-message">
-            <CheckCircle2 size={18} color="#4ade80" />
+            <CheckCircle2 size={18} color="var(--accent)" />
             {isHindi ? 'शर्त क्लिपबोर्ड पर कॉपी की गई!' : 'Clause copied to clipboard!'}
           </div>
         </div>

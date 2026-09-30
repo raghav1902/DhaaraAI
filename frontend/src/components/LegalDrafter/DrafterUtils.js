@@ -1,5 +1,3 @@
-import html2pdf from 'html2pdf.js';
-
 export const getPresetData = (presetKey, isHindi) => {
   if (presetKey === 'cyber') {
     return {
@@ -103,7 +101,7 @@ export const exportDraftToDoc = (documentType, draft) => {
   URL.revokeObjectURL(url);
 };
 
-export const exportDraftToPdf = (documentType, draft, isHindi) => {
+export const exportDraftToPdf = async (documentType, draft, isHindi) => {
   if (!draft) return;
   const docTitle = documentType === 'Legal Demand Notice' ? 'Legal_Demand_Notice' : 'Police_Complaint_FIR';
 
@@ -125,7 +123,7 @@ export const exportDraftToPdf = (documentType, draft, isHindi) => {
     <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:24px;">
       <div style="font-size:10pt;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${emblem}</div>
       <h1 style="font-size:16pt;font-weight:bold;margin:6px 0 2px;text-transform:uppercase;">${headerTitle}</h1>
-      <div style="font-size:9pt;">Formulated under the Bharatiya Nagarik Suraksha Sanhita, 2023 & BNS 2023</div>
+      <div style="font-size:9pt;">Formulated under Bharatiya Nagarik Suraksha Sanhita, 2023 & BNS 2023</div>
     </div>
     <div style="white-space:pre-wrap;">${draft}</div>
   `;
@@ -139,7 +137,14 @@ export const exportDraftToPdf = (documentType, draft, isHindi) => {
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
-  html2pdf().set(opt).from(element).save();
+  try {
+    const html2pdfModule = await import('html2pdf.js');
+    const html2pdf = html2pdfModule.default || html2pdfModule;
+    html2pdf().set(opt).from(element).save();
+  } catch (err) {
+    console.error('PDF export error:', err);
+    window.print();
+  }
 };
 
 export const saveDraftToVault = (documentType, complainantName, draft, isHindi) => {

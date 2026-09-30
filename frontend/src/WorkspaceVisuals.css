@@ -1,39 +1,101 @@
-/* Authenticated workspace visual layer. Decorative imagery stays behind the UI. */
-.app-container { isolation: isolate; overflow: hidden; }
-.app-container::before { content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(circle at 82% 8%, rgba(99, 102, 241, .11), transparent 28%), radial-gradient(circle at 15% 94%, rgba(14, 165, 233, .08), transparent 28%), linear-gradient(135deg, #f8fafc, #f4f7fb 52%, #f8fafc); }
-.app-container::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .045; background-image: url('./assets/workspace/legal-court-texture.jpg'); background-size: cover; background-position: right bottom; mix-blend-mode: multiply; }
-.workspace-content { position: relative; z-index: 1; }
-.app-main { background: linear-gradient(145deg, color-mix(in srgb, var(--card-bg) 96%, var(--primary-light)), var(--card-bg) 44%, color-mix(in srgb, var(--card-bg) 96%, var(--ai-purple-light))) !important; box-shadow: 0 18px 45px -28px rgba(15, 23, 42, .24), var(--card-shadow) !important; }
-.app-sidebar { background: color-mix(in srgb, var(--sidebar-bg) 94%, transparent) !important; backdrop-filter: blur(18px); }
-.app-top-header { border-bottom: 1px solid color-mix(in srgb, var(--card-border) 72%, transparent) !important; padding-bottom: 14px !important; margin-bottom: 3px; }
-.workspace-content::before { content: ''; position: absolute; inset: -12px -18px; z-index: -1; pointer-events: none; border-radius: 24px; opacity: .44; background: radial-gradient(circle at 90% 8%, var(--primary-light), transparent 28%), radial-gradient(circle at 9% 92%, var(--ai-purple-light), transparent 32%); }
-.app-container :focus-visible { outline: 3px solid var(--primary-border); outline-offset: 2px; }
+/* ==========================================================================
+   DHAARAAI / LEGALGPT — WORKSPACE VISUAL ATMOSPHERE & TEXTURES
+   Contextual, subtle legal architecture and security textures.
+   Non-intrusive, WCAG-compliant contrast, light & dark mode adaptive.
+   ========================================================================== */
 
-/* The same image is softly tinted per feature so it reads as a product system, not wallpaper. */
-.ask-ai-hero,
-.drafter-header,
-.contract-audit__header,
-.citizen-rights__header,
-.bns-concordance__header,
-.legal-library__header,
-.legal-vault__header,
-.fee-calculator__header { background-image: linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 92%, transparent) 58%, color-mix(in srgb, var(--card-bg) 42%, transparent) 100%), url('./assets/workspace/legal-court-texture.jpg') !important; background-repeat: no-repeat !important; background-size: cover !important; background-position: center right !important; }
-.ask-ai-hero { background-color: var(--card-bg) !important; }
-.citizen-rights__header { background-image: linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 93%, transparent) 62%, color-mix(in srgb, var(--danger-light) 50%, transparent) 100%), url('./assets/workspace/legal-court-texture.jpg') !important; }
-.legal-vault__header { background-image: linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 94%, transparent) 62%, color-mix(in srgb, var(--accent-light) 55%, transparent) 100%), url('./assets/workspace/legal-court-texture.jpg') !important; }
-.fee-calculator__header { background-image: linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 93%, transparent) 62%, color-mix(in srgb, var(--warning-light) 55%, transparent) 100%), url('./assets/workspace/legal-court-texture.jpg') !important; }
-.cyber-scanner__workspace { position: relative; isolation: isolate; background-image: linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 89%, transparent) 67%, color-mix(in srgb, var(--primary-light) 40%, transparent) 100%), url('./assets/workspace/cyber-shield.png') !important; background-repeat: no-repeat !important; background-size: cover, min(330px, 39%) auto !important; background-position: center, right 18px bottom 14px !important; }
+.app-container {
+  isolation: isolate;
+  position: relative;
+  min-height: 100vh;
+}
 
-body.dark-theme .app-container::before { background: radial-gradient(circle at 82% 8%, rgba(99, 102, 241, .16), transparent 28%), radial-gradient(circle at 15% 94%, rgba(14, 165, 233, .09), transparent 28%), linear-gradient(135deg, #0b0f19, #101827 52%, #0b0f19); }
-body.dark-theme .app-container::after { opacity: .025; mix-blend-mode: screen; }
-body.dark-theme .app-main { background: linear-gradient(145deg, color-mix(in srgb, var(--card-bg) 93%, var(--primary-light)), var(--card-bg) 44%, color-mix(in srgb, var(--card-bg) 93%, var(--ai-purple-light))) !important; box-shadow: 0 18px 45px -28px rgba(0, 0, 0, .72), var(--card-shadow) !important; }
-body.dark-theme .ask-ai-hero,
-body.dark-theme .drafter-header,
-body.dark-theme .contract-audit__header,
-body.dark-theme .citizen-rights__header,
-body.dark-theme .bns-concordance__header,
-body.dark-theme .legal-library__header,
-body.dark-theme .legal-vault__header,
-body.dark-theme .fee-calculator__header { background-image: linear-gradient(90deg, rgba(17, 24, 39, .98) 0%, rgba(17, 24, 39, .94) 65%, rgba(17, 24, 39, .78) 100%), url('./assets/workspace/legal-court-texture.jpg') !important; }
-body.dark-theme .cyber-scanner__workspace { background-image: linear-gradient(90deg, rgba(17, 24, 39, .98) 0%, rgba(17, 24, 39, .94) 67%, rgba(17, 24, 39, .78) 100%), url('./assets/workspace/cyber-shield.png') !important; }
-@media (max-width: 700px) { .app-container::after { opacity: .028; } .app-main { box-shadow: none !important; } .app-top-header { padding-bottom: 10px !important; } .workspace-content::before { inset: -8px -4px; opacity: .26; } .ask-ai-hero, .drafter-header, .contract-audit__header, .citizen-rights__header, .bns-concordance__header, .legal-library__header, .legal-vault__header, .fee-calculator__header { background-size: auto 100% !important; } .cyber-scanner__workspace { background-size: cover, 200px auto !important; background-position: center, right -34px bottom -4px !important; } }
+/* Subtle ambient backdrop gradients */
+.app-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 85% 8%, rgba(37, 99, 235, 0.04), transparent 28%),
+    radial-gradient(circle at 10% 92%, rgba(124, 58, 237, 0.03), transparent 28%),
+    var(--bg-color);
+  transition: background 0.25s ease;
+}
+
+/* Very faint legal architectural watermark texture */
+.app-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.018;
+  background-image: url('./assets/workspace/legal-court-texture.jpg');
+  background-size: cover;
+  background-position: right bottom;
+  mix-blend-mode: multiply;
+  transition: opacity 0.25s ease;
+}
+
+body.dark-theme .app-container::before {
+  background: 
+    radial-gradient(circle at 85% 8%, rgba(59, 130, 246, 0.06), transparent 30%),
+    radial-gradient(circle at 10% 92%, rgba(139, 92, 246, 0.05), transparent 30%),
+    var(--bg-color);
+}
+
+body.dark-theme .app-container::after {
+  opacity: 0.012;
+  mix-blend-mode: screen;
+}
+
+/* Focus indicator for keyboard accessibility */
+.app-container :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Contextual Header Textures - Scoped & Opt-in (High Contrast Guaranteed) */
+.texture-legal-court {
+  background-image: 
+    linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 95%, transparent) 60%, color-mix(in srgb, var(--card-bg) 85%, transparent) 100%),
+    url('./assets/workspace/legal-court-texture.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center right;
+}
+
+.texture-cyber-shield {
+  position: relative;
+  isolation: isolate;
+  background-image: 
+    linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 94%, transparent) 70%, color-mix(in srgb, var(--card-bg) 88%, transparent) 100%),
+    url('./assets/workspace/cyber-shield.png');
+  background-repeat: no-repeat;
+  background-size: cover, min(240px, 30%) auto;
+  background-position: center, right 24px bottom 16px;
+}
+
+body.dark-theme .texture-legal-court {
+  background-image: 
+    linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 65%, color-mix(in srgb, var(--card-bg) 90%, transparent) 100%),
+    url('./assets/workspace/legal-court-texture.jpg');
+}
+
+body.dark-theme .texture-cyber-shield {
+  background-image: 
+    linear-gradient(90deg, var(--card-bg) 0%, color-mix(in srgb, var(--card-bg) 96%, transparent) 72%, color-mix(in srgb, var(--card-bg) 90%, transparent) 100%),
+    url('./assets/workspace/cyber-shield.png');
+}
+
+/* Responsive safeguards */
+@media (max-width: 868px) {
+  .texture-cyber-shield {
+    background-image: none !important;
+  }
+  .texture-legal-court {
+    background-size: auto 100%;
+  }
+}

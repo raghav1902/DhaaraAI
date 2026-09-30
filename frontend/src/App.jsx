@@ -29,8 +29,8 @@ import {
   X,
   Settings as SettingsIcon,
   LogOut,
-  User as UserIcon,
-  Smartphone
+  Smartphone,
+  ShieldCheck
 } from 'lucide-react';
 
 function App() {
@@ -53,6 +53,7 @@ function App() {
   });
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('chat');
   const [language, setLanguage] = useState('English');
@@ -82,7 +83,27 @@ function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
 
-  React.useEffect(() => {
+  // Close profile menu on outside click or Escape
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 868) {
         setIsSidebarOpen(false);
@@ -94,7 +115,7 @@ function App() {
 
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -102,7 +123,6 @@ function App() {
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
@@ -118,7 +138,7 @@ function App() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
     } else {
@@ -135,7 +155,7 @@ function App() {
   const searchInputRef = useRef(null);
 
   // Global Ctrl + K search shortcut
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -154,8 +174,8 @@ function App() {
   };
 
   const navItems = [
-    { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Search, badge: 'AI' },
-    { id: 'drafting', label: isHindi ? 'ड्राफ्टिंग' : 'Drafting', icon: FileText, badge: 'Sec 173' },
+    { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Search, badge: 'LegalGPT' },
+    { id: 'drafting', label: isHindi ? 'ड्राफ्टिंग' : 'Legal Drafting', icon: FileText, badge: 'Sec 173' },
     { id: 'analyzer', label: isHindi ? 'अनुबंध समीक्षक' : 'Contract Audit', icon: FileSearch, badge: 'Risk' },
     { id: 'rights', label: isHindi ? 'नागरिक अधिकार & SOS' : 'Citizen Rights & SOS', icon: ShieldAlert, badge: 'Emergency' },
     { id: 'converter', label: isHindi ? 'BNS ↔ IPC' : 'BNS ↔ IPC', icon: ArrowRightLeft, badge: '2024' },
@@ -186,6 +206,8 @@ function App() {
     );
   }
 
+  const currentNav = navItems.find(n => n.id === activeTab) || navItems[0];
+
   return (
     <div className="app-container" style={{
       display: 'flex',
@@ -193,10 +215,10 @@ function App() {
       background: 'var(--bg-color)',
       color: 'var(--text-main)',
       position: 'relative',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      fontFamily: "var(--font-sans)",
       transition: 'background 0.2s ease, color 0.2s ease'
     }}>
-      {/* Mobile Drawer Overlay Backdrop */}
+      {/* Mobile Drawer Backdrop */}
       {isSidebarOpen && (
         <div
           className="mobile-backdrop"
@@ -205,24 +227,28 @@ function App() {
         />
       )}
 
-      {/* Modern Refined Sidebar */}
-      <nav className={`no-print app-sidebar ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{
-        width: isSidebarOpen ? '255px' : '72px',
-        minWidth: isSidebarOpen ? '255px' : '72px',
-        padding: '18px 12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        position: 'sticky',
-        top: '0',
-        height: '100vh',
-        overflow: 'hidden',
-        background: 'var(--sidebar-bg)',
-        borderRight: '1px solid var(--card-border)',
-        boxShadow: 'var(--card-shadow)',
-        zIndex: 50,
-        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
-      }}>
+      {/* Primary Sidebar Navigation */}
+      <nav
+        className={`no-print app-sidebar ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
+        aria-label="Main Navigation"
+        style={{
+          width: isSidebarOpen ? '260px' : '74px',
+          minWidth: isSidebarOpen ? '260px' : '74px',
+          padding: '16px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          position: 'sticky',
+          top: '0',
+          height: '100vh',
+          overflow: 'hidden',
+          background: 'var(--sidebar-bg)',
+          borderRight: '1px solid var(--card-border)',
+          boxShadow: 'var(--card-shadow)',
+          zIndex: 50,
+          transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+        }}
+      >
         {/* Brand Header */}
         <div style={{
           display: 'flex',
@@ -244,11 +270,12 @@ function App() {
               setActiveTab('chat');
               if (window.innerWidth <= 868) setIsSidebarOpen(false);
             }}
+            title="DhaaraAI Home Workspace"
           >
             <div style={{
-              background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
-              padding: '9px',
-              borderRadius: '10px',
+              background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
+              padding: '8px',
+              borderRadius: 'var(--radius-sm)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
@@ -261,8 +288,8 @@ function App() {
             </div>
             <div style={{ whiteSpace: 'nowrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h1 style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.02em' }}>DhaaraAI</h1>
-                <span style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>LegalGPT</span>
+                <span style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>DhaaraAI</span>
+                <span style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', padding: '1px 6px', borderRadius: 'var(--radius-full)', fontWeight: '700' }}>LegalGPT</span>
               </div>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>Indian Legal Intelligence</p>
             </div>
@@ -279,11 +306,12 @@ function App() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: '8px',
+              borderRadius: 'var(--radius-xs)',
               minWidth: '34px',
               minHeight: '34px',
               transition: 'all 0.2s ease'
             }}
+            aria-label={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
             title={isSidebarOpen ? (isHindi ? "साइडबार बंद करें" : "Collapse Sidebar") : (isHindi ? "साइडबार खोलें" : "Expand Sidebar")}
           >
             {isSidebarOpen ? <X size={16} /> : <Menu size={18} />}
@@ -293,7 +321,7 @@ function App() {
         {/* Section Label */}
         {isSidebarOpen && (
           <div style={{ padding: '0 8px', fontSize: '10.5px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-dim)' }}>
-            {isHindi ? 'विधिक मॉड्यूल' : 'Legal Modules'}
+            {isHindi ? 'विधिक मॉड्यूल' : 'Legal Workspaces'}
           </div>
         )}
 
@@ -312,6 +340,7 @@ function App() {
                   }
                 }}
                 title={tab.label}
+                aria-current={isActive ? 'page' : undefined}
                 style={{
                   background: isActive ? 'var(--primary-light)' : 'transparent',
                   border: isActive ? '1px solid var(--primary-border)' : '1px solid transparent',
@@ -324,7 +353,7 @@ function App() {
                   justifyContent: isSidebarOpen ? 'flex-start' : 'center',
                   gap: '10px',
                   padding: isSidebarOpen ? '9px 12px' : '9px 0',
-                  borderRadius: '10px',
+                  borderRadius: 'var(--radius-sm)',
                   transition: 'all 0.15s ease',
                   textAlign: 'left',
                   width: '100%',
@@ -348,9 +377,9 @@ function App() {
                   <div style={{
                     position: 'absolute',
                     left: '0',
-                    top: '18%',
-                    bottom: '18%',
-                    width: '3.5px',
+                    top: '20%',
+                    bottom: '20%',
+                    width: '3px',
                     borderRadius: '0 4px 4px 0',
                     background: 'var(--primary)'
                   }} />
@@ -364,7 +393,7 @@ function App() {
                         fontSize: '9.5px',
                         fontWeight: '700',
                         padding: '1px 6px',
-                        borderRadius: '999px',
+                        borderRadius: 'var(--radius-full)',
                         background: tab.id === 'rights' ? 'var(--danger-light)' : 'var(--primary-light)',
                         color: tab.id === 'rights' ? 'var(--danger)' : 'var(--primary)',
                         border: `1px solid ${tab.id === 'rights' ? 'var(--danger-border)' : 'var(--primary-border)'}`
@@ -387,10 +416,10 @@ function App() {
               title={isHindi ? "ऐप इंस्टॉल करें" : "Install App"}
               style={{
                 width: '100%',
-                background: 'linear-gradient(135deg, #059669, #047857)',
+                background: 'linear-gradient(135deg, var(--emerald-600), var(--emerald-700))',
                 color: 'white',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: 'var(--radius-xs)',
                 padding: isSidebarOpen ? '8px 12px' : '8px 0',
                 cursor: 'pointer',
                 display: 'flex',
@@ -409,18 +438,18 @@ function App() {
         )}
       </nav>
 
-      {/* Main Content Area */}
+      {/* Main Workspace Stage */}
       <main className="app-main" style={{
         flex: 1,
-        margin: '10px 12px 10px 0',
-        padding: '20px 28px',
+        margin: '10px 14px 10px 0',
+        padding: '20px 24px',
         background: 'var(--card-bg)',
-        borderRadius: '16px',
+        borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--card-border)',
         boxShadow: 'var(--card-shadow)',
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: isSidebarOpen ? 'calc(100% - 267px)' : 'calc(100% - 84px)',
+        maxWidth: isSidebarOpen ? 'calc(100% - 274px)' : 'calc(100% - 88px)',
         height: 'calc(100vh - 20px)',
         overflowY: 'auto',
         color: 'var(--text-main)',
@@ -428,7 +457,7 @@ function App() {
         zIndex: 1,
         position: 'relative'
       }}>
-        {/* Top Header with Breadcrumbs, Global Search, and Quick Actions */}
+        {/* Top Header: Breadcrumb, Verified Status, Global Search, Theme, Language, Profile */}
         <header className="app-top-header" style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -436,11 +465,11 @@ function App() {
           paddingBottom: '14px',
           marginBottom: '16px',
           borderBottom: '1px solid var(--card-border)',
-          gap: '16px',
+          gap: '14px',
           flexWrap: 'wrap'
         }}>
-          {/* Left: Mobile Toggle & Active Module Breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Left: Mobile Toggle & Active Workspace Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '220px' }}>
             <button
               className="mobile-header-bar"
               onClick={() => setIsSidebarOpen(true)}
@@ -448,7 +477,7 @@ function App() {
                 display: 'none',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
-                borderRadius: '8px',
+                borderRadius: 'var(--radius-xs)',
                 padding: '7px',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -460,12 +489,12 @@ function App() {
               <Menu size={18} />
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div style={{
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 padding: '5px 12px',
-                borderRadius: '999px',
+                borderRadius: 'var(--radius-full)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '7px',
@@ -473,19 +502,19 @@ function App() {
                 fontWeight: '700',
                 color: 'var(--text-main)'
               }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px rgba(16, 185, 129, 0.4)' }} />
-                {navItems.find(n => n.id === activeTab)?.label || 'Workspace'}
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--emerald-500)', display: 'inline-block', boxShadow: '0 0 6px rgba(16, 185, 129, 0.4)' }} />
+                {currentNav.label}
               </div>
-              <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>•</span>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <ShieldCheck size={13} color="var(--emerald-600)" />
                 <span>BNS 2023 / BNSS Verified</span>
               </div>
             </div>
           </div>
 
           {/* Center: Global Search Bar with Ctrl+K shortcut */}
-          <form onSubmit={handleGlobalSearchSubmit} style={{ flex: '1 1 280px', maxWidth: '440px', position: 'relative' }}>
-            <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <form onSubmit={handleGlobalSearchSubmit} style={{ flex: '1 1 240px', maxWidth: '420px', minWidth: '180px', position: 'relative' }}>
+            <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
             <input
               ref={searchInputRef}
               type="text"
@@ -494,13 +523,13 @@ function App() {
               placeholder={isHindi ? "धारा, केस या कानूनी प्रश्न खोजें..." : "Search sections, cases, or legal queries..."}
               className="input-field"
               style={{
-                paddingLeft: '34px',
-                paddingRight: '64px',
-                paddingTop: '8px',
-                paddingBottom: '8px',
-                fontSize: '13px',
-                height: '36px',
-                borderRadius: '999px',
+                paddingLeft: '32px',
+                paddingRight: '60px',
+                paddingTop: '7px',
+                paddingBottom: '7px',
+                fontSize: '12.5px',
+                height: '34px',
+                borderRadius: 'var(--radius-full)',
                 background: 'var(--subtle-bg)'
               }}
             />
@@ -514,17 +543,16 @@ function App() {
               color: 'var(--text-dim)',
               background: 'var(--card-bg)',
               border: '1px solid var(--card-border)',
-              padding: '2px 6px',
-              borderRadius: '6px',
-              pointerEvents: 'none',
-              letterSpacing: '0.04em'
+              padding: '1px 5px',
+              borderRadius: 'var(--radius-xs)',
+              pointerEvents: 'none'
             }}>
               Ctrl K
             </div>
           </form>
 
           {/* Right: Language, Theme, Profile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -534,13 +562,13 @@ function App() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '6px 10px',
-                borderRadius: '8px',
+                borderRadius: 'var(--radius-xs)',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 color: 'var(--text-main)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                gap: '6px',
+                gap: '5px',
                 fontSize: '12px',
                 fontWeight: '600'
               }}
@@ -559,7 +587,7 @@ function App() {
             </button>
 
             {/* Language Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', padding: '3px 8px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', padding: '3px 8px', borderRadius: 'var(--radius-xs)' }}>
               <Globe size={13} color="var(--text-muted)" />
               <select
                 value={language}
@@ -575,140 +603,157 @@ function App() {
                 }}
               >
                 <option value="English">English</option>
-                <option value="Hindi">हिंदी (Hindi)</option>
+                <option value="Hindi">हिंदी</option>
               </select>
             </div>
 
             {/* Profile Menu Trigger */}
-            <div
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '7px',
-                padding: '3px 9px 3px 4px',
-                borderRadius: '999px',
-                background: 'var(--subtle-bg)',
-                border: '1px solid var(--card-border)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                userSelect: 'none'
-              }}
-            >
-              <div style={{
-                width: '26px',
-                height: '26px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 'bold',
-                fontSize: '12px',
-                boxShadow: '0 2px 6px rgba(29, 78, 216, 0.25)'
-              }}>
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-main)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {user?.name || 'Citizen'}
-              </span>
-            </div>
-
-            {showProfileMenu && (
-              <div style={{
-                position: 'absolute',
-                top: '42px',
-                right: '0',
-                background: 'var(--card-bg)',
-                padding: '14px',
-                borderRadius: '14px',
-                boxShadow: 'var(--modal-shadow)',
-                zIndex: 100,
-                minWidth: '210px',
-                border: '1px solid var(--card-border)',
-                animation: 'fadeIn 0.2s ease'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid var(--card-border)' }}>
-                  <div style={{
-                    width: '34px',
-                    height: '34px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '14px'
-                  }}>
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-main)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name || 'User'}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email || 'user@example.com'}</div>
-                  </div>
+            <div ref={profileMenuRef} style={{ position: 'relative' }}>
+              <div
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  padding: '3px 9px 3px 4px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--subtle-bg)',
+                  border: '1px solid var(--card-border)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+                title="Account Menu"
+              >
+                <div style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '12px',
+                  boxShadow: '0 2px 6px rgba(29, 78, 216, 0.25)'
+                }}>
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
-
-                <button
-                  onClick={() => {
-                    setActiveTab('settings');
-                    setShowProfileMenu(false);
-                  }}
-                  style={{
-                    width: '100%',
-                    background: 'transparent',
-                    border: 'none',
-                    padding: '7px 10px',
-                    borderRadius: '6px',
-                    fontSize: '12.5px',
-                    color: 'var(--text-secondary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    marginBottom: '4px'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <SettingsIcon size={14} color="var(--text-muted)" /> {isHindi ? 'प्रोफ़ाइल सेटिंग्स' : 'Account Settings'}
-                </button>
-
-                <button
-                  onClick={() => {
-                    setUser(null);
-                    try {
-                      localStorage.removeItem('dhaara_active_user');
-                    } catch { }
-                    setAppView('landing');
-                    setShowProfileMenu(false);
-                  }}
-                  style={{
-                    width: '100%',
-                    background: 'var(--danger-light)',
-                    color: 'var(--danger)',
-                    border: '1px solid var(--danger-border)',
-                    padding: '7px 10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    fontSize: '12.5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  <LogOut size={14} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
-                </button>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-main)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {user?.name || 'Citizen'}
+                </span>
               </div>
-            )}
+
+              {showProfileMenu && (
+                <div style={{
+                  position: 'absolute',
+                  top: '40px',
+                  right: '0',
+                  background: 'var(--card-bg)',
+                  padding: '14px',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--modal-shadow)',
+                  zIndex: 100,
+                  minWidth: '210px',
+                  border: '1px solid var(--card-border)',
+                  animation: 'fadeIn 0.2s ease'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid var(--card-border)' }}>
+                    <div style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '14px'
+                    }}>
+                      {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-main)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name || 'User'}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email || 'user@dhaara.ai'}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('settings');
+                      setShowProfileMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      border: 'none',
+                      padding: '7px 10px',
+                      borderRadius: 'var(--radius-xs)',
+                      fontSize: '12.5px',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      marginBottom: '4px'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--subtle-bg)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <SettingsIcon size={14} color="var(--text-muted)" /> {isHindi ? 'प्रोफ़ाइल सेटिंग्स' : 'Account Settings'}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setUser(null);
+                      try {
+                        localStorage.removeItem('dhaara_active_user');
+                      } catch { }
+                      setAppView('landing');
+                      setShowProfileMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'var(--danger-light)',
+                      color: 'var(--danger)',
+                      border: '1px solid var(--danger-border)',
+                      padding: '7px 10px',
+                      borderRadius: 'var(--radius-xs)',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '12.5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <LogOut size={14} /> {isHindi ? 'साइन आउट' : 'Sign Out'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        <div className={activeTab === 'chat' ? 'workspace-content workspace-content-chat' : 'workspace-content'} style={{ maxWidth: activeTab === 'chat' ? 'none' : '1120px', margin: activeTab === 'chat' ? '0' : '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, minHeight: 0, height: '100%' }}>
+        {/* Dynamic Workspace Container */}
+        <div
+          className={activeTab === 'chat' ? 'workspace-content workspace-content-chat' : 'workspace-content'}
+          style={{
+            maxWidth: activeTab === 'chat' || activeTab === 'drafting' ? 'none' : '1160px',
+            margin: activeTab === 'chat' || activeTab === 'drafting' ? '0' : '0 auto',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            flex: 1,
+            minHeight: 0,
+            height: '100%'
+          }}
+        >
           {activeTab === 'chat' && (
             <LegalChat
               initialQuery={injectedQuery}

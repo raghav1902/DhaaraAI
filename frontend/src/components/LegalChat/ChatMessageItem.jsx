@@ -1,5 +1,5 @@
-import { Bot, Volume2, Square, ShieldCheck, Copy, Check } from 'lucide-react';
 import React, { useState } from 'react';
+import { Bot, Volume2, Square, ShieldCheck, Copy, Check, Scale } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleSpeak, isHindi }) {
@@ -10,7 +10,7 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
     try {
       await navigator.clipboard.writeText(msg.content);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
+      window.setTimeout(() => setCopied(false), 1800);
     } catch (error) {
       console.warn('Could not copy response:', error);
     }
@@ -18,7 +18,6 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
 
   return (
     <div
-      className="chat-msg-row"
       className={`ask-ai-message-row ${isUser ? 'is-user' : 'is-assistant'}`}
       style={{
         display: 'flex',
@@ -29,9 +28,9 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
     >
       {!isUser && (
         <div style={{
-          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+          background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
           padding: '8px',
-          borderRadius: '12px',
+          borderRadius: 'var(--radius-sm)',
           height: '36px',
           width: '36px',
           display: 'flex',
@@ -39,9 +38,9 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
           justifyContent: 'center',
           color: 'white',
           flexShrink: 0,
-          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)'
+          boxShadow: '0 2px 8px rgba(29, 78, 216, 0.25)'
         }}>
-          <Bot size={20} />
+          <Scale size={18} />
         </div>
       )}
 
@@ -51,10 +50,10 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
           background: isUser ? 'var(--primary)' : 'var(--card-bg)',
           color: isUser ? '#ffffff' : 'var(--text-main)',
           padding: '16px 20px',
-          borderRadius: '16px',
-          borderTopRightRadius: isUser ? 4 : '16px',
-          borderTopLeftRadius: !isUser ? 4 : '16px',
-          boxShadow: isUser ? '0 4px 12px rgba(37, 99, 235, 0.25)' : 'var(--card-shadow)',
+          borderRadius: 'var(--radius-md)',
+          borderTopRightRadius: isUser ? 4 : 'var(--radius-md)',
+          borderTopLeftRadius: !isUser ? 4 : 'var(--radius-md)',
+          boxShadow: isUser ? '0 4px 12px var(--primary-glow)' : 'var(--card-shadow)',
           border: isUser ? 'none' : '1px solid var(--card-border)',
           position: 'relative',
           wordBreak: 'break-word',
@@ -63,52 +62,74 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
         }}
       >
         {isUser ? (
-          <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.5' }}>{msg.content}</p>
+          <p style={{ margin: 0, fontSize: '14.5px', lineHeight: '1.55' }}>{msg.content}</p>
         ) : (
           <div>
-            {/* Audio Reader Control Bar */}
+            {/* Action Bar & Metadata */}
             <div className="ask-ai-message-toolbar">
-              <span className="ask-ai-message-brand"><span className="ask-ai-message-mini-avatar"><Bot size={14} /></span><span>LegalGPT AI</span>{msg.sources?.length > 0 && <span className="ask-ai-source-badge"><ShieldCheck size={12} />{isHindi ? 'स्रोत शामिल' : 'Sources included'}</span>}</span>
-              <div className="ask-ai-message-actions">
-                <button type="button" className="ask-ai-action-button" onClick={handleCopy} title={isHindi ? 'उत्तर कॉपी करें' : 'Copy response'} aria-label={isHindi ? 'उत्तर कॉपी करें' : 'Copy response'}>
-                  {copied ? <Check size={14} /> : <Copy size={14} />}<span>{copied ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'कॉपी' : 'Copy')}</span>
-                </button>
-                <button
-                type="button"
-                onClick={() => handleToggleSpeak(idx, msg.content)}
-                className={`ask-ai-action-button ${speakingIndex === idx ? 'is-speaking' : ''}`}
-                title={speakingIndex === idx ? (isHindi ? 'आवाज़ बंद करें' : 'Stop voice') : (isHindi ? 'उत्तर सुनें' : 'Listen to response')}
-              >
-                {speakingIndex === idx ? (
-                  <>
-                    <Square size={13} />
-                    <span>{isHindi ? 'रोकें' : 'Stop'}</span>
-                    <span className="audio-wave-pulse" />
-                  </>
-                ) : (
-                  <>
-                    <Volume2 size={14} />
-                    <span>{isHindi ? 'सुनें (Audio)' : 'Listen (Audio)'}</span>
-                  </>
+              <span className="ask-ai-message-brand">
+                <span className="ask-ai-message-mini-avatar"><Bot size={13} /></span>
+                <span>LegalGPT Intelligence</span>
+                {msg.sources?.length > 0 && (
+                  <span className="ask-ai-source-badge">
+                    <ShieldCheck size={11} />
+                    {isHindi ? 'धाराएं सत्यापित' : 'IndiaCode Verified'}
+                  </span>
                 )}
+              </span>
+
+              <div className="ask-ai-message-actions">
+                <button
+                  type="button"
+                  className="ask-ai-action-button"
+                  onClick={handleCopy}
+                  title={isHindi ? 'उत्तर कॉपी करें' : 'Copy response text'}
+                  aria-label={isHindi ? 'उत्तर कॉपी करें' : 'Copy response text'}
+                >
+                  {copied ? <Check size={13} color="var(--accent)" /> : <Copy size={13} />}
+                  <span>{copied ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'कॉपी' : 'Copy')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleSpeak(idx, msg.content)}
+                  className={`ask-ai-action-button ${speakingIndex === idx ? 'is-speaking' : ''}`}
+                  title={speakingIndex === idx ? (isHindi ? 'आवाज़ बंद करें' : 'Stop voice') : (isHindi ? 'उत्तर सुनें' : 'Listen to response')}
+                  aria-label={speakingIndex === idx ? 'Stop audio reading' : 'Listen to response'}
+                >
+                  {speakingIndex === idx ? (
+                    <>
+                      <Square size={12} />
+                      <span>{isHindi ? 'रोकें' : 'Stop'}</span>
+                      <span className="audio-wave-pulse" />
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 size={13} />
+                      <span>{isHindi ? 'सुनें (Audio)' : 'Listen (Audio)'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
 
-            <div className="markdown-content" style={{ fontSize: '14.5px', color: msg.isError ? 'var(--danger)' : 'inherit' }}>
+            {/* Markdown Body */}
+            <div className="markdown-content" style={{ fontSize: '14px', color: msg.isError ? 'var(--danger)' : 'inherit' }}>
               <ReactMarkdown>{msg.content}</ReactMarkdown>
 
               {msg.sources && msg.sources.length > 0 && (
                 <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
                   <p className="ask-ai-citations-heading">
                     <ShieldCheck size={13} />
-                    {isHindi ? 'वैधानिक स्रोत (IndiaCode Verified Sources)' : 'VERIFIED STATUTORY SOURCES (IndiaCode)'}
+                    {isHindi ? 'वैधानिक संदर्भ एवं धाराएं (IndiaCode)' : 'VERIFIED STATUTORY PROVISIONS (IndiaCode)'}
                   </p>
-                  {msg.sources.slice(0, 2).map((src, i) => (
-                    <div key={i} className="ask-ai-citation">
-                      <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Reference Provision'}
-                    </div>
-                  ))}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                    {msg.sources.slice(0, 3).map((src, i) => (
+                      <div key={i} className="ask-ai-citation">
+                        <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Legal Reference'}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

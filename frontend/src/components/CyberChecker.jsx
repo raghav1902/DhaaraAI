@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ShieldAlert, Mail, Search, AlertTriangle, ShieldCheck, Lock, Globe, Database, ExternalLink } from 'lucide-react';
+import { ShieldAlert, Mail, Search, AlertTriangle, ShieldCheck, Lock, Globe, Database, PhoneCall, ExternalLink } from 'lucide-react';
 import './CyberChecker.css';
 
 export default function CyberChecker({ language = 'English' }) {
@@ -48,7 +48,7 @@ export default function CyberChecker({ language = 'English' }) {
           email: cleanEmail
         });
       } else if (resData && resData.breaches) {
-        // Breaches found in real live database
+        // Breaches found in live database
         const rawBreaches = resData.breaches;
         let breachList = [];
         if (Array.isArray(rawBreaches) && rawBreaches.length > 0) {
@@ -60,8 +60,8 @@ export default function CyberChecker({ language = 'English' }) {
           }
         }
 
-        const formatted = breachList.map(name => ({
-          name: typeof name === 'string' ? name : (name.name || 'Identified Database'),
+        const formatted = breachList.map((name) => ({
+          name: typeof name === 'string' ? name : name.name || 'Identified Breach Incident',
           data: 'Email, Passwords or Account Credentials'
         }));
 
@@ -80,11 +80,11 @@ export default function CyberChecker({ language = 'English' }) {
         });
       }
     } catch (err) {
-      console.warn('Real cyber scan error:', err);
+      console.warn('Live cyber scan connection error:', err);
       setErrorMessage(
         isHindi
-          ? 'डेटाबेस से कनेक्ट करने में अस्थायी समस्या आई। कृपया थोड़ी देर बाद पुनः प्रयास करें।'
-          : 'Unable to reach the live breach database. Please verify your internet connection or try again shortly.'
+          ? 'XposedOrNot डेटाबेस से कनेक्ट करने में अस्थायी समस्या आई। कृपया थोड़ी देर बाद पुनः प्रयास करें।'
+          : 'Unable to reach the live XposedOrNot breach repository. Please verify your connection or try again shortly.'
       );
     } finally {
       setIsScanning(false);
@@ -92,141 +92,161 @@ export default function CyberChecker({ language = 'English' }) {
   };
 
   return (
-    <div className="cyber-scanner" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="cyber-scanner__header" style={{
-        padding: '16px 20px',
-        borderRadius: '16px',
-        background: 'var(--card-bg)',
-        border: '1px solid var(--card-border)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '14px',
-        boxShadow: 'var(--card-shadow)'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-          padding: '10px',
-          borderRadius: '12px',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
-        }}>
-          <ShieldAlert size={22} />
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-              {isHindi ? 'साइबर फ्रॉड शील्ड' : 'Cyber Fraud Shield'}
-            </h2>
-            <span style={{ fontSize: '11px', background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--accent-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
-              Live Breach DB
-            </span>
+    <div className="cyber-scanner animate-fade-in">
+      {/* Header Banner */}
+      <div className="cyber-scanner__header">
+        <div className="cyber-scanner__header-left">
+          <div className="cyber-scanner__icon-badge">
+            <ShieldAlert size={22} />
           </div>
-          <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
-            {isHindi
-              ? 'XposedOrNot डेटाबेस के ज़रिए लाइव जांचें कि क्या आपका ईमेल डार्क वेब लीक्स में शामिल है।'
-              : 'Check an email against the configured public breach-record source.'}
-          </p>
+          <div>
+            <div className="cyber-scanner__title-row">
+              <h2 className="cyber-scanner__title">
+                {isHindi ? 'साइबर फ्रॉड व लीक चेकर' : 'Cyber Exposure & Breach Scanner'}
+              </h2>
+              <span className="badge badge-purple">
+                XposedOrNot API
+              </span>
+            </div>
+            <p className="cyber-scanner__subtitle">
+              {isHindi
+                ? 'सार्वजनिक सुरक्षा रिकॉर्ड्स (XposedOrNot) के ज़रिए सत्यापित करें कि क्या आपका ईमेल किसी ज्ञात डेटा लीक में शामिल है।'
+                : 'Query verified public breach datasets via XposedOrNot to detect credential and account exposure.'}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="glass-panel cyber-scanner__workspace animate-fade-in" style={{ padding: '32px', borderRadius: '16px', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(37, 99, 235, 0.08)', color: '#2563eb', padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: '600', marginBottom: '14px' }}>
-          <Database size={13} /> Powered by Live Breach Intelligence
+      {/* Main Scanner Workspace */}
+      <div className="cyber-scanner__workspace">
+        <div className="cyber-scanner__source-badge">
+          <Database size={13} />
+          <span>Verified Breach Index (XposedOrNot)</span>
         </div>
 
-        <h3 style={{ margin: '0 0 10px', fontSize: '18px', color: 'var(--text-main)' }}>
-          {isHindi ? 'सुरक्षित लाइव ईमेल जांच' : 'Secure Live Breach Check'}
+        <h3 className="cyber-scanner__prompt-title">
+          {isHindi ? 'ईमेल ब्रीच सत्यापन' : 'Check Email for Known Security Breaches'}
         </h3>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '440px', margin: '0 auto 24px', lineHeight: '1.5' }}>
+        <p className="cyber-scanner__prompt-desc">
           {isHindi
-            ? 'हम आपका ईमेल किसी भी सर्वर पर स्टोर नहीं करते। यह सीधे आधिकारिक डार्क-वेब ब्रीच रिकॉर्ड्स से लाइव मैच होता है।'
-            : 'Your email address is checked against public breach records to help you assess potential exposure.'}
+            ? 'आपका ईमेल DhaaraAI के सर्वर पर सुरक्षित नहीं किया जाता। यह सीधे सार्वजनिक लीक रिकॉर्ड्स से मिलान करता है।'
+            : 'Your address is checked against authenticated public incident databases. We never store or log your queries.'}
         </p>
 
-        <div style={{ display: 'flex', gap: '12px', maxWidth: '520px', margin: '0 auto' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Mail size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '16px', top: '15px' }} />
+        {/* Input Bar */}
+        <div className="cyber-scanner__input-form">
+          <div className="cyber-scanner__input-wrapper">
+            <Mail size={18} className="cyber-scanner__input-icon" />
             <input
               type="email"
-              className="input-field"
+              className="input-field cyber-scanner__input-field"
               value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder={isHindi ? "अपना ईमेल एड्रेस दर्ज करें (उदा. user@gmail.com)..." : "Enter email to check (e.g. user@gmail.com)..."}
-              style={{ paddingLeft: '44px', height: '48px' }}
-              onKeyDown={e => e.key === 'Enter' && handleScan()}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={isHindi ? 'उदा. advocate.sharma@example.com' : 'e.g. advocate.sharma@example.com'}
+              onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+              aria-label={isHindi ? 'ईमेल दर्ज करें' : 'Enter email to scan'}
             />
           </div>
+
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary cyber-scanner__submit-btn"
             onClick={handleScan}
             disabled={isScanning || !email}
-            style={{ height: '48px', padding: '0 24px', background: isScanning ? '#94a3b8' : 'var(--ai-purple)' }}
           >
             {isScanning ? (
-              isHindi ? 'लाइव स्कैन...' : 'Scanning...'
+              <span>{isHindi ? 'स्कैनिंग जारी...' : 'Querying Database...'}</span>
             ) : (
-              <><Search size={18} /> {isHindi ? 'स्कैन करें' : 'Scan Live'}</>
+              <>
+                <Search size={16} />
+                <span>{isHindi ? 'जांच करें' : 'Scan Records'}</span>
+              </>
             )}
           </button>
         </div>
 
+        {/* Error Feedback */}
         {errorMessage && (
-          <div style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#92400e', padding: '12px', borderRadius: '10px', maxWidth: '520px', margin: '20px auto 0', fontSize: '13px' }}>
-            {errorMessage}
+          <div className="cyber-scanner__error-alert">
+            <AlertTriangle size={16} />
+            <span>{errorMessage}</span>
           </div>
         )}
 
+        {/* Results Presentation */}
         {result && (
-          <div className="animate-fade-in" style={{ marginTop: '32px', textAlign: 'left', maxWidth: '540px', margin: '32px auto 0' }}>
+          <div className="cyber-scanner__results animate-fade-in">
             {result.status === 'safe' ? (
-              <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '12px', padding: '24px', textAlign: 'center' }}>
-                <ShieldCheck size={48} color="#16a34a" style={{ marginBottom: '12px' }} />
-                <h4 style={{ margin: '0 0 8px', color: '#166534', fontSize: '18px' }}>
-                  {isHindi ? 'सुरक्षित! कोई डेटा लीक नहीं मिला।' : 'Good News! No Breaches Found.'}
+              <div className="cyber-scanner__safe-card">
+                <div className="cyber-scanner__safe-icon-wrap">
+                  <ShieldCheck size={36} />
+                </div>
+                <h4 className="cyber-scanner__safe-title">
+                  {isHindi ? 'कोई सार्वजनिक डेटा लीक नहीं मिला' : 'Zero Breaches Detected'}
                 </h4>
-                <p style={{ margin: 0, fontSize: '13px', color: '#15803d', lineHeight: '1.5' }}>
+                <p className="cyber-scanner__safe-desc">
                   {isHindi
-                    ? `ईमेल (${result.email}) किसी भी ज्ञात सार्वजनिक या डार्क-वेब डेटा ब्रीच में नहीं पाया गया है।`
-                    : `The email (${result.email}) was not found in any monitored global data breaches.`}
+                    ? `ईमेल (${result.email}) XposedOrNot के किसी भी ज्ञात सार्वजनिक डेटा ब्रीच में नहीं पाया गया।`
+                    : `The queried address (${result.email}) does not appear in any indexed public security breaches.`}
                 </p>
               </div>
             ) : (
-              <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '12px', padding: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#991b1b' }}>
-                  <AlertTriangle size={32} />
+              <div className="cyber-scanner__breach-card">
+                <div className="cyber-scanner__breach-header">
+                  <div className="cyber-scanner__breach-icon-wrap">
+                    <AlertTriangle size={24} />
+                  </div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '18px' }}>
-                      {isHindi ? 'चेतावनी! असली डेटा लीक पाया गया' : 'Warning! Data Breach Detected'}
+                    <h4 className="cyber-scanner__breach-title">
+                      {isHindi ? 'डेटा उल्लंघन रिकॉर्ड पाया गया' : 'Public Breach Exposure Detected'}
                     </h4>
-                    <span style={{ fontSize: '13px', fontWeight: '600' }}>
-                      {isHindi ? `यह ईमेल ${result.count} आधिकारिक ब्रीचेस में पाया गया है:` : `Compromised in ${result.count} verified public breaches:`}
+                    <span className="cyber-scanner__breach-count">
+                      {isHindi
+                        ? `यह ईमेल ${result.count} सार्वजनिक सुरक्षा लीक्स में दर्ज है:`
+                        : `Identified in ${result.count} verified public security incident(s):`}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '280px', overflowY: 'auto', paddingRight: '4px' }}>
+                <div className="cyber-scanner__breach-list">
                   {result.breaches.map((b, i) => (
-                    <div key={i} style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--card-shadow)' }}>
+                    <div key={i} className="cyber-scanner__breach-row">
                       <div>
-                        <strong style={{ fontSize: '14px', color: '#ef4444', display: 'block' }}>{b.name}</strong>
-                        <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{isHindi ? 'लीक श्रेणी:' : 'Exposed Category:'} {b.data}</span>
+                        <strong className="cyber-scanner__breach-name">{b.name}</strong>
+                        <span className="cyber-scanner__breach-meta">
+                          {isHindi ? 'संभावित संवेदनशील डेटा:' : 'Potentially Exposed Data:'} {b.data}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '11px', background: '#fee2e2', color: '#b91c1c', padding: '3px 8px', borderRadius: '6px', fontWeight: '600' }}>
-                        Breached
+                      <span className="badge badge-danger">
+                        Exposed
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ marginTop: '16px', padding: '12px 14px', background: '#fee2e2', borderRadius: '8px', fontSize: '12.5px', color: '#7f1d1d', lineHeight: '1.5' }}>
-                  <Lock size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
-                  {isHindi
-                    ? 'सलाह: इन संबंधित खातों का पासवर्ड तुरंत बदलें तथा 2-Factor Authentication (2FA) ऑन करें। किसी भी वित्तीय ठगी पर तुरंत 1930 हेल्पलाइन पर कॉल करें।'
-                    : 'Security Advisory: Immediately reset passwords for these services and enable Two-Factor Authentication (2FA). For financial cyber fraud, report promptly at 1930.'}
+                {/* Indian Statutory Remediation Guidance */}
+                <div className="cyber-scanner__remediation-box">
+                  <div className="cyber-scanner__remediation-title">
+                    <Lock size={15} />
+                    <span>{isHindi ? 'अनुशंसित सुरक्षा व कानूनी कदम:' : 'Recommended Remediation Protocol:'}</span>
+                  </div>
+                  <ul className="cyber-scanner__remediation-steps">
+                    <li>
+                      {isHindi
+                        ? 'संबंधित सेवा के पासवर्ड को तुरंत बदलें और दो-चरणीय प्रमाणीकरण (2FA) सक्षम करें।'
+                        : 'Change your passwords immediately on affected portals and enforce Two-Factor Authentication (2FA).'}
+                    </li>
+                    <li>
+                      {isHindi
+                        ? 'यदि वित्तीय धोखाधड़ी हुई है, तो तुरंत राष्ट्रीय साइबर हेल्पलाइन 1930 पर कॉल करें।'
+                        : 'If unauthorized financial transactions occurred, call the National Cyber Crime Helpline at 1930 immediately.'}
+                    </li>
+                    <li>
+                      {isHindi
+                        ? 'आधिकारिक पोर्टल (cybercrime.gov.in) पर औपचारिक शिकायत दर्ज करें।'
+                        : 'File an official report on the Government of India portal: cybercrime.gov.in'}
+                    </li>
+                  </ul>
                 </div>
               </div>
             )}
