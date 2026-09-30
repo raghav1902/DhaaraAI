@@ -11,6 +11,8 @@ export default function CyberChecker({ language = 'English' }) {
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const [savedToVault, setSavedToVault] = useState(false);
+
   const handleScan = async () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@')) return;
@@ -20,26 +22,30 @@ export default function CyberChecker({ language = 'English' }) {
     setErrorMessage(null);
 
     try {
-      // 1. First attempt via Vite proxy / XposedOrNot
       let resData = null;
+      // 1. Direct call to FastAPI backend cyber-check
       try {
-        const response = await axios.get(`/api/xposed/check-email/${encodeURIComponent(cleanEmail)}`, {
-          timeout: 7000
+        const response = await axios.get(`http://localhost:8000/api/cyber-check?email=${encodeURIComponent(cleanEmail)}`, {
+          timeout: 8000
         });
         resData = response.data;
-      } catch (proxyErr) {
-        // Fallback directly to public CORS endpoint if available
+      } catch (backendErr) {
+        // 2. Fallback via Vite proxy /api/cyber-check
         try {
-          const directResp = await axios.get(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(cleanEmail)}`, {
+          const proxyResp = await axios.get(`/api/cyber-check?email=${encodeURIComponent(cleanEmail)}`, {
+            timeout: 7000
+          });
+          resData = proxyResp.data;
+        } catch (proxyErr) {
+          // 3. Fallback via Vite /api/xposed
+          const xposedResp = await axios.get(`/api/xposed/check-email/${encodeURIComponent(cleanEmail)}`, {
             timeout: 6000
           });
-          resData = directResp.data;
-        } catch {
-          throw proxyErr;
+          resData = xposedResp.data;
         }
       }
 
-      if (resData && resData.Error === 'Not found') {
+      if (resData && (resData.status === 'safe' || resData.Error === 'Not found')) {
         // Safe: 0 breaches found
         setResult({
           status: 'safe',
@@ -47,26 +53,28 @@ export default function CyberChecker({ language = 'English' }) {
           breaches: [],
           email: cleanEmail
         });
-      } else if (resData && resData.breaches) {
-        // Breaches found in live database
-        const rawBreaches = resData.breaches;
-        let breachList = [];
-        if (Array.isArray(rawBreaches) && rawBreaches.length > 0) {
-          const firstElem = rawBreaches[0];
-          if (Array.isArray(firstElem)) {
-            breachList = firstElem;
-          } else {
-            breachList = rawBreaches;
+      } else if (resData && (resData.status === 'breached' || resData.breaches)) {
+        // Breaches found
+        let formatted = [];
+        if (resData.breaches && Array.isArray(resData.breaches)) {
+          const rawBreaches = resData.breaches;
+          let breachList = rawBreaches;
+          if (rawBreaches.length > 0 && Array.isArray(rawBreaches[0])) {
+            breachList = rawBreaches[0];
           }
+          formatted = breachList.map((item) => {
+            if (typeof item === 'string') {
+              return { name: item, data: 'Email, Passwords or Account Credentials' };
+            }
+            return {
+              name: item.name || item.breach || 'Identified Breach Incident',
+              data: item.data || 'Email, Passwords or Account Credentials'
+            };
+          });
         }
 
-        const formatted = breachList.map((name) => ({
-          name: typeof name === 'string' ? name : name.name || 'Identified Breach Incident',
-          data: 'Email, Passwords or Account Credentials'
-        }));
-
         setResult({
-          status: 'breached',
+          status: formatted.length > 0 ? 'breached' : 'safe',
           count: formatted.length,
           breaches: formatted,
           email: cleanEmail
@@ -83,11 +91,46 @@ export default function CyberChecker({ language = 'English' }) {
       console.warn('Live cyber scan connection error:', err);
       setErrorMessage(
         isHindi
-          ? 'XposedOrNot डेटाबेस से कनेक्ट करने में अस्थायी समस्या आई। कृपया थोड़ी देर बाद पुनः प्रयास करें।'
-          : 'Unable to reach the live XposedOrNot breach repository. Please verify your connection or try again shortly.'
+          ? 'साइबर डेटाबेस से कनेक्ट करने में अस्थायी समस्या आई। कृपया थोड़ी देर बाद पुनः प्रयास करें।'
+          : 'Unable to reach the breach verification service. Please verify your connection or try again shortly.'
       );
     } finally {
       setIsScanning(false);
+    }
+  };
+
+  const handleSaveToVault = () => {
+    if (!result) return;
+    try {
+      const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+      const breachDetails = result.breaches.map((b, i) => `[${i + 1}] Incident: ${b.name} | Compromised: ${b.data}`).join('\n');
+      const reportText = `DHAARAAI CYBER INCIDENT & BREACH AUDIT REPORT
+Target Identifier: ${result.email}
+Scan Timestamp: ${new Date().toLocaleString()}
+Exposure Status: ${result.status.toUpperCase()} (${result.count} breach incidents detected)
+
+--- VERIFIED BREACH INCIDENTS ---
+${breachDetails || 'No indexed public breaches found.'}
+
+--- STATUTORY REMEDIATION PROTOCOL (CERT-In & IT Act 2000) ---
+1. Immediate credential rotation on primary and affiliated accounts.
+2. Mandatory enforcement of Multi-Factor Authentication (MFA / 2FA).
+3. If unauthorized transactions or banking debits occurred, dial National Cyber Crime Helpline at 1930 immediately to freeze beneficiary bank accounts.
+4. Formal reporting at cybercrime.gov.in (National Cyber Crime Reporting Portal).`;
+
+      drafts.push({
+        id: `cyber_${Date.now()}`,
+        type: 'Cyber Breach Incident Audit',
+        title: `Cyber Audit - ${result.email} (${result.count} Breaches)`,
+        content: reportText,
+        date: new Date().toISOString()
+      });
+
+      localStorage.setItem('dhaara_vault_drafts', JSON.stringify(drafts));
+      setSavedToVault(true);
+      setTimeout(() => setSavedToVault(false), 2500);
+    } catch (e) {
+      console.error('Error saving cyber report to vault:', e);
     }
   };
 
@@ -210,6 +253,24 @@ export default function CyberChecker({ language = 'English' }) {
                     ? `ईमेल (${result.email}) XposedOrNot के किसी भी ज्ञात सार्वजनिक डेटा ब्रीच में नहीं पाया गया।`
                     : `The queried address (${result.email}) does not appear in any indexed public security breaches.`}
                 </p>
+                <button
+                  type="button"
+                  onClick={handleSaveToVault}
+                  className="btn-secondary"
+                  style={{
+                    marginTop: '14px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '12.5px',
+                    fontWeight: '600'
+                  }}
+                >
+                  {savedToVault ? <ShieldCheck size={15} color="var(--emerald-600)" /> : <ShieldCheck size={15} />}
+                  <span>{savedToVault ? (isHindi ? 'प्रमाणपत्र वॉल्ट में सुरक्षित!' : 'Certificate Saved to Vault!') : (isHindi ? 'क्लीन स्टेटस प्रमाण वॉल्ट में सहेजें' : 'Save Safe Audit Certificate to Vault')}</span>
+                </button>
               </div>
             ) : (
               <div className="cyber-scanner__breach-card">
@@ -268,6 +329,67 @@ export default function CyberChecker({ language = 'English' }) {
                         : 'File an official report on the Government of India portal: cybercrime.gov.in'}
                     </li>
                   </ul>
+                </div>
+
+                {/* Action Buttons: Dial 1930, Portal link, Save to Vault */}
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '16px' }}>
+                  <a
+                    href="tel:1930"
+                    className="btn-primary"
+                    style={{
+                      background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                      color: '#ffffff',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: '700'
+                    }}
+                  >
+                    <PhoneCall size={15} />
+                    <span>{isHindi ? '1930 साइबर हेल्पलाइन डायल करें' : 'Call 1930 Helpline'}</span>
+                  </a>
+
+                  <a
+                    href="https://cybercrime.gov.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <ExternalLink size={15} />
+                    <span>cybercrime.gov.in</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveToVault}
+                    className="btn-secondary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: '600'
+                    }}
+                  >
+                    {savedToVault ? <ShieldCheck size={15} color="var(--emerald-600)" /> : <ShieldCheck size={15} />}
+                    <span>{savedToVault ? (isHindi ? 'वॉल्ट में सहेजा गया!' : 'Saved to Vault!') : (isHindi ? 'घटना रिपोर्ट वॉल्ट में सहेजें' : 'Save Report to Vault')}</span>
+                  </button>
                 </div>
               </div>
             )}

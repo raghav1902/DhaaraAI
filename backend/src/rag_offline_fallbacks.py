@@ -26,12 +26,12 @@ def generate_offline_concordance_fallback(
         if matched:
             for itm in matched:
                 lines.extend([
-                    f"#### {itm.get('offense_hi', itm['offense_en'])}",
-                    f"- **लागू कानून (BNS 2023)**: धारा {itm['bns_section']} ({itm['bns_title']})",
-                    f"- **पुराना संदर्भ (IPC 1860)**: धारा {itm['ipc_section']} ({itm['ipc_title']})",
-                    f"- **प्रकृति व जमानत**: {itm['nature']} | {itm['bailable']}",
-                    f"- **सजा**: {itm['punishment']} | **अदालत**: {itm['triable_by']}",
-                    f"- **तुरंत कार्रवाई**: {itm['victim_guidance'] if user_role == 'victim' else itm['accused_guidance']}",
+                    f"#### {itm.get('offense_hi', itm.get('offense_en', 'अपराध'))}",
+                    f"- **लागू कानून (BNS 2023)**: धारा {itm.get('bns_section','?')} ({itm.get('bns_title','BNS')})",
+                    f"- **पुराना संदर्भ (IPC 1860)**: धारा {itm.get('ipc_section','?')} ({itm.get('ipc_title','IPC')})",
+                    f"- **प्रकृति व जमानत**: {itm.get('nature','?')} | {itm.get('bailable','?')}",
+                    f"- **सजा**: {itm.get('punishment','?')} | **अदालत**: {itm.get('triable_by','?')}",
+                    f"- **तुरंत कार्रवाई**: {itm.get('victim_guidance','') if user_role == 'victim' else itm.get('accused_guidance','')}",
                     ""
                 ])
         else:
@@ -57,12 +57,12 @@ def generate_offline_concordance_fallback(
         if matched:
             for itm in matched:
                 lines.extend([
-                    f"#### {itm['offense_en']}",
-                    f"- **Active Law (BNS 2023)**: Section {itm['bns_section']} ({itm['bns_title']})",
-                    f"- **Legacy Law (IPC 1860)**: Section {itm['ipc_section']} ({itm['ipc_title']})",
-                    f"- **Nature & Bail**: {itm['nature']} | {itm['bailable']}",
-                    f"- **Punishment**: {itm['punishment']} | **Trial Court**: {itm['triable_by']}",
-                    f"- **Action**: {itm['victim_guidance'] if user_role == 'victim' else itm['accused_guidance']}",
+                    f"#### {itm.get('offense_en', 'Legal Matter')}",
+                    f"- **Active Law (BNS 2023)**: Section {itm.get('bns_section','?')} ({itm.get('bns_title','BNS')})",
+                    f"- **Legacy Law (IPC 1860)**: Section {itm.get('ipc_section','?')} ({itm.get('ipc_title','IPC')})",
+                    f"- **Nature & Bail**: {itm.get('nature','?')} | {itm.get('bailable','?')}",
+                    f"- **Punishment**: {itm.get('punishment','?')} | **Trial Court**: {itm.get('triable_by','?')}",
+                    f"- **Action**: {itm.get('victim_guidance','') if user_role == 'victim' else itm.get('accused_guidance','')}",
                     ""
                 ])
         else:

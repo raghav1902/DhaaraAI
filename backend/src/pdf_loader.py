@@ -70,33 +70,44 @@ def load_pdf(pdf_path: str) -> List[Dict[str, Any]]:
     if not path_obj.exists() or not path_obj.is_file():
         raise FileNotFoundError(f"PDF file not found at: {pdf_path}")
 
-    filename = path_obj.name
-    pages_data = []
+    # Safety: only accept .pdf extension
+    if path_obj.suffix.lower() != ".pdf":
+        raise ValueError(f"[pdf_loader] Refusing to load non-PDF file: {path_obj.name}")
+
+    filename    = path_obj.name
+    pages_data  = []
+    MAX_PAGES   = 300   # DoS protection: cap per-document page count
 
     try:
-        reader = PdfReader(str(path_obj))
+        reader      = PdfReader(str(path_obj))
         total_pages = len(reader.pages)
-        print(f"[pdf_loader] Reading '{filename}' ({total_pages} pages)...")
+        load_pages  = min(total_pages, MAX_PAGES)
 
-        for idx, page in enumerate(reader.pages):
+        if total_pages > MAX_PAGES:
+            print(f"[pdf_loader] '{filename}' has {total_pages} pages — capping at {MAX_PAGES}.")
+
+        print(f"[pdf_loader] Reading '{filename}' ({load_pages}/{total_pages} pages)...")
+
+        for idx in range(load_pages):
+            page        = reader.pages[idx]
             page_number = idx + 1
-            raw_text = page.extract_text() or ""
-            cleaned = clean_text(raw_text)
+            raw_text    = page.extract_text() or ""
+            cleaned     = clean_text(raw_text)
 
-            # Keep page even if text is short, but record non-empty text
             if cleaned:
                 pages_data.append({
-                    "page": page_number,
+                    "page":   page_number,
                     "source": filename,
-                    "text": cleaned
+                    "text":   cleaned
                 })
 
-        print(f"[pdf_loader] Successfully extracted {len(pages_data)} pages from '{filename}'.")
+        print(f"[pdf_loader] Successfully extracted {len(pages_data)} non-empty pages from '{filename}'.")
     except Exception as e:
         print(f"[pdf_loader] Error reading '{filename}': {e}")
         raise e
 
     return pages_data
+
 
 
 def load_all_pdfs(data_dir: str = "data") -> List[Dict[str, Any]]:

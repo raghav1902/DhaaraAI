@@ -21,37 +21,41 @@ TRANSITION_DATE = "2024-07-01"
 from concordance_data import CONCORDANCE_DB
 
 
-def lookup_by_section(query_section: str) -> List[Dict[str, Any]]:
+def lookup_by_section(query_section: Optional[str]) -> List[Dict[str, Any]]:
     """
     Looks up concordance records matching either a BNS section, IPC section, or Act name.
     """
-    clean_q = re.sub(r"[^0-9a-zA-Z\s]", "", query_section.lower()).strip()
+    clean_q = re.sub(r"[^0-9a-zA-Z\s]", "", str(query_section or "").lower()).strip()
+    if not clean_q:
+        return []
     results = []
     
     for item in CONCORDANCE_DB:
-        bns_sec = re.sub(r"[^0-9a-zA-Z\s]", "", item["bns_section"].lower())
-        ipc_sec = re.sub(r"[^0-9a-zA-Z\s]", "", item["ipc_section"].lower())
+        bns_sec = re.sub(r"[^0-9a-zA-Z\s]", "", str(item.get("bns_section", "")).lower())
+        ipc_sec = re.sub(r"[^0-9a-zA-Z\s]", "", str(item.get("ipc_section", "")).lower())
         
         if clean_q in bns_sec or clean_q in ipc_sec:
             results.append(item)
-        elif any(clean_q in word.lower() for word in item["offense_en"].split() if len(clean_q) >= 4):
+        elif any(clean_q in word.lower() for word in str(item.get("offense_en", "")).split() if len(clean_q) >= 4):
             results.append(item)
 
     return results
 
 
-def search_crimes(keyword: str) -> List[Dict[str, Any]]:
+def search_crimes(keyword: Optional[str]) -> List[Dict[str, Any]]:
     """
     Searches concordance database across English and Hindi offense descriptions,
     sections, categories, and guidance notes.
     """
-    kw = keyword.lower().strip()
+    kw = str(keyword or "").lower().strip()
+    if not kw:
+        return []
     matches = []
     
     for item in CONCORDANCE_DB:
         searchable_text = (
-            f"{item['offense_en']} {item['offense_hi']} {item['category']} "
-            f"{item['bns_section']} {item['ipc_section']} {item['victim_guidance']} {item['accused_guidance']}"
+            f"{item.get('offense_en', '')} {item.get('offense_hi', '')} {item.get('category', '')} "
+            f"{item.get('bns_section', '')} {item.get('ipc_section', '')} {item.get('victim_guidance', '')} {item.get('accused_guidance', '')}"
         ).lower()
         
         if kw in searchable_text:
@@ -75,13 +79,19 @@ def get_transition_alert(incident_date: Optional[str] = None) -> Dict[str, str]:
     }
 
 
-def diagnose_situation(query: str, user_role: str = "general") -> Dict[str, Any]:
+def diagnose_situation(query: Optional[str] = "", user_role: str = "general") -> Dict[str, Any]:
     """
     Performs quick situational diagnosis to identify likely applicable sections,
     procedural rights, and immediate safeguards.
     """
-    q_lower = query.lower()
-    
+    q_lower = str(query or "").lower()
+
+    # Normalize user_role to a known safe enum — prevents role-spoofing
+    VALID_ROLES = {"general", "victim", "accused", "lawyer"}
+    safe_role = str(user_role or "general").strip().lower()
+    if safe_role not in VALID_ROLES:
+        safe_role = "general"
+
     # Priority keyword detectors
     matched_items = []
     
@@ -121,5 +131,5 @@ def diagnose_situation(query: str, user_role: str = "general") -> Dict[str, Any]
     return {
         "matched_crimes": matched_items[:3],
         "transition": get_transition_alert(),
-        "user_role": user_role
+        "user_role": safe_role   # normalized, never attacker-supplied raw string
     }

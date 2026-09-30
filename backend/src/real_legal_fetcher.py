@@ -122,8 +122,9 @@ class RealLegalDataService:
     def get_landmark_guidance_for_query(query: str) -> List[Dict[str, Any]]:
         """
         Retrieves relevant Supreme Court guidelines matching the citizen's query.
+        Null-safe: coerces query to string before any operation.
         """
-        q_lower = query.lower()
+        q_lower = str(query or "").lower()
         matched = []
         
         if any(term in q_lower for term in ["arrest", "police bulaya", "notice", "41a", "section 35", "hiraasat"]):

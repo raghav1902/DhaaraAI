@@ -422,7 +422,8 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
                   <button
                     className="btn-secondary legal-vault__action-btn"
                     onClick={() => {
-                      const blob = new Blob([draft.content], { type: 'text/plain;charset=utf-8' });
+                      const text = draft.content || draft.draft_text || draft.draft || '';
+                      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
                       const a = document.createElement('a');
                       a.href = URL.createObjectURL(blob);
                       a.download = `${(draft.title || 'legal_draft').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_')}.txt`;
@@ -476,7 +477,7 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
             {/* Modal Body */}
             <div className="legal-vault__modal-body">
               <pre className="legal-vault__document-text">
-                {previewDraft.content}
+                {previewDraft.content || previewDraft.draft_text || previewDraft.draft || ''}
               </pre>
             </div>
 
@@ -485,7 +486,8 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
               <button
                 className="btn-secondary"
                 onClick={() => {
-                  navigator.clipboard.writeText(previewDraft.content);
+                  const txt = previewDraft.content || previewDraft.draft_text || previewDraft.draft || '';
+                  navigator.clipboard.writeText(txt);
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);
                 }}
@@ -497,7 +499,8 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
               <button
                 className="btn-primary"
                 onClick={() => {
-                  const blob = new Blob([previewDraft.content], { type: 'text/plain;charset=utf-8' });
+                  const txt = previewDraft.content || previewDraft.draft_text || previewDraft.draft || '';
+                  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
                   const a = document.createElement('a');
                   a.href = URL.createObjectURL(blob);
                   a.download = `${(previewDraft.title || 'legal_draft').replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, '_')}.txt`;

@@ -125,17 +125,87 @@ class TestFastAPIEndpoints(unittest.TestCase):
         self.assertEqual(data.get("filename"), "test_lease.txt")
         self.assertIn("Tenant and Landlord", data.get("text", ""))
 
-    def test_contract_analyzer_endpoint(self):
+    def test_query_endpoint(self):
         payload = {
-            "document_text": "The company may withhold salary without explanation for 6 months.",
-            "document_type": "Employment Contract / Bond",
-            "language": "English"
+            "question": "What is the punishment for cheating under BNS?",
+            "language": "English",
+            "user_role": "general"
         }
-        resp = self.client.post("/api/analyze-contract", json=payload)
+        resp = self.client.post("/api/query", json=payload)
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
-        self.assertIn("risk_score", data)
-        self.assertIn("red_flags", data)
+        self.assertIn("answer", data)
+        self.assertIn("concordance", data)
+        self.assertIn("question", data)
+
+    def test_draft_endpoint(self):
+        payload = {
+            "document_type": "FIR Application",
+            "language": "English",
+            "complainant": {"name": "Test Citizen", "phone": "9999999999"},
+            "accused": {"name": "Unknown Person"},
+            "incident_category": "Theft",
+            "incident_datetime": "2026-09-28",
+            "incident_location": "Metro Station",
+            "facts": "Mobile phone picked from pocket",
+            "evidence": "CCTV available",
+            "relief_sought": "Lodge FIR"
+        }
+        resp = self.client.post("/api/draft", json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data.get("success"))
+        self.assertIn("draft", data)
+
+    def test_helplines_endpoint(self):
+        resp = self.client.get("/api/helplines")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("status"), "success")
+        self.assertGreater(data.get("total", 0), 3)
+
+    def test_guidelines_endpoint(self):
+        resp = self.client.get("/api/guidelines")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("status"), "success")
+        self.assertIn("arrest_notice_rules", data.get("guidelines", {}))
+
+    def test_court_fee_calculator_property(self):
+        payload = {
+            "category": "property",
+            "state": "Delhi",
+            "property_value": 5000000,
+            "gender": "male"
+        }
+        resp = self.client.post("/api/calculate-court-fee", json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("category"), "property")
+        self.assertGreater(data.get("total_outlay", 0), 0)
+
+    def test_court_fee_calculator_court(self):
+        payload = {
+            "category": "court",
+            "suit_value": 1000000
+        }
+        resp = self.client.post("/api/calculate-court-fee", json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data.get("category"), "court")
+        self.assertGreater(data.get("court_fee", 0), 0)
+
+    def test_cyber_check_query_endpoint(self):
+        resp = self.client.get("/api/cyber-check?email=safe_test_user_nobody_12345@example.com")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("status", data)
+
+    def test_cyber_check_path_alias(self):
+        resp = self.client.get("/api/xposed/check-email/safe_test_user_nobody_12345@example.com")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("status", data)
 
 if __name__ == "__main__":
     unittest.main()
