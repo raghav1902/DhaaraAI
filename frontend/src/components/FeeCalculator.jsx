@@ -26,6 +26,127 @@ export default function FeeCalculator({ language = 'English' }) {
     setTimeout(() => setCopiedReceipt(false), 2000);
   };
 
+  /**
+   * Premium Editorial Statutory Document / Digital Receipt Component
+   * Resembles an official Indian Registry Stamp Paper & Revenue Assessment
+   */
+  const renderStatutoryReceipt = ({
+    documentTitle,
+    scheduleCode,
+    subTitle,
+    jurisdictionLabel,
+    jurisdictionVal,
+    valuationLabel,
+    valuationVal,
+    lines,
+    totalVal,
+    isCalculated,
+    emptyPrompt,
+    receiptText,
+    statutoryNote
+  }) => (
+    <div className="fee-statutory-receipt animate-fade-in" aria-label="Statutory Fee Estimate Document">
+      {/* Top Document Header Bar */}
+      <div className="fee-statutory-receipt__top-bar">
+        <div className="fee-statutory-receipt__badge">
+          <FileText size={12} />
+          <span>{scheduleCode}</span>
+        </div>
+        <span className="fee-statutory-receipt__series">FORM VIII • STATUTORY ASSESSMENT</span>
+      </div>
+
+      {/* Main Document Body */}
+      <div className="fee-statutory-receipt__body">
+        {/* Official Registry Paper Watermark / Header Motif */}
+        <div className="fee-statutory-receipt__header-motif">
+          <div className="fee-statutory-receipt__crest">
+            <Landmark size={20} className="fee-statutory-receipt__crest-icon" />
+          </div>
+          <div className="fee-statutory-receipt__heading-wrap">
+            <h4 className="fee-statutory-receipt__title">{documentTitle}</h4>
+            <span className="fee-statutory-receipt__subtitle">{subTitle}</span>
+          </div>
+        </div>
+
+        {/* Assessment Parameter Details */}
+        <div className="fee-statutory-receipt__metadata">
+          <div className="fee-statutory-receipt__meta-item">
+            <span className="fee-statutory-receipt__meta-label">{jurisdictionLabel}</span>
+            <span className="fee-statutory-receipt__meta-val">{jurisdictionVal}</span>
+          </div>
+          <div className="fee-statutory-receipt__meta-item">
+            <span className="fee-statutory-receipt__meta-label">{valuationLabel}</span>
+            <span className="fee-statutory-receipt__meta-val font-mono">
+              {valuationVal > 0 ? formatCurrency(valuationVal) : '₹ —'}
+            </span>
+          </div>
+        </div>
+
+        <div className="fee-statutory-receipt__divider" />
+
+        {/* Itemized Statutory Lines */}
+        <div className="fee-statutory-receipt__lines">
+          {lines.map((item, idx) => (
+            <div key={idx} className="fee-statutory-receipt__line">
+              <span className="fee-statutory-receipt__line-label">{item.label}</span>
+              <div className="fee-statutory-receipt__dots" />
+              <span className={`fee-statutory-receipt__line-val font-mono ${item.highlight ? 'is-highlight' : ''}`}>
+                {isCalculated ? item.value : '₹ —'}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="fee-statutory-receipt__divider-heavy" />
+
+        {/* Total Outlay Row */}
+        <div className="fee-statutory-receipt__total-row">
+          <div>
+            <span className="fee-statutory-receipt__total-label">
+              {isHindi ? 'कुल अनुमानित विधिक शुल्क' : 'ESTIMATED TOTAL'}
+            </span>
+            <span className="fee-statutory-receipt__total-sub">
+              {isCalculated
+                ? (isHindi ? 'देय सरकारी शुल्क' : 'Statutory Government Outlay')
+                : (isHindi ? 'गणना लंबित' : 'Awaiting Calculation')}
+            </span>
+          </div>
+          <span className={`fee-statutory-receipt__total-val font-mono ${isCalculated ? 'is-calculated' : 'is-empty'}`}>
+            {isCalculated ? formatCurrency(totalVal) : '₹ —'}
+          </span>
+        </div>
+
+        {/* Dynamic Action / Prompt Box */}
+        {isCalculated ? (
+          <div className="fee-statutory-receipt__calculated-footer">
+            <div className="fee-statutory-receipt__note">
+              <AlertCircle size={13} className="fee-statutory-receipt__note-icon" />
+              <span>{statutoryNote}</span>
+            </div>
+            <button
+              className="fee-statutory-receipt__copy-btn"
+              onClick={() => copyReceiptToClipboard(receiptText)}
+              type="button"
+            >
+              {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
+              <span>{copiedReceipt ? (isHindi ? 'कॉपी हो गया' : 'Copied to Clipboard') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Official Breakdown')}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="fee-statutory-receipt__prompt">
+            <div className="fee-statutory-receipt__prompt-dot" />
+            <span>{emptyPrompt}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Perforated Security Footer Notch */}
+      <div className="fee-statutory-receipt__security-edge">
+        <span>SECURITY WATERMARK • DHAARAAI STATUTORY ENGINE • SCHEDULE VERIFIED</span>
+      </div>
+    </div>
+  );
+
   const renderPropertyCalc = () => {
     const val = Number(propertyValue) || 0;
     const rates = STAMP_DUTY_RATES[state] || STAMP_DUTY_RATES['Delhi'];
@@ -87,88 +208,37 @@ export default function FeeCalculator({ language = 'English' }) {
           </div>
         </div>
 
-        {val > 0 ? (
-          <div className="fee-calculator__receipt animate-fade-in">
-            <div className="fee-calculator__receipt-header">
-              <div className="fee-calculator__receipt-badge">
-                <FileText size={14} />
-                <span>STATUTORY ESTIMATE RECEIPT</span>
-              </div>
-              <button
-                className="fee-calculator__receipt-copy"
-                onClick={() => copyReceiptToClipboard(receiptText)}
-                type="button"
-              >
-                {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
-                <span>{copiedReceipt ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Breakdown')}</span>
-              </button>
-            </div>
-
-            <div className="fee-calculator__receipt-body">
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'अधिसूचित राज्य व सर्कल' : 'Jurisdiction'}
-                </span>
-                <span className="fee-calculator__receipt-val">{state}</span>
-              </div>
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'मूल्यांकन मूल्य' : 'Assessed Valuation'}
-                </span>
-                <span className="fee-calculator__receipt-val font-mono">{formatCurrency(val)}</span>
-              </div>
-
-              <div className="fee-calculator__receipt-divider"></div>
-
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'स्टाम्प ड्यूटी' : 'Stamp Duty'} ({stampRate}%)
-                </span>
-                <span className="fee-calculator__receipt-val font-mono">{formatCurrency(stampDuty)}</span>
-              </div>
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'पंजीकरण शुल्क' : 'Registration Fee'} ({regRate}%)
-                </span>
-                <span className="fee-calculator__receipt-val font-mono">{formatCurrency(regFee)}</span>
-              </div>
-
-              <div className="fee-calculator__receipt-divider"></div>
-
-              <div className="fee-calculator__receipt-total-row">
-                <span className="fee-calculator__receipt-total-label">
-                  {isHindi ? 'कुल अनुमानित खर्च' : 'Total Statutory Outlay'}
-                </span>
-                <span className="fee-calculator__receipt-total-val font-mono">
-                  {formatCurrency(total)}
-                </span>
-              </div>
-            </div>
-
-            <div className="fee-calculator__receipt-footer">
-              <AlertCircle size={13} />
-              <span>
-                {isHindi
-                  ? '* अनुमानित आंकड़े संबंधित राज्य के स्टाम्प अधिनियम अनुसार हैं। नगर निगम या सेस शुल्क अतिरिक्त हो सकते हैं।'
-                  : '* Estimate based on State Stamp Duty Schedules. Additional municipal/cess surcharges may apply at sub-registrar.'}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="fee-calculator__receipt-placeholder">
-            <div className="fee-calculator__placeholder-icon-wrap">
-              <FileText size={32} />
-            </div>
-            <h4 className="fee-calculator__placeholder-title">
-              {isHindi ? 'लाइव गणना रसीद' : 'Statutory Fee Estimate'}
-            </h4>
-            <p className="fee-calculator__placeholder-desc">
-              {isHindi
-                ? 'बाईं ओर संपत्ति का मूल्य दर्ज करें। राज्य स्टाम्प ड्यूटी, पंजीकरण शुल्क और महिला छूट की मदवार रसीद यहां प्रदर्शित होगी।'
-                : 'Enter property value on the left to generate an itemized statutory breakdown covering stamp duty, registration charges, and gender concessions.'}
-            </p>
-          </div>
-        )}
+        {renderStatutoryReceipt({
+          documentTitle: isHindi ? 'स्टाम्प ड्यूटी एवं निबंधन शुल्क मूल्यांकन' : 'STATUTORY FEE ESTIMATE',
+          scheduleCode: 'INDIAN STAMP ACT 1899',
+          subTitle: isHindi ? 'उप-निबंधक कार्यालय विधिक अनुसूची' : 'Department of Revenue & Sub-Registrar Assessment',
+          jurisdictionLabel: isHindi ? 'अधिसूचित राज्य / सर्कल' : 'Jurisdiction / State',
+          jurisdictionVal: state,
+          valuationLabel: isHindi ? 'घोषित संपत्ति मूल्यांकन' : 'Declared Market Valuation',
+          valuationVal: val,
+          lines: [
+            { label: `${isHindi ? 'स्टाम्प ड्यूटी' : 'Stamp Duty'} (${stampRate}%)`, value: formatCurrency(stampDuty) },
+            { label: `${isHindi ? 'पंजीकरण शुल्क' : 'Registration Fee'} (${regRate}%)`, value: formatCurrency(regFee) },
+            {
+              label: isHindi ? 'महिला/संयुक्त छूट' : 'Gender Concession / Rebate',
+              value: buyerGender === 'female'
+                ? (isHindi ? 'लागू (महिला छूट)' : 'Applied (Statutory Rebate)')
+                : buyerGender === 'joint'
+                ? (isHindi ? 'संयुक्त स्वामित्व' : 'Joint Ownership Rate')
+                : (isHindi ? 'मानक दर (पुरुष)' : 'Standard Male Rate'),
+              highlight: buyerGender === 'female'
+            }
+          ],
+          totalVal: total,
+          isCalculated: val > 0,
+          emptyPrompt: isHindi
+            ? 'बाईं ओर संपत्ति का मूल्य दर्ज करें। राज्य स्टाम्प ड्यूटी, पंजीकरण शुल्क और महिला छूट की मदवार रसीद यहां प्रदर्शित होगी।'
+            : 'Enter property value on the left to calculate live statutory duty and registration charges.',
+          receiptText,
+          statutoryNote: isHindi
+            ? '* अनुमानित आंकड़े संबंधित राज्य के स्टाम्प अधिनियम अनुसार हैं। नगर निगम या सेस शुल्क अतिरिक्त हो सकते हैं।'
+            : '* Estimate based on State Stamp Duty Schedules. Additional municipal/cess surcharges may apply at sub-registrar.'
+        })}
       </div>
     );
   };
@@ -209,73 +279,29 @@ export default function FeeCalculator({ language = 'English' }) {
           </div>
         </div>
 
-        {val > 0 ? (
-          <div className="fee-calculator__receipt animate-fade-in">
-            <div className="fee-calculator__receipt-header">
-              <div className="fee-calculator__receipt-badge">
-                <FileText size={14} />
-                <span>COURT FEES ACT ESTIMATE</span>
-              </div>
-              <button
-                className="fee-calculator__receipt-copy"
-                onClick={() => copyReceiptToClipboard(receiptText)}
-                type="button"
-              >
-                {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
-                <span>{copiedReceipt ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Breakdown')}</span>
-              </button>
-            </div>
-
-            <div className="fee-calculator__receipt-body">
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'दावे का विषय' : 'Suit Category'}
-                </span>
-                <span className="fee-calculator__receipt-val">Plaint / Suit for Recovery or Declaration</span>
-              </div>
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'विवादित दावा मूल्य' : 'Subject Valuation'}
-                </span>
-                <span className="fee-calculator__receipt-val font-mono">{formatCurrency(val)}</span>
-              </div>
-
-              <div className="fee-calculator__receipt-divider"></div>
-
-              <div className="fee-calculator__receipt-total-row">
-                <span className="fee-calculator__receipt-total-label">
-                  {isHindi ? 'अनुमानित न्यायालय शुल्क' : 'Estimated Ad-Valorem Fee'}
-                </span>
-                <span className="fee-calculator__receipt-total-val font-mono">
-                  {formatCurrency(courtFee)}
-                </span>
-              </div>
-            </div>
-
-            <div className="fee-calculator__receipt-footer">
-              <AlertCircle size={13} />
-              <span>
-                {isHindi
-                  ? '* यह कोर्ट फीस एक्ट 1870 के मानक स्लैब अनुसार अनुमान है। संबंधित उच्च न्यायालय नियमावली अनुसार मामूली अंतर संभव है।'
-                  : '* Standard ad-valorem estimate. Exact fees depend on State Court Fees Amendments and High Court Rules.'}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="fee-calculator__receipt-placeholder">
-            <div className="fee-calculator__placeholder-icon-wrap">
-              <Landmark size={32} />
-            </div>
-            <h4 className="fee-calculator__placeholder-title">
-              {isHindi ? 'अदालत शुल्क रसीद' : 'Court Fee Calculation'}
-            </h4>
-            <p className="fee-calculator__placeholder-desc">
-              {isHindi
-                ? 'दीवानी मुकदमे की दावा राशि दर्ज करें। कोर्ट फीस एक्ट 1870 के अनुसार स्लैबवार अनुमान यहां दिखेगा।'
-                : 'Enter suit claim or disputed property valuation to estimate ad-valorem court fee requirements under the Court Fees Act.'}
-            </p>
-          </div>
-        )}
+        {renderStatutoryReceipt({
+          documentTitle: isHindi ? 'दीवानी मुकदमा न्यायालय शुल्क रसीद' : 'STATUTORY COURT FEE ESTIMATE',
+          scheduleCode: 'COURT FEES ACT 1870',
+          subTitle: isHindi ? 'अदालत शुल्क एवं वाद मूल्यांकन अनुसूची' : 'Ad-Valorem Plaint Valuation Schedule',
+          jurisdictionLabel: isHindi ? 'दावे का विषय' : 'Suit Category',
+          jurisdictionVal: isHindi ? 'दीवानी वाद (Plaint/Suit for Recovery)' : 'Plaint / Recovery / Declaration Suit',
+          valuationLabel: isHindi ? 'विवादित दावा मूल्य' : 'Subject Valuation Claim',
+          valuationVal: val,
+          lines: [
+            { label: isHindi ? 'दावा राशि' : 'Claimed Subject Matter', value: formatCurrency(val) },
+            { label: isHindi ? 'एड-वैलोरेम स्लैब दर' : 'Ad-Valorem Slab Rate', value: val <= 100000 ? '3.00%' : val <= 500000 ? '2.00% + Base' : '1.00% + Base' },
+            { label: isHindi ? 'अधिकतम सांविधिक सीमा' : 'Statutory Fee Ceiling', value: '₹ 3,00,000 (Max Cap)' }
+          ],
+          totalVal: courtFee,
+          isCalculated: val > 0,
+          emptyPrompt: isHindi
+            ? 'दीवानी मुकदमे की दावा राशि दर्ज करें। कोर्ट फीस एक्ट 1870 के अनुसार स्लैबवार अनुमान यहां दिखेगा।'
+            : 'Enter suit claim or disputed property valuation to calculate ad-valorem court fees.',
+          receiptText,
+          statutoryNote: isHindi
+            ? '* यह कोर्ट फीस एक्ट 1870 के मानक स्लैब अनुसार अनुमान है। संबंधित उच्च न्यायालय नियमावली अनुसार मामूली अंतर संभव है।'
+            : '* Standard ad-valorem estimate. Exact fees depend on State Court Fees Amendments and High Court Rules.'
+        })}
       </div>
     );
   };
@@ -330,73 +356,33 @@ export default function FeeCalculator({ language = 'English' }) {
           </div>
         </div>
 
-        {val > 0 ? (
-          <div className="fee-calculator__receipt animate-fade-in">
-            <div className="fee-calculator__receipt-header">
-              <div className="fee-calculator__receipt-badge">
-                <FileText size={14} />
-                <span>CONSUMER PROTECTION RULES 2020</span>
-              </div>
-              <button
-                className="fee-calculator__receipt-copy"
-                onClick={() => copyReceiptToClipboard(receiptText)}
-                type="button"
-              >
-                {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
-                <span>{copiedReceipt ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Breakdown')}</span>
-              </button>
-            </div>
-
-            <div className="fee-calculator__receipt-body">
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'सक्षम न्यायालय / फोरम' : 'Appropriate Forum'}
-                </span>
-                <span className="fee-calculator__receipt-val font-semibold">{forumLevel}</span>
-              </div>
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'दावा राशि' : 'Claim Valuation'}
-                </span>
-                <span className="fee-calculator__receipt-val font-mono">{formatCurrency(val)}</span>
-              </div>
-
-              <div className="fee-calculator__receipt-divider"></div>
-
-              <div className="fee-calculator__receipt-total-row">
-                <span className="fee-calculator__receipt-total-label">
-                  {isHindi ? 'सरकारी फाइलिंग शुल्क' : 'Statutory Filing Fee'}
-                </span>
-                <span className="fee-calculator__receipt-total-val font-mono">
-                  {fee === 0 ? (isHindi ? 'निःशुल्क (Nil)' : 'Exempt / Nil') : formatCurrency(fee)}
-                </span>
-              </div>
-            </div>
-
-            <div className="fee-calculator__receipt-footer">
-              <AlertCircle size={13} />
-              <span>
-                {isHindi
-                  ? '* उपभोक्ता संरक्षण नियम 2020 के अनुसार ₹5 लाख तक के उपभोक्ता दावों पर कोई शुल्क नहीं लगता है।'
-                  : '* Under Consumer Protection Rules 2020, disputes up to ₹5,00,000 carry zero court filing fee.'}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="fee-calculator__receipt-placeholder">
-            <div className="fee-calculator__placeholder-icon-wrap">
-              <ShoppingCart size={32} />
-            </div>
-            <h4 className="fee-calculator__placeholder-title">
-              {isHindi ? 'उपभोक्ता आयोग फोरम शुल्क' : 'Consumer Forum Jurisdiction'}
-            </h4>
-            <p className="fee-calculator__placeholder-desc">
-              {isHindi
-                ? 'वस्तु या सेवा का मूल्य दर्ज करें। जिला, राज्य या राष्ट्रीय आयोग का अधिकार क्षेत्र और फाइलिंग शुल्क यहां दिखेगा।'
-                : 'Enter claim valuation to determine appropriate forum jurisdiction (District, State, or National) and applicable fee.'}
-            </p>
-          </div>
-        )}
+        {renderStatutoryReceipt({
+          documentTitle: isHindi ? 'उपभोक्ता आयोग शिकायत शुल्क रसीद' : 'CONSUMER FORUM FEE ESTIMATE',
+          scheduleCode: 'CONSUMER PROTECTION ACT 2019',
+          subTitle: isHindi ? 'उपभोक्ता संरक्षण (फोरम प्रक्रिया) नियमावली 2020' : 'Consumer Protection (Filing & Procedure) Rules 2020',
+          jurisdictionLabel: isHindi ? 'सक्षम न्यायालय / फोरम' : 'Statutory Forum Jurisdiction',
+          jurisdictionVal: forumLevel,
+          valuationLabel: isHindi ? 'दावा व क्षतिपूर्ति राशि' : 'Total Goods/Services + Relief Claimed',
+          valuationVal: val,
+          lines: [
+            { label: isHindi ? 'दावा मूल्यांकन' : 'Dispute Claim Valuation', value: formatCurrency(val) },
+            { label: isHindi ? 'न्यायाधिकार फोरम' : 'Statutory Jurisdiction', value: forumLevel.split(' (')[0] },
+            {
+              label: isHindi ? '₹5 लाख तक छूट' : 'Exemption Status (Up to ₹5L)',
+              value: val <= 500000 ? (isHindi ? 'निःशुल्क (Nil Fee)' : 'Statutory Exemption (Nil)') : (isHindi ? 'सशुल्क स्लैब' : 'Applicable Tier Fee'),
+              highlight: val <= 500000 && val > 0
+            }
+          ],
+          totalVal: fee,
+          isCalculated: val > 0,
+          emptyPrompt: isHindi
+            ? 'वस्तु या सेवा का मूल्य दर्ज करें। जिला, राज्य या राष्ट्रीय आयोग का अधिकार क्षेत्र और फाइलिंग शुल्क यहां दिखेगा।'
+            : 'Enter consumer claim value to determine statutory jurisdiction and filing fee.',
+          receiptText,
+          statutoryNote: isHindi
+            ? '* उपभोक्ता संरक्षण नियम 2020 के अनुसार ₹5 लाख तक के उपभोक्ता दावों पर कोई शुल्क नहीं लगता है।'
+            : '* Under Consumer Protection Rules 2020, consumer complaints up to ₹5,00,000 carry zero filing fee.'
+        })}
       </div>
     );
   };
@@ -464,69 +450,29 @@ export default function FeeCalculator({ language = 'English' }) {
           </div>
         </div>
 
-        {totalFine > 0 ? (
-          <div className="fee-calculator__receipt animate-fade-in">
-            <div className="fee-calculator__receipt-header">
-              <div className="fee-calculator__receipt-badge">
-                <FileText size={14} />
-                <span>MOTOR VEHICLE ACT ESTIMATE</span>
-              </div>
-              <button
-                className="fee-calculator__receipt-copy"
-                onClick={() => copyReceiptToClipboard(receiptText)}
-                type="button"
-              >
-                {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
-                <span>{copiedReceipt ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Breakdown')}</span>
-              </button>
-            </div>
-
-            <div className="fee-calculator__receipt-body">
-              <div className="fee-calculator__receipt-row">
-                <span className="fee-calculator__receipt-label">
-                  {isHindi ? 'चिह्नित अपराधों की संख्या' : 'Selected Offences'}
-                </span>
-                <span className="fee-calculator__receipt-val font-semibold">
-                  {selectedViolations.length} {isHindi ? 'उल्लंघन' : 'Violations'}
-                </span>
-              </div>
-
-              <div className="fee-calculator__receipt-divider"></div>
-
-              <div className="fee-calculator__receipt-total-row">
-                <span className="fee-calculator__receipt-total-label">
-                  {isHindi ? 'कुल अनुमानित कंपाउंडिंग जुर्माना' : 'Total Compounding Fine'}
-                </span>
-                <span className="fee-calculator__receipt-total-val font-mono" style={{ color: 'var(--crimson-600)' }}>
-                  {formatCurrency(totalFine)}
-                </span>
-              </div>
-            </div>
-
-            <div className="fee-calculator__receipt-footer">
-              <AlertCircle size={13} />
-              <span>
-                {isHindi
-                  ? '* जुर्माना राशि संबंधित राज्य पुलिस नियमों और प्रथम/दोबारा अपराध की स्थिति के अनुसार भिन्न हो सकती है।'
-                  : '* Compounding penalty under MV Amendment Act. Repeat offences may attract higher statutory penalty or impoundment.'}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="fee-calculator__receipt-placeholder">
-            <div className="fee-calculator__placeholder-icon-wrap">
-              <Car size={32} />
-            </div>
-            <h4 className="fee-calculator__placeholder-title">
-              {isHindi ? 'चालान जुर्माना सारांश' : 'Challan Fine Assessment'}
-            </h4>
-            <p className="fee-calculator__placeholder-desc">
-              {isHindi
-                ? 'बाईं सूची से यातायात उल्लंघन चुनें। मोटर वाहन अधिनियम 2019/2024 के अनुसार कुल कंपाउंडिंग राशि यहां बनेगी।'
-                : 'Select traffic violations from the list to compute cumulative compounding penalties under the Motor Vehicles Act.'}
-            </p>
-          </div>
-        )}
+        {renderStatutoryReceipt({
+          documentTitle: isHindi ? 'यातायात चालान कंपाउंडिंग जुर्माना रसीद' : 'TRAFFIC COMPOUNDING ASSESSMENT',
+          scheduleCode: 'MOTOR VEHICLES ACT 1988/2019',
+          subTitle: isHindi ? 'सांविधिक कंपाउंडिंग जुर्माना सारणी' : 'Statutory Compoundable Offence Schedule',
+          jurisdictionLabel: isHindi ? 'अपराध विधान' : 'Statute Category',
+          jurisdictionVal: 'Motor Vehicles (Amendment) Act',
+          valuationLabel: isHindi ? 'चिह्नित अपराधों की संख्या' : 'Selected Recorded Violations',
+          valuationVal: selectedViolations.length,
+          lines: [
+            { label: isHindi ? 'दर्ज उल्लंघन' : 'Recorded Infractions', value: `${selectedViolations.length} ${isHindi ? 'उल्लंघन' : 'Violations'}` },
+            { label: isHindi ? 'प्रथम अपराध कंपाउंडिंग' : 'Compounding Status', value: selectedViolations.length > 0 ? (isHindi ? 'कंपाउंडेबल' : 'Compoundable at Challan Desk') : '₹ —' },
+            { label: isHindi ? 'न्यायालय पेशी विकल्प' : 'Court Trial Option', value: 'Virtual Court / Traffic Lok Adalat' }
+          ],
+          totalVal: totalFine,
+          isCalculated: totalFine > 0,
+          emptyPrompt: isHindi
+            ? 'बाईं सूची से यातायात उल्लंघन चुनें। मोटर वाहन अधिनियम के अनुसार कुल कंपाउंडिंग राशि यहां बनेगी।'
+            : 'Select traffic violations from the schedule to assess statutory compounding fines.',
+          receiptText,
+          statutoryNote: isHindi
+            ? '* जुर्माना राशि संबंधित राज्य पुलिस नियमों और प्रथम/दोबारा अपराध की स्थिति के अनुसार भिन्न हो सकती है।'
+            : '* Compounding penalty under MV Amendment Act. Repeat offences may attract higher statutory penalty or impoundment.'
+        })}
       </div>
     );
   };
@@ -554,6 +500,16 @@ export default function FeeCalculator({ language = 'English' }) {
                 : 'Accurate statutory calculation of Property Stamp Duty, Civil Court Fees, Consumer Court, and Traffic Compounding Fines.'}
             </p>
           </div>
+        </div>
+
+        <div className="module-banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/fees/property_registry.webp"
+            alt=""
+            className="module-banner-image"
+            loading="lazy"
+          />
+          <div className="module-banner-gradient" />
         </div>
       </div>
 

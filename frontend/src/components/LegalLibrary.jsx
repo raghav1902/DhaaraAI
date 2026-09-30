@@ -88,7 +88,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
     <div className="legal-library animate-fade-in">
       {/* Header Banner */}
       <div className="legal-library__header">
-        <div className="legal-library__header-left">
+        <div className="legal-library__header-left" style={{ position: 'relative', zIndex: 2, maxWidth: '75%' }}>
           <div className="legal-library__icon-badge">
             <BookOpen size={22} />
           </div>
@@ -115,11 +115,21 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
         </div>
 
         {/* Stats Pill */}
-        <div className="legal-library__stats-pill">
+        <div className="legal-library__stats-pill" style={{ position: 'relative', zIndex: 2 }}>
           <Scale size={16} />
           <span>
             {filteredStatutes.length} {isHindi ? 'धाराएं उपलब्ध' : 'Sections Indexed'}
           </span>
+        </div>
+
+        <div className="legal-library__banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/library/law_library.webp"
+            alt=""
+            className="legal-library__banner-image"
+            loading="lazy"
+          />
+          <div className="legal-library__banner-gradient" />
         </div>
       </div>
 

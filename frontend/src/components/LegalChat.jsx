@@ -313,6 +313,15 @@ export default function LegalChat({
               </div>
             </div>
           </div>
+          <div className="ask-ai-hero-visual" aria-hidden="true">
+            <img
+              src="/assets/legal/hero/supreme_court_hero.webp"
+              alt="Supreme Court of India"
+              className="ask-ai-hero-image"
+              loading="eager"
+            />
+            <div className="ask-ai-hero-gradient-overlay" />
+          </div>
         </section>
 
         {/* Suggestion Chips */}

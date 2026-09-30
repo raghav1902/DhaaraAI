@@ -112,8 +112,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
     <div className="contract-audit animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
       <div className="contract-audit__header module-header-banner">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '75%' }}>
             <div style={{
               background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
               padding: '10px',
@@ -122,7 +122,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(29, 78, 216, 0.25)'
+              boxShadow: '0 4px 12px rgba(29, 78, 216, 0.25)',
+              flexShrink: 0
             }}>
               <FileSearch size={22} />
             </div>
@@ -145,7 +146,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
         </div>
 
         {/* Quick Sample Selector Chips */}
-        <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', width: '100%', borderTop: '1px solid var(--card-border)', paddingTop: '12px' }}>
+        <div style={{ position: 'relative', zIndex: 2, marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', width: '100%', borderTop: '1px solid var(--card-border)', paddingTop: '12px' }}>
           <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Sparkles size={14} color="var(--primary)" />
             {isHindi ? 'त्वरित नमूना अनुबंध लोड करें:' : 'Try Sample Legal Agreements:'}
@@ -174,6 +175,16 @@ export default function DocumentAnalyzer({ language = 'English' }) {
           >
             {isHindi ? 'फ्रीलांस सर्विस अनुबंध (Consultancy)' : 'Freelance Agreement'}
           </button>
+        </div>
+
+        <div className="module-banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/contracts/contract_audit.webp"
+            alt=""
+            className="module-banner-image"
+            loading="lazy"
+          />
+          <div className="module-banner-gradient" />
         </div>
       </div>
 

@@ -49,7 +49,7 @@ export default function CitizenRights({ language = 'English' }) {
     <div className="citizen-rights animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner */}
       <div className="citizen-rights__header module-header-banner">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '75%' }}>
           <div style={{
             background: 'linear-gradient(135deg, var(--crimson-600), #991b1b)',
             padding: '10px',
@@ -58,7 +58,8 @@ export default function CitizenRights({ language = 'English' }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.25)'
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.25)',
+            flexShrink: 0
           }}>
             <Shield size={22} />
           </div>
@@ -77,6 +78,16 @@ export default function CitizenRights({ language = 'English' }) {
                 : 'Statutory citizen safeguards under BNSS 2023, Constitution of India, and Supreme Court arrest guidelines.'}
             </p>
           </div>
+        </div>
+
+        <div className="module-banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/civic/constitution_civic.webp"
+            alt=""
+            className="module-banner-image"
+            loading="lazy"
+          />
+          <div className="module-banner-gradient" />
         </div>
       </div>
 

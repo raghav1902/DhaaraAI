@@ -34,6 +34,61 @@
   background: linear-gradient(90deg, var(--royal-600), var(--purple-600));
 }
 
+.legal-library__banner-visual {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 36%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.legal-library__banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  filter: contrast(1.05) saturate(1.1);
+  transform: scale(1.02);
+}
+
+.legal-library__banner-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--card-bg) 0%,
+    color-mix(in srgb, var(--card-bg) 96%, transparent) 22%,
+    color-mix(in srgb, var(--card-bg) 40%, transparent) 65%,
+    rgba(15, 23, 42, 0.25) 100%
+  );
+}
+
+body.dark-theme .legal-library__banner-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--card-bg) 0%,
+    color-mix(in srgb, var(--card-bg) 95%, transparent) 26%,
+    color-mix(in srgb, var(--card-bg) 48%, transparent) 65%,
+    rgba(15, 23, 42, 0.55) 100%
+  );
+}
+
+@media (max-width: 960px) {
+  .legal-library__banner-visual {
+    width: 42%;
+    opacity: 0.25;
+  }
+}
+
+@media (max-width: 640px) {
+  .legal-library__banner-visual {
+    display: none;
+  }
+}
+
 .legal-library__header-left {
   display: flex;
   align-items: center;

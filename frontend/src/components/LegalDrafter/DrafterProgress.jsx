@@ -13,9 +13,11 @@ export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft 
       alignItems: 'center',
       flexWrap: 'wrap',
       gap: '12px',
-      boxShadow: 'var(--card-shadow)'
+      boxShadow: 'var(--card-shadow)',
+      flexShrink: 0,
+      minHeight: '76px'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative', zIndex: 2, flex: 1, minWidth: 0 }}>
         <div style={{
           background: 'linear-gradient(135deg, #1d4ed8, #1e40af)',
           color: 'white',
@@ -42,7 +44,16 @@ export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft 
           </p>
         </div>
       </div>
-      <button type="button" className="drafter-new-button" onClick={onNewDraft}><FileText size={15} /> {isHindi ? 'नया ड्राफ्ट' : 'New Draft'}</button>
+      <button type="button" className="drafter-new-button" onClick={onNewDraft} style={{ position: 'relative', zIndex: 2 }}><FileText size={15} /> {isHindi ? 'नया ड्राफ्ट' : 'New Draft'}</button>
+      <div className="drafter-header-visual" aria-hidden="true">
+        <img
+          src="/assets/legal/drafting/drafting_desk.webp"
+          alt=""
+          className="drafter-header-image"
+          loading="lazy"
+        />
+        <div className="drafter-header-gradient" />
+      </div>
     </div>
   );
 }

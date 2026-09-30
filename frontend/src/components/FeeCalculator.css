@@ -39,6 +39,8 @@
   align-items: center;
   gap: 14px;
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
 
 .fee-calculator__icon-badge {
@@ -210,152 +212,324 @@
   color: var(--crimson-600);
 }
 
-/* Legal Receipt Card */
-.fee-calculator__receipt {
-  background: var(--subtle-bg);
+/* ==========================================================================
+   STATUTORY DIGITAL LEGAL RECEIPT & REGISTRY ASSESSMENT DOCUMENT
+   Clean Editorial Legal-Tech UI • No Stock Photos • High-Contrast Document
+   ========================================================================== */
+.fee-statutory-receipt {
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  position: relative;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(217, 119, 6, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
 }
 
-.fee-calculator__receipt-header {
+body.dark-theme .fee-statutory-receipt {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.fee-statutory-receipt__top-bar {
+  background: linear-gradient(90deg, #1e3a8a 0%, #172554 100%);
+  color: #f8fafc;
+  padding: 8px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed var(--card-border);
-}
-
-.fee-calculator__receipt-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--royal-600);
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
-.fee-calculator__receipt-copy {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+body.dark-theme .fee-statutory-receipt__top-bar {
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fee-statutory-receipt__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.fee-statutory-receipt__series {
+  font-size: 10px;
+  opacity: 0.8;
+  font-family: var(--font-mono);
+}
+
+.fee-statutory-receipt__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Header Motif / Crest */
+.fee-statutory-receipt__header-motif {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  position: relative;
+}
+
+.fee-statutory-receipt__crest {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--amber-600), #92400e);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+}
+
+.fee-statutory-receipt__crest-icon {
+  stroke-width: 2.2;
+}
+
+.fee-statutory-receipt__heading-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fee-statutory-receipt__title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.fee-statutory-receipt__subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Metadata Parameters */
+.fee-statutory-receipt__metadata {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-xs);
 }
 
-.fee-calculator__receipt-copy:hover {
-  background: var(--card-bg);
+.fee-statutory-receipt__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fee-statutory-receipt__meta-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fee-statutory-receipt__meta-val {
+  font-size: 13px;
+  font-weight: 700;
   color: var(--text-main);
 }
 
-.fee-calculator__receipt-body {
+.fee-statutory-receipt__divider {
+  height: 1px;
+  border-bottom: 1px dashed var(--card-border);
+  margin: 2px 0;
+}
+
+.fee-statutory-receipt__divider-heavy {
+  height: 2px;
+  border-bottom: 2px dashed var(--card-border);
+  margin: 4px 0;
+}
+
+/* Itemized Lines with Dotted Leaders */
+.fee-statutory-receipt__lines {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.fee-calculator__receipt-row {
+.fee-statutory-receipt__line {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  align-items: center;
   font-size: 13px;
+  gap: 8px;
 }
 
-.fee-calculator__receipt-label {
+.fee-statutory-receipt__line-label {
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
-.fee-calculator__receipt-val {
+.fee-statutory-receipt__dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--card-border);
+  transform: translateY(-3px);
+  opacity: 0.8;
+}
+
+.fee-statutory-receipt__line-val {
   color: var(--text-main);
-  font-weight: 600;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.fee-calculator__receipt-divider {
-  height: 1px;
-  border-bottom: 1px dashed var(--card-border);
-  margin: 4px 0;
+.fee-statutory-receipt__line-val.is-highlight {
+  color: var(--emerald-600);
 }
 
-.fee-calculator__receipt-total-row {
+/* Total Outlay Row */
+.fee-statutory-receipt__total-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 12px 14px;
+  background: rgba(5, 150, 105, 0.06);
+  border: 1px solid rgba(5, 150, 105, 0.22);
+  border-radius: var(--radius-sm);
+  margin-top: 2px;
 }
 
-.fee-calculator__receipt-total-label {
-  font-size: 14px;
+body.dark-theme .fee-statutory-receipt__total-row {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+.fee-statutory-receipt__total-label {
+  display: block;
+  font-size: 13px;
   font-weight: 800;
+  letter-spacing: 0.04em;
   color: var(--emerald-600);
 }
 
-.fee-calculator__receipt-total-val {
-  font-size: 20px;
+.fee-statutory-receipt__total-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.fee-statutory-receipt__total-val {
+  font-size: 22px;
   font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.fee-statutory-receipt__total-val.is-calculated {
   color: var(--emerald-600);
 }
 
-.fee-calculator__receipt-footer {
+.fee-statutory-receipt__total-val.is-empty {
+  color: var(--text-muted);
+}
+
+/* Calculated Footer & Actions */
+.fee-statutory-receipt__calculated-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.fee-statutory-receipt__note {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--card-border);
   font-size: 11.5px;
   color: var(--text-muted);
   line-height: 1.4;
 }
 
-/* Placeholder Receipt */
-.fee-calculator__receipt-placeholder {
-  background: var(--subtle-bg);
-  border: 1px dashed var(--card-border);
-  border-radius: var(--radius-md);
-  padding: 36px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+.fee-statutory-receipt__note-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--amber-600);
 }
 
-.fee-calculator__placeholder-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-full);
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  display: flex;
+.fee-statutory-receipt__copy-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--royal-600);
-  margin-bottom: 6px;
-}
-
-.fee-calculator__placeholder-title {
-  margin: 0;
-  font-size: 16px;
+  gap: 6px;
+  padding: 9px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius-xs);
+  color: var(--primary);
+  font-size: 12.5px;
   font-weight: 700;
-  color: var(--text-main);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-xs);
 }
 
-.fee-calculator__placeholder-desc {
-  margin: 0;
-  font-size: 13px;
+.fee-statutory-receipt__copy-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Empty Prompt */
+.fee-statutory-receipt__prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--subtle-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-xs);
+  font-size: 12.5px;
   color: var(--text-muted);
-  max-width: 380px;
-  line-height: 1.5;
+  line-height: 1.45;
+}
+
+.fee-statutory-receipt__prompt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber-600);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+}
+
+/* Security Edge Footer */
+.fee-statutory-receipt__security-edge {
+  padding: 6px 14px;
+  background: var(--subtle-bg);
+  border-top: 1px solid var(--card-border);
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 @media (max-width: 900px) {

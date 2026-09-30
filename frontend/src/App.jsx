@@ -54,8 +54,17 @@ function App() {
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
+  const mainScrollRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('chat');
+
+  // Reset scroll to top on tab change
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab]);
+
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState(() => {
     try {
@@ -439,18 +448,19 @@ function App() {
       </nav>
 
       {/* Main Workspace Stage */}
-      <main className="app-main" style={{
+      <main ref={mainScrollRef} className="app-main" style={{
         flex: 1,
-        margin: '10px 14px 10px 0',
-        padding: '20px 24px',
+        margin: 0,
+        padding: '16px 28px 28px',
         background: 'var(--card-bg)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--card-border)',
-        boxShadow: 'var(--card-shadow)',
+        borderRadius: 0,
+        border: 'none',
+        boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: isSidebarOpen ? 'calc(100% - 274px)' : 'calc(100% - 88px)',
-        height: 'calc(100vh - 20px)',
+        maxWidth: isSidebarOpen ? 'calc(100% - 260px)' : 'calc(100% - 74px)',
+        width: isSidebarOpen ? 'calc(100% - 260px)' : 'calc(100% - 74px)',
+        height: '100vh',
         overflowY: 'auto',
         color: 'var(--text-main)',
         transition: 'all 0.25s ease',
@@ -743,15 +753,15 @@ function App() {
         <div
           className={activeTab === 'chat' ? 'workspace-content workspace-content-chat' : 'workspace-content'}
           style={{
-            maxWidth: activeTab === 'chat' || activeTab === 'drafting' ? 'none' : '1160px',
-            margin: activeTab === 'chat' || activeTab === 'drafting' ? '0' : '0 auto',
+            maxWidth: activeTab === 'chat' || activeTab === 'drafting' || activeTab === 'vault' ? 'none' : '1160px',
+            margin: activeTab === 'chat' || activeTab === 'drafting' || activeTab === 'vault' ? '0' : '0 auto',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
             flex: 1,
             minHeight: 0,
-            height: '100%'
+            height: activeTab === 'chat' ? '100%' : 'auto'
           }}
         >
           {activeTab === 'chat' && (
@@ -791,7 +801,7 @@ function App() {
             />
           )}
           {activeTab === 'vault' && (
-            <LegalVault language={language} />
+            <LegalVault language={language} onNavigateTab={setActiveTab} />
           )}
           {activeTab === 'calculator' && (
             <FeeCalculator language={language} />

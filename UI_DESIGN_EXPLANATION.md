@@ -9,10 +9,12 @@ DhaaraAI (LegalGPT) is an AI-powered Indian Legal Intelligence Platform tailored
 
 ### Core Visual Principles:
 - **Legal Authority & Trust:** Deep Royal Navy Blue (`#1d4ed8`) as the foundational brand color, accented by Emerald Green (`#059669`) for verified statutory accuracy.
-- **Airy Professionalism:** High contrast slate typography with purposeful whitespace rather than empty stretched layouts.
+- **Editorial Legal Tech Imagery:** Bespoke architectural judicial photography (Supreme Court dome silhouettes, antique teakwood law libraries, official petition scrolls, and circular steel bank vaults) anchored directly in `frontend/public/assets/legal/`.
+- **Seamless Edge Docking:** Workstation canvas docks flush with the top and sides of the browser window (`margin: 0; height: 100vh; overflow-y: auto`), eliminating awkward floating gaps and internal nested scrollbars.
+- **Subtle Horizontal Fading:** Cards blend seamlessly into their surrounding containers via pure horizontal linear gradients (`linear-gradient(90deg, var(--card-bg) 0%, ...)`), avoiding foggy or muddy vertical bands.
 - **Contextual Accent Discipline:** Colors have explicit semantic meaning:
   - **BLUE:** Primary actions, statutory information, and navigation markers.
-  - **GREEN:** Verified statutes, bailable offenses, and safe/low-risk contract clauses.
+  - **GREEN:** Verified statutes, active session indicators, and bailable offenses.
   - **AMBER / ORANGE:** Financial calculations, stamp duty breakdowns, and cautionary provisions.
   - **RED:** Emergency SOS helplines (112, 1930, 1091) and critical non-bailable offences.
   - **PURPLE:** AI cognitive reasoning and generation features.
@@ -54,10 +56,10 @@ The desktop experience features a clean, responsive 2-column SaaS shell:
 
 ```
 +-----------------------------------------------------------------------------------+
-|  SIDEBAR (255px)   |  TOP STICKY HEADER                                            |
+|  SIDEBAR (260px)   |  TOP STICKY HEADER                                            |
 |  - Brand Logo      |  [Module Badge]  [Global Search (Ctrl+K)]  [Theme] [Lang] [User]|
 |  - "LegalGPT"      |---------------------------------------------------------------|
-|  - 10 Modules Nav  |  WORKSPACE AREA (Max 1120px Balanced Width)                   |
+|  - 10 Modules Nav  |  WORKSPACE STAGE (Full-Height Flush Viewport)                 |
 |    * Active Glow   |                                                               |
 |    * Left Bar      |  Dynamic Module Views:                                        |
 |  - PWA Action Dock |  1. Ask AI (LegalChat)          6. Legal Library (Bare Acts)  |
@@ -83,7 +85,7 @@ The desktop experience features a clean, responsive 2-column SaaS shell:
 ## 4. MODULE-BY-MODULE UI/UX BREAKDOWN
 
 ### 1. Ask AI (`LegalChat.jsx`):
-- **Header:** BNS 2023 verification badge, reset conversation action.
+- **Hero Banner:** Supreme Court dome horizon silhouette with horizontal fade into card background.
 - **Quick Question Chips:** Curated prompts (e.g., FIR refusal, tenant security deposit, cheque bounce).
 - **Message Stream:**
   - User bubbles: Deep royal blue right-aligned.
@@ -91,12 +93,13 @@ The desktop experience features a clean, responsive 2-column SaaS shell:
 - **Composer Dock:** Integrated speech-to-text microphone button with audio recording animation.
 
 ### 2. Legal Drafting Studio (`LegalDrafter.jsx`):
-- **4-Step Visual Stepper:**
+- **5-Step Split-Screen Studio:**
   - Step 1: Document & Type (FIR vs Legal Notice) + Crime Category Grid.
   - Step 2: Parties Details (Complainant & Accused with unknown accused toggle).
   - Step 3: Incident Details, Date/Location, Evidence Preset Checkboxes.
   - Step 4: Review, Live Legal Draft Generation, and Print/PDF/Vault actions.
-- **Connected Stepper Bar:** Numbered circular nodes with checkmarks and primary accent progress tracking.
+  - Step 5: Live A4 legal document preview with court margin standards.
+- **Autofill Presets:** Cyber Fraud FIR, Cheque Bounce Notice, Tenant Deposit Refund.
 
 ### 3. Contract Audit (`DocumentAnalyzer.jsx`):
 - **Dropzone:** Dotted border upload zone supporting `.pdf` and `.txt` files with text extraction.
@@ -123,18 +126,28 @@ The desktop experience features a clean, responsive 2-column SaaS shell:
 ### 6. Legal Library & Bare Acts (`LegalLibrary.jsx`):
 - Category filter tags (Criminal, Civil, Corporate, Constitutional, Cyber).
 - Instant live search by section number or keyword with query clear button.
-- **Refined Empty State:** Illustrated state with book icon and structured search suggestions when no items match.
+- Illustrated state with book icon and structured search suggestions when no items match.
 
 ### 7. Encrypted Legal Vault (`LegalVault.jsx`):
-- **Secure PIN Lock Screen:** Centered security card with dark-accented lock visual, 4-digit PIN input, and local-storage encryption badge.
-- **Decrypted Locker Grid:** Categorized draft cards with date stamps, word count, download, copy, and secure delete.
+- **Locked Screen:**
+  - Full-section atmospheric dark legal repository backdrop with teakwood shelves, red-ribbon petition stacks, and heavy circular steel vault door (`vault_locked.webp`).
+  - Focused radial central vignette with high-contrast, frosted glass PIN unlock card (`backdrop-filter: blur(24px)`).
+  - Zero-cloud local device encryption indicators.
+- **Unlocked Workspace:**
+  - Compact header with real-time active session badge, emerald pulse dot, and client AES-256 telemetry.
+  - Dual-column ready stage with actionable guidance cards connecting to Drafting Studio and Contract Risk Audit.
+  - Subtle integrated archival backdrop (`law_library.webp`) with frosted specimen schema cards.
+  - In-vault document preview modal, clipboard copy, and `.txt` file export.
 
-### 8. Court Fee & Stamp Duty Calculator (`FeeCalculator.jsx`):
+### 8. Statutory Fee & Assessment Calculator (`FeeCalculator.jsx`):
+- **Statutory Assessment Receipt (Schedule I-A / Form VIII)**:
+  - Digital court receipt with official court seal watermark and itemized fee calculation breakdown.
 - Multi-category navigation: Property Registration, Civil Suit Ad-Valorem, Consumer Forum, and Traffic Violations.
 - State-specific calculation matrices (Delhi, Maharashtra, UP, Karnataka) with transparent fee breakdown tables.
 
 ### 9. Cyber Fraud Scanner (`CyberChecker.jsx`):
 - Security scanner interface with live breach intelligence.
+- Deep technical cyber network backdrop with illuminated node telemetry.
 - Zero-retention privacy assurance indicator.
 - Actionable post-scan checklist with direct redirection to cybercrime.gov.in.
 
@@ -145,6 +158,6 @@ The desktop experience features a clean, responsive 2-column SaaS shell:
 ---
 
 ## 5. RESPONSIVE DESIGN & ACCESSIBILITY
-- **Desktop (>868px):** Fixed compact sidebar (255px), centered main viewport (max-width 1120px) preventing horizontal overflow.
+- **Desktop (>868px):** Fixed compact sidebar (260px), full-stage main viewport docking flush to window edges.
 - **Mobile & Tablet (<=868px):** Fluid drawer menu with blurred backdrop overlay, minimum 44px tap targets, full-width fluid forms.
 - **Print Mode:** Pure white background, zero sidebar/top-bar print leakage, formatted for A4 court filing standards.

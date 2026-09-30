@@ -95,7 +95,7 @@ export default function CyberChecker({ language = 'English' }) {
     <div className="cyber-scanner animate-fade-in">
       {/* Header Banner */}
       <div className="cyber-scanner__header">
-        <div className="cyber-scanner__header-left">
+        <div className="cyber-scanner__header-left" style={{ position: 'relative', zIndex: 2, maxWidth: '75%' }}>
           <div className="cyber-scanner__icon-badge">
             <ShieldAlert size={22} />
           </div>
@@ -115,23 +115,44 @@ export default function CyberChecker({ language = 'English' }) {
             </p>
           </div>
         </div>
+
+        <div className="module-banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/cyber/cyber_network.webp"
+            alt=""
+            className="module-banner-image"
+            loading="lazy"
+          />
+          <div className="module-banner-gradient" />
+        </div>
       </div>
 
       {/* Main Scanner Workspace */}
-      <div className="cyber-scanner__workspace">
-        <div className="cyber-scanner__source-badge">
-          <Database size={13} />
-          <span>Verified Breach Index (XposedOrNot)</span>
+      <div className={`cyber-scanner__workspace ${result ? 'has-results' : ''}`}>
+        <div className="cyber-scanner__backdrop" aria-hidden="true">
+          <img
+            src="/assets/legal/cyber/cyber_network.webp"
+            alt=""
+            className="cyber-scanner__backdrop-image"
+            loading="lazy"
+          />
+          <div className="cyber-scanner__backdrop-overlay" />
         </div>
 
-        <h3 className="cyber-scanner__prompt-title">
-          {isHindi ? 'ईमेल ब्रीच सत्यापन' : 'Check Email for Known Security Breaches'}
-        </h3>
-        <p className="cyber-scanner__prompt-desc">
-          {isHindi
-            ? 'आपका ईमेल DhaaraAI के सर्वर पर सुरक्षित नहीं किया जाता। यह सीधे सार्वजनिक लीक रिकॉर्ड्स से मिलान करता है।'
-            : 'Your address is checked against authenticated public incident databases. We never store or log your queries.'}
-        </p>
+        <div className="cyber-scanner__workspace-inner">
+          <div className="cyber-scanner__source-badge">
+            <Database size={13} />
+            <span>Verified Breach Index (XposedOrNot)</span>
+          </div>
+
+          <h3 className="cyber-scanner__prompt-title">
+            {isHindi ? 'ईमेल ब्रीच सत्यापन' : 'Check Email for Known Security Breaches'}
+          </h3>
+          <p className="cyber-scanner__prompt-desc">
+            {isHindi
+              ? 'आपका ईमेल DhaaraAI के सर्वर पर सुरक्षित नहीं किया जाता। यह सीधे सार्वजनिक लीक रिकॉर्ड्स से मिलान करता है।'
+              : 'Your address is checked against authenticated public incident databases. We never store or log your queries.'}
+          </p>
 
         {/* Input Bar */}
         <div className="cyber-scanner__input-form">
@@ -252,6 +273,7 @@ export default function CyberChecker({ language = 'English' }) {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

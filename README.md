@@ -23,14 +23,16 @@ Available in both **English and Hindi (हिंदी)** with native speech-to-
 - Real-time grounding with **ChromaDB vector search** and **Groq Llama 3.3 70B** / OSS-120B.
 - Voice input (Speech-to-Text) and Audio reader (Text-to-Speech) with Markdown speech sanitizer.
 - Procedural step-by-step guidance including cognizable/bailable classification and police station remedies.
+- Subtle Supreme Court dome architectural horizon silhouette seamlessly integrated into the hero header.
 
 ### 2. 📝 Automated FIR & Statutory Legal Drafter
-- 4-step interactive legal drafting wizard for:
+- 5-step interactive legal drafting wizard for:
   - **Police FIR Applications** (under Section 173 BNSS).
   - **Statutory Legal Demand Notices** (Cheque Bounce Sec 138 NI Act, Tenant deposit refund, Vendor breach).
+- Split-screen studio with live, real-time updated A4 legal document preview.
 - Autofill sample presets (Cyber fraud, cheque bounce, tenant dispute).
 - Export to formatted **PDF (A4 Court standard)** and **Word (.doc)** with zero margin clipping.
-- One-click save to the encrypted local Legal Vault.
+- One-click direct save to the encrypted local Legal Vault.
 
 ### 3. 🔍 Smart Contract & Legal Document Risk Analyzer
 - **Direct PDF/TXT File Upload**: Drag and drop real rental deeds, employment bonds, or service agreements (`.pdf`, `.txt`, `.md`).
@@ -52,18 +54,28 @@ Available in both **English and Hindi (हिंदी)** with native speech-to-
 - Direct tap-to-call emergency helplines: **1930** (Cyber Crime), **112** (National Emergency), **1091** (Women Safety), **15100** (NALSA Free Legal Aid).
 
 ### 6. 🔐 Encrypted Legal Vault
-- 4-digit PIN-protected client-side vault for saving drafts, FIR copies, and contract risk audits.
-- Full offline confidentiality: data remains stored locally on your device.
-- In-vault draft previewer, copy, and export capabilities.
+- **Locked Stage**:
+  - Imposing judicial archive environment featuring high-detail teakwood law libraries, red-ribbon court petition dossiers, and circular steel bank vault door marked *"JUDICIAL ARCHIVE"*.
+  - Atmospheric radial vignette with high-contrast, frosted glass PIN unlock card (`backdrop-filter: blur(24px)`).
+  - Client-side encryption: 4-6 digit PIN protection with zero cloud telemetry.
+- **Unlocked Workspace**:
+  - Compact header with real-time active session badge, emerald pulse dot, and client AES-256 telemetry.
+  - Balanced dual-column layout eliminating empty space.
+  - Integrated High Court library archive background (`law_library.webp`) with frosted specimen schema cards.
+  - Actionable 1-click guidance cards connecting to Drafting Studio and Contract Risk Audit.
+  - In-vault document preview modal, clipboard copy, and `.txt` file export.
 
-### 7. ⚖️ Legal Fee & Traffic Fine Calculator
+### 7. ⚖️ Statutory Legal Fee & Assessment Calculator
+- **Statutory Assessment Receipt (Schedule I-A / Form VIII)**:
+  - High-precision digital receipt with official court seal watermark, itemized statutory fee breakdown, and live recalculation.
 - **Property Stamp Duty & Registration**: State-wise rates (Delhi, Maharashtra, UP, Karnataka, etc.) with gender concessions for female/joint buyers.
-- **Civil Court Fees**: Ad-valorem suit valuation calculator.
+- **Civil Court Fees**: Ad-valorem suit valuation calculator based on state court fee schedules.
 - **Consumer Dispute Forum Filing Fees**: Updated 2024 zero-fee thresholds up to ₹5 Lakhs.
 - **Traffic Challan Fine Estimator**: Motor Vehicles Amendment Act 2024 penalty breakdowns.
 
 ### 8. 🌐 Cyber Crime & Dark-Web Breach Scanner
 - Live, zero-logging query against verified global dark-web breaches powered by open-source **XposedOrNot** intelligence.
+- Deep technical cyber network aesthetic with illuminated node telemetry.
 - Immediate breach summary and actionable 2FA / 1930 helpline guidance.
 
 ### 9. 📚 Indian Legal Library & Statutory Archive
@@ -77,7 +89,17 @@ Available in both **English and Hindi (हिंदी)** with native speech-to-
 
 ---
 
+## 🎨 Architectural Design & Visual System
+
+- **Full-Viewport Edge Docking**: Workstation stage docks flush with the top and sides of the browser window (`margin: 0; height: 100vh`), eliminating awkward floating gaps and internal nested scrollbars.
+- **Editorial Legal Tech Imagery**: Custom-crafted, authentic Indian judicial imagery stored in `frontend/public/assets/legal/` (Supreme Court architecture, law libraries, drafting desks, property registries, and judicial archive vaults).
+- **Subtle Horizontal Fading**: Cards blend seamlessly into their surrounding containers via pure horizontal linear gradients (`linear-gradient(90deg, var(--card-bg) 0%, ...)`), avoiding foggy or muddy vertical bands.
+- **Accessible Glassmorphism**: Tailored backdrop blurs with high contrast, legible slate typography, and semantic color markers (Blue for primary/statute, Emerald for verified/bailable, Amber for financial, Crimson for emergencies, Purple for AI cognition).
+
+---
+
 ## 📱 Progressive Web App (PWA) & Mobile Responsiveness
+
 - **Install on Mobile / Desktop**: Full manifest and service worker configuration with offline fallback.
 - **Adaptive Drawer Navigation**: Slide-over drawer with backdrop overlay for phone viewports ($\le 868\text{px}$).
 - **Zero Horizontal Overflow**: Fluid typography clamps and auto-wrapping tables and forms.
@@ -91,7 +113,7 @@ DhaaraAI includes an end-to-end automated test suite covering backend statutory 
 ### Running Backend Tests (13 Tests):
 ```bash
 cd backend
-py test_backend_suite.py
+.\venv\Scripts\python test_backend_suite.py
 ```
 *Validates Concordance accuracy, RAG offline fallback, FIR draft structure, Contract Risk heuristics, and live FastAPI endpoints (`/api/health`, `/api/converter`, `/api/library`, `/api/upload-document`, `/api/analyze-contract`).*
 
@@ -117,9 +139,9 @@ npm test
 git clone https://github.com/your-username/DhaaraAI.git
 cd DhaaraAI/backend
 
-# Create virtual environment (optional but recommended)
+# Create and activate virtual environment
 py -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -129,7 +151,7 @@ cp .env.example .env
 # Edit .env and paste: GROQ_API_KEY="your_groq_api_key_here"
 
 # Start the FastAPI server
-py -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+.\venv\Scripts\python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 *Backend API docs available at: http://localhost:8000/docs*
 
@@ -169,18 +191,29 @@ DhaaraAI/
 │   └── requirements.txt          # Python dependencies
 ├── frontend/
 │   ├── public/
+│   │   ├── assets/legal/         # Curated Indian legal imagery & backdrops
+│   │   │   ├── civic/            # Constitutional & civil rights visuals
+│   │   │   ├── contracts/        # Contract audit textures
+│   │   │   ├── cyber/            # Cyber network visuals
+│   │   │   ├── drafting/         # Drafting studio desk visuals
+│   │   │   ├── fees/             # Property registry textures
+│   │   │   ├── hero/             # Supreme Court horizon silhouettes
+│   │   │   ├── library/          # High Court library archive visuals
+│   │   │   ├── statutes/         # Bare act code backgrounds
+│   │   │   └── vault/            # Judicial archive vault backdrops
 │   │   ├── manifest.json         # PWA Manifest
 │   │   ├── service-worker.js     # PWA Service Worker & caching
 │   │   └── favicon.svg
 │   ├── src/
-│   │   ├── components/           # 10 modular app components & landing subcomponents
+│   │   ├── components/           # 10 modular app components & subcomponents
 │   │   ├── data/                 # Local concordance and citizen rights data
 │   │   ├── tests/                # Vitest automated test suites
 │   │   ├── App.jsx               # Main state router & responsive drawer
-│   │   └── index.css             # Glassmorphism design tokens & media queries
+│   │   └── index.css             # Design system tokens, utilities & themes
 │   ├── package.json
-│   └── vite.config.js            # Rollup chunk splitting & PWA proxy
-└── README.md
+│   └── vite.config.js            # Vite build & chunk configuration
+├── UI_DESIGN_EXPLANATION.md      # Detailed UI/UX design specifications
+└── README.md                     # Platform overview & setup documentation
 ```
 
 ---

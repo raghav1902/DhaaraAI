@@ -69,7 +69,7 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
     <div className="bns-concordance animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
       {/* Header Banner */}
       <div className="bns-concordance__header module-header-banner">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '75%' }}>
           <div style={{
             background: 'linear-gradient(135deg, var(--emerald-600), #047857)',
             padding: '10px',
@@ -78,7 +78,8 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+            boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+            flexShrink: 0
           }}>
             <ArrowRightLeft size={22} />
           </div>
@@ -97,6 +98,16 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
                 : 'Cross-reference IPC 1860 and Bharatiya Nyaya Sanhita 2023. Compare sections, bail status, punishments, and trial procedure.'}
             </p>
           </div>
+        </div>
+
+        <div className="module-banner-visual" aria-hidden="true">
+          <img
+            src="/assets/legal/statutes/bns_statute_codes.webp"
+            alt=""
+            className="module-banner-image"
+            loading="lazy"
+          />
+          <div className="module-banner-gradient" />
         </div>
       </div>
 
