@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 
 export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleSpeak, isHindi }) {
   const [copied, setCopied] = useState(false);
+  const [savedToVault, setSavedToVault] = useState(false);
   const isUser = msg.role === 'user';
 
   const handleCopy = async () => {
@@ -13,6 +14,28 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
       window.setTimeout(() => setCopied(false), 1800);
     } catch (error) {
       console.warn('Could not copy response:', error);
+    }
+  };
+
+  const handleSaveToVault = () => {
+    try {
+      const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+      const firstLine = (msg.content || '').split('\n').find(l => l.trim().length > 0) || 'Legal Consultation';
+      const cleanTitle = firstLine.replace(/^[#* \-_]+/, '').slice(0, 50);
+
+      drafts.push({
+        id: `chat_${Date.now()}`,
+        type: 'Legal Consultation',
+        title: cleanTitle ? `Consultation: ${cleanTitle}` : 'Legal Consultation Record',
+        content: msg.content,
+        date: new Date().toISOString()
+      });
+
+      localStorage.setItem('dhaara_vault_drafts', JSON.stringify(drafts));
+      setSavedToVault(true);
+      setTimeout(() => setSavedToVault(false), 2000);
+    } catch (err) {
+      console.warn('Failed saving message to vault:', err);
     }
   };
 
@@ -88,6 +111,17 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
                 >
                   {copied ? <Check size={13} color="var(--accent)" /> : <Copy size={13} />}
                   <span>{copied ? (isHindi ? 'कॉपी हुआ' : 'Copied') : (isHindi ? 'कॉपी' : 'Copy')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveToVault}
+                  className="ask-ai-action-button"
+                  title={isHindi ? 'वॉल्ट में सुरक्षित करें' : 'Save response to Vault'}
+                  aria-label={isHindi ? 'वॉल्ट में सुरक्षित करें' : 'Save response to Vault'}
+                >
+                  {savedToVault ? <Check size={13} color="var(--emerald-600)" /> : <ShieldCheck size={13} />}
+                  <span>{savedToVault ? (isHindi ? 'सहेजा गया!' : 'Saved!') : (isHindi ? 'वॉल्ट' : 'Vault')}</span>
                 </button>
 
                 <button

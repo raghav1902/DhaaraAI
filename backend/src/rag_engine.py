@@ -63,7 +63,11 @@ class DhaaraRAGEngine:
             print(f"[rag_engine] Failed to initialize Groq client: {e}")
             self.client = None
 
-    def set_api_key(self, key: str):
+    def _set_api_key_internal(self, key: str):
+        """Private: update Groq key internally. Never expose this via any API route."""
+        if not key or not str(key).strip().startswith("gsk_"):
+            print("[rag_engine] Invalid or empty API key — skipping update.")
+            return
         self._init_groq_client(key)
 
     def _format_concordance_context(self, question: str, user_role: str) -> str:
@@ -75,15 +79,19 @@ class DhaaraRAGEngine:
 
         crimes = diagnosis.get("matched_crimes", [])
         for c in crimes:
+            # Escape curly braces from all concordance values to prevent prompt injection
+            def _esc(v: str) -> str:
+                return str(v or "").replace("{", "(").replace("}", ")")
+
             b = (
-                f"• Offense: {c['offense_en']}\n"
-                f"  - Active BNS Section: {c['bns_section']} ({c['bns_act']}) — {c['bns_title']}\n"
-                f"  - Legacy IPC Section: {c['ipc_section']} ({c['ipc_act']})\n"
-                f"  - Classification: {c['nature']} | {c['bailable']} | Triable by: {c['triable_by']}\n"
-                f"  - Punishment: {c['punishment']}\n"
-                f"  - BNSS Procedure & Rights: {c['bnss_procedure']}\n"
-                f"  - Action for Complainant: {c['victim_guidance']}\n"
-                f"  - Safeguard for Accused: {c['accused_guidance']}"
+                f"• Offense: {_esc(c.get('offense_en', ''))}\n"
+                f"  - Active BNS Section: {_esc(c.get('bns_section', ''))} ({_esc(c.get('bns_act', ''))}) — {_esc(c.get('bns_title', ''))}\n"
+                f"  - Legacy IPC Section: {_esc(c.get('ipc_section', ''))} ({_esc(c.get('ipc_act', ''))})\n"
+                f"  - Classification: {_esc(c.get('nature', ''))} | {_esc(c.get('bailable', ''))} | Triable by: {_esc(c.get('triable_by', ''))}\n"
+                f"  - Punishment: {_esc(c.get('punishment', ''))}\n"
+                f"  - BNSS Procedure & Rights: {_esc(c.get('bnss_procedure', ''))}\n"
+                f"  - Action for Complainant: {_esc(c.get('victim_guidance', ''))}\n"
+                f"  - Safeguard for Accused: {_esc(c.get('accused_guidance', ''))}"
             )
             blocks.append(b)
 
@@ -140,10 +148,13 @@ class DhaaraRAGEngine:
         """
         Executes end-to-end situational legal intelligence query with robust fallbacks.
         """
+        safe_question = str(question or "").strip()
+        if not safe_question:
+            safe_question = "general legal rights and statutory remedies"
         is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
 
         # 1. Retrieve top_k chunks from ChromaDB
-        raw_chunks = self.embed_store.query(question, top_k=top_k)
+        raw_chunks = self.embed_store.query(safe_question, top_k=top_k)
 
         # Filter chunks by similarity threshold
         relevant_chunks = [
@@ -250,26 +261,46 @@ class DhaaraRAGEngine:
                 }
 
         except Exception as api_err:
-            print(f"[rag_engine] Groq API call failed: {api_err}. Activating graceful fallback.")
-            error_reason = (
-                "AI सेवा अस्थायी रूप से अनुपलब्ध है। त्वरित वैधानिक जानकारी नीचे उपलब्ध है:"
-                if is_hindi else
-                "AI service temporarily unavailable. Direct statutory guidance is provided below:"
-            )
-            fallback_text = self._generate_offline_concordance_fallback(
-                question=question,
-                user_role=user_role,
-                reason=error_reason,
-                language=language
-            )
+            print(f"[rag_engine] Primary model ({self.model_name}) call failed: {api_err}. Trying fallback model {FALLBACK_MODEL}.")
+            try:
+                response = self.client.chat.completions.create(
+                    model=FALLBACK_MODEL,
+                    messages=messages,
+                    temperature=0.1,
+                    max_tokens=900,
+                    stream=False
+                )
+                answer_text = response.choices[0].message.content.strip()
+                if active_disclaimer not in answer_text:
+                    answer_text += f"\n\n*{active_disclaimer}*"
+                return {
+                    "answer": answer_text,
+                    "sources": used_chunks,
+                    "question": question,
+                    "language": language,
+                    "concordance": diagnose_situation(question, user_role)
+                }
+            except Exception as fb_err:
+                print(f"[rag_engine] Fallback model also failed: {fb_err}. Activating graceful offline concordance fallback.")
+                error_reason = (
+                    "AI सेवा अस्थायी रूप से अनुपलब्ध है। त्वरित वैधानिक जानकारी नीचे उपलब्ध है:"
+                    if is_hindi else
+                    "AI service temporarily unavailable. Direct statutory guidance is provided below:"
+                )
+                fallback_text = self._generate_offline_concordance_fallback(
+                    question=question,
+                    user_role=user_role,
+                    reason=error_reason,
+                    language=language
+                )
 
-            return {
-                "answer": fallback_text,
-                "sources": used_chunks,
-                "question": question,
-                "language": language,
-                "concordance": diagnose_situation(question, user_role)
-            }
+                return {
+                    "answer": fallback_text,
+                    "sources": used_chunks,
+                    "question": question,
+                    "language": language,
+                    "concordance": diagnose_situation(question, user_role)
+                }
 
     def generate_legal_draft(
         self,
@@ -287,15 +318,30 @@ class DhaaraRAGEngine:
         """
         Generates a formal, legally grounded FIR Application or Legal Demand Notice.
         """
+        # Null-safe all inputs before any string interpolation
+        complainant  = complainant  or {}
+        accused      = accused      or {}
+        facts             = str(facts             or "Not specified").strip() or "Not specified"
+        evidence          = str(evidence          or "None provided").strip() or "None provided"
+        relief_sought     = str(relief_sought     or "As per applicable law").strip() or "As per applicable law"
+        incident_category = str(incident_category or "General Complaint").strip() or "General Complaint"
+        incident_datetime = str(incident_datetime or "Not specified").strip() or "Not specified"
+        incident_location = str(incident_location or "Not specified").strip() or "Not specified"
+
         is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
-        
+
         # Diagnose incident to find relevant statutory sections
         diagnosis = diagnose_situation(f"{incident_category} {facts}")
         matched_crimes = diagnosis.get("matched_crimes", [])
         sections_summary = []
         for c in matched_crimes[:3]:
-            sections_summary.append(f"BNS Sec {c['bns_section']} ({c['bns_title']}) [Legacy IPC Sec {c['ipc_section']}]")
+            bns_sec   = c.get("bns_section", "?")
+            bns_title = c.get("bns_title",   "BNS 2023")
+            ipc_sec   = c.get("ipc_section", "?")
+            sections_summary.append(f"BNS Sec {bns_sec} ({bns_title}) [Legacy IPC Sec {ipc_sec}]")
+
         sections_str = ", ".join(sections_summary) if sections_summary else "Relevant sections of Bharatiya Nyaya Sanhita, 2023 (BNS)"
+
 
         if is_hindi:
             system_prompt = DRAFTING_SYSTEM_PROMPT_HI
@@ -351,26 +397,49 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
                 "draft": draft_text
             }
         except Exception as e:
-            print(f"[rag_engine] Drafting failed via primary model: {e}")
-            fallback_draft = self._generate_fallback_draft(
-                document_type=document_type,
-                is_hindi=is_hindi,
-                complainant=complainant,
-                accused=accused,
-                incident_datetime=incident_datetime,
-                incident_location=incident_location,
-                facts=facts,
-                evidence=evidence,
-                relief=relief_sought,
-                sections=sections_str
-            )
-            return {
-                "success": True,
-                "document_type": document_type,
-                "language": language,
-                "sections_referenced": sections_summary,
-                "draft": fallback_draft
-            }
+            print(f"[rag_engine] Drafting failed via primary model ({self.model_name}): {e}. Trying fallback model {FALLBACK_MODEL}.")
+            try:
+                response = self.client.chat.completions.create(
+                    model=FALLBACK_MODEL,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=0.15,
+                    max_tokens=1500,
+                    stream=False
+                )
+                draft_text = response.choices[0].message.content.strip()
+                return {
+                    "success": True,
+                    "document_type": document_type,
+                    "language": language,
+                    "sections_referenced": sections_summary,
+                    "draft": draft_text,
+                    "model": FALLBACK_MODEL
+                }
+            except Exception as fb_err:
+                print(f"[rag_engine] Fallback drafting model failed: {fb_err}. Using verified statutory template.")
+                fallback_draft = self._generate_fallback_draft(
+                    document_type=document_type,
+                    is_hindi=is_hindi,
+                    complainant=complainant,
+                    accused=accused,
+                    incident_datetime=incident_datetime,
+                    incident_location=incident_location,
+                    facts=facts,
+                    evidence=evidence,
+                    relief=relief_sought,
+                    sections=sections_str
+                )
+                return {
+                    "success": True,
+                    "document_type": document_type,
+                    "language": language,
+                    "sections_referenced": sections_summary,
+                    "draft": fallback_draft,
+                    "mode": "statutory_verified_template"
+                }
 
     def _generate_fallback_draft(
         self,

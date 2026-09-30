@@ -12,7 +12,9 @@ from prompts import CONTRACT_ANALYSIS_SYSTEM_PROMPT
 
 def heuristic_contract_analysis(text: str, doc_type: str, is_hindi: bool) -> Dict[str, Any]:
     """Rule-based Indian contract auditor detecting predatory clauses."""
-    text_lower = text.lower()
+    safe_text = str(text or "")
+    text_lower = safe_text.lower()
+    doc_type = str(doc_type or "General Contract")
     red_flags = []
     missing = []
     score = 20
@@ -109,28 +111,63 @@ def analyze_contract_document(
     document_type: str = "General Contract",
     language: str = "English"
 ) -> Dict[str, Any]:
-    is_hindi = "hindi" in str(language).lower()
+    safe_doc_text = str(document_text or "")[:12000]   # hard cap for token safety
+    doc_type      = str(document_type or "General Contract")[:100]
+    is_hindi      = "hindi" in str(language).lower()
+
+    REQUIRED_FIELDS = {"summary", "risk_score", "risk_percentage", "red_flags", "actionable_advice"}
 
     if client:
         prompt_lang = "HINDI (देवनागरी)" if is_hindi else "ENGLISH"
         system_instruction = CONTRACT_ANALYSIS_SYSTEM_PROMPT.format(prompt_lang=prompt_lang)
-        user_msg = f"Document Type: {document_type}\n\nDocument Text:\n{document_text[:6000]}"
+        user_msg = f"Document Type: {doc_type}\n\nDocument Text:\n{safe_doc_text[:6000]}"
 
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": user_msg}
+                    {"role": "user",   "content": user_msg}
                 ],
                 model=default_model,
                 temperature=0.2,
+                max_tokens=1500,
                 response_format={"type": "json_object"}
             )
-            parsed = json.loads(chat_completion.choices[0].message.content)
-            parsed["success"] = True
-            parsed["source"] = "AI Legal Audit"
-            return parsed
-        except Exception as e:
-            print(f"[contract_analyzer] Groq contract analysis failed: {e}. Falling back to rule-based engine.")
+            raw_content = chat_completion.choices[0].message.content or "{}"
+            parsed = json.loads(raw_content)
 
-    return heuristic_contract_analysis(document_text, document_type, is_hindi)
+            # Validate that the AI response has required schema fields
+            if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
+                raise ValueError(f"AI response missing required fields: {REQUIRED_FIELDS - set(parsed.keys())}")
+
+            parsed["success"] = True
+            parsed["source"]  = "AI Legal Audit"
+            return parsed
+
+        except Exception as e:
+            print(f"[contract_analyzer] Primary model failed: {e}. Trying fallback model qwen/qwen3.8-27b.")
+            try:
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user",   "content": user_msg}
+                    ],
+                    model="qwen/qwen3.8-27b",
+                    temperature=0.2,
+                    max_tokens=1500,
+                    response_format={"type": "json_object"}
+                )
+                raw_content = chat_completion.choices[0].message.content or "{}"
+                parsed = json.loads(raw_content)
+
+                if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
+                    raise ValueError("Fallback AI response also missing required fields")
+
+                parsed["success"] = True
+                parsed["source"]  = "AI Legal Audit (Fallback Model)"
+                return parsed
+
+            except Exception as e2:
+                print(f"[contract_analyzer] Fallback model failed: {e2}. Falling back to statutory rule-based engine.")
+
+    return heuristic_contract_analysis(safe_doc_text, doc_type, is_hindi)

@@ -5,7 +5,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8.0+-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-blue.svg)](https://web.dev/progressive-web-apps/)
-[![Tests](https://img.shields.io/badge/Tests-17%20Passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-24%20Passed-brightgreen.svg)]()
 
 **DhaaraAI** is India's premier AI legal companion and automated drafting engine. Engineered specifically for Indian advocates, law students, and citizens, it bridges the monumental legal transition from the colonial **Indian Penal Code (IPC 1860)**, **CrPC 1973**, and **IEA 1872** to the new criminal statutory framework:
 - **Bharatiya Nyaya Sanhita, 2023 (BNS)**
@@ -110,12 +110,12 @@ Available in both **English and Hindi (हिंदी)** with native speech-to-
 
 DhaaraAI includes an end-to-end automated test suite covering backend statutory endpoints and frontend datasets:
 
-### Running Backend Tests (13 Tests):
+### Running Backend Tests (20 Tests):
 ```bash
 cd backend
 .\venv\Scripts\python test_backend_suite.py
 ```
-*Validates Concordance accuracy, RAG offline fallback, FIR draft structure, Contract Risk heuristics, and live FastAPI endpoints (`/api/health`, `/api/converter`, `/api/library`, `/api/upload-document`, `/api/analyze-contract`).*
+*Validates Concordance accuracy, RAG intelligence, secondary model retry, FIR and Notice drafting, Contract Risk heuristics, cyber breach check & path alias, statutory helplines, landmark guidelines, court fee and stamp duty calculations, and live FastAPI endpoints (`/api/health`, `/api/query`, `/api/draft`, `/api/converter`, `/api/library`, `/api/upload-document`, `/api/analyze-contract`, `/api/cyber-check`, `/api/helplines`, `/api/guidelines`, `/api/calculate-court-fee`).*
 
 ### Running Frontend Tests (Vitest):
 ```bash

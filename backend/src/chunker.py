@@ -162,16 +162,18 @@ def process_pages_into_chunks(
 ) -> List[Dict[str, Any]]:
     """
     Transforms raw page-level records into tagged, section-aware chunks.
-
-    Parameters:
-        pages (List[Dict[str, Any]]): Extracted pages from pdf_loader.
-        chunk_size (int): Target token count per chunk (~500).
-        overlap (int): Token overlap between consecutive chunks (~100).
-        save_to_file (str, optional): Destination JSON path in /processed.
-
-    Returns:
-        List[Dict[str, Any]]: Complete list of enriched chunk dictionaries.
+    Security: chunk_size/overlap are capped; save_to_file is restricted to 'processed/' subdir.
     """
+    # Cap params to prevent OOM from adversarial inputs
+    chunk_size = max(50, min(int(chunk_size or 500), 2000))
+    overlap    = max(0,  min(int(overlap    or 100), chunk_size // 2))
+
+    # Cap total pages to prevent DoS
+    MAX_PAGES = 500
+    if len(pages) > MAX_PAGES:
+        print(f"[chunker] Capping pages to {MAX_PAGES} (received {len(pages)}).")
+        pages = pages[:MAX_PAGES]
+
     all_chunks = []
     chunk_counter = 0
 
@@ -231,11 +233,17 @@ def process_pages_into_chunks(
 
     # Save to /processed cache if path is provided
     if save_to_file and all_chunks:
-        out_path = Path(save_to_file)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump(all_chunks, f, indent=2, ensure_ascii=False)
-        print(f"[chunker] Saved {len(all_chunks)} processed chunks to '{save_to_file}'.")
+        # Security: restrict save path to 'processed/' subdirectory only
+        out_path = Path(save_to_file).resolve()
+        safe_root = (Path.cwd() / "processed").resolve()
+        if not str(out_path).startswith(str(safe_root)):
+            print(f"[chunker] BLOCKED: Refusing to save chunks to restricted path '{save_to_file}'.")
+        else:
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(all_chunks, f, indent=2, ensure_ascii=False)
+            print(f"[chunker] Saved {len(all_chunks)} processed chunks to '{save_to_file}'.")
+
 
     return all_chunks
 

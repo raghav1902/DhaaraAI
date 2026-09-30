@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, Building, Landmark, AlertCircle, FileText, IndianRupee, Car, ShoppingCart, Check, Copy } from 'lucide-react';
+import { Calculator, Building, Landmark, AlertCircle, FileText, IndianRupee, Car, ShoppingCart, Check, Copy, ShieldCheck, Download } from 'lucide-react';
 import { STAMP_DUTY_RATES, TRAFFIC_VIOLATIONS } from '../data/feeCalculatorData';
 import './FeeCalculator.css';
 
@@ -15,6 +15,7 @@ export default function FeeCalculator({ language = 'English' }) {
   const [consumerValue, setConsumerValue] = useState('');
   const [selectedViolations, setSelectedViolations] = useState([]);
   const [copiedReceipt, setCopiedReceipt] = useState(false);
+  const [savedVault, setSavedVault] = useState(false);
 
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
@@ -24,6 +25,42 @@ export default function FeeCalculator({ language = 'English' }) {
     navigator.clipboard.writeText(text);
     setCopiedReceipt(true);
     setTimeout(() => setCopiedReceipt(false), 2000);
+  };
+
+  const saveFeeToVault = (receiptText, title) => {
+    if (!receiptText) return;
+    try {
+      const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+      const categoryTitles = {
+        property: isHindi ? 'संपत्ति स्टाम्प एवं रजिस्ट्री शुल्क मूल्यांकन' : 'Property Stamp Duty & Registration Assessment',
+        court: isHindi ? 'दीवानी मुकदमा न्यायालय शुल्क मूल्यांकन' : 'Civil Suit Ad-Valorem Court Fee Assessment',
+        consumer: isHindi ? 'उपभोक्ता आयोग शिकायत शुल्क मूल्यांकन' : 'Consumer Commission Statutory Fee Assessment',
+        traffic: isHindi ? 'ट्रैफिक चालान प्रशमन जुर्माना मूल्यांकन' : 'Traffic Challan Compounding Fine Assessment'
+      };
+
+      drafts.push({
+        id: `fee_${Date.now()}`,
+        type: 'Statutory Fee Assessment',
+        title: categoryTitles[calcType] || (title || 'Court Fee & Stamp Assessment'),
+        content: receiptText,
+        date: new Date().toISOString()
+      });
+
+      localStorage.setItem('dhaara_vault_drafts', JSON.stringify(drafts));
+      setSavedVault(true);
+      setTimeout(() => setSavedVault(false), 2500);
+    } catch (e) {
+      console.error('Error saving fee assessment to vault:', e);
+    }
+  };
+
+  const downloadReceipt = (receiptText, prefix = 'statutory_fee_estimate') => {
+    const blob = new Blob([receiptText], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${prefix}_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
   };
 
   /**
@@ -123,14 +160,38 @@ export default function FeeCalculator({ language = 'English' }) {
               <AlertCircle size={13} className="fee-statutory-receipt__note-icon" />
               <span>{statutoryNote}</span>
             </div>
-            <button
-              className="fee-statutory-receipt__copy-btn"
-              onClick={() => copyReceiptToClipboard(receiptText)}
-              type="button"
-            >
-              {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
-              <span>{copiedReceipt ? (isHindi ? 'कॉपी हो गया' : 'Copied to Clipboard') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Official Breakdown')}</span>
-            </button>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                className="fee-statutory-receipt__copy-btn"
+                onClick={() => copyReceiptToClipboard(receiptText)}
+                type="button"
+                style={{ flex: 1, minWidth: '130px' }}
+              >
+                {copiedReceipt ? <Check size={14} color="var(--emerald-600)" /> : <Copy size={14} />}
+                <span>{copiedReceipt ? (isHindi ? 'कॉपी हो गया' : 'Copied') : (isHindi ? 'रसीद कॉपी करें' : 'Copy Breakdown')}</span>
+              </button>
+
+              <button
+                className="fee-statutory-receipt__copy-btn"
+                onClick={() => saveFeeToVault(receiptText, documentTitle)}
+                type="button"
+                style={{ flex: 1, minWidth: '130px', background: savedVault ? 'rgba(5, 150, 105, 0.1)' : undefined, borderColor: savedVault ? 'var(--emerald-600)' : undefined }}
+              >
+                {savedVault ? <Check size={14} color="var(--emerald-600)" /> : <ShieldCheck size={14} />}
+                <span>{savedVault ? (isHindi ? 'वॉल्ट में सुरक्षित!' : 'Saved to Vault!') : (isHindi ? 'वॉल्ट में सहेजें' : 'Save to Vault')}</span>
+              </button>
+
+              <button
+                className="fee-statutory-receipt__copy-btn"
+                onClick={() => downloadReceipt(receiptText, `dhaara_statutory_fee_${calcType}`)}
+                type="button"
+                style={{ flex: 1, minWidth: '130px' }}
+                title={isHindi ? 'रसीद डाउनलोड करें' : 'Download text statement'}
+              >
+                <Download size={14} />
+                <span>{isHindi ? 'डाउनलोड' : 'Download TXT'}</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="fee-statutory-receipt__prompt">

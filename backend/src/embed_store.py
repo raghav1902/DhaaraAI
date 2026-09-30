@@ -28,6 +28,7 @@ For College Project / Viva Reference:
 
 import os
 import json
+import threading
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import chromadb
@@ -81,6 +82,10 @@ class LegalEmbedStore:
         self.db_path = db_path
         self.model_name = model_name
 
+        # Thread-safety: RLock allows the same thread to re-acquire (e.g. seed then query)
+        # while blocking concurrent writes from other threads.
+        self._lock = threading.RLock()
+
         # Ensure db directory exists
         Path(self.db_path).mkdir(parents=True, exist_ok=True)
 
@@ -101,13 +106,7 @@ class LegalEmbedStore:
     def add_chunks(self, chunks: List[Dict[str, Any]], batch_size: int = 64) -> int:
         """
         Generates embeddings for chunk texts and stores them in ChromaDB with metadata.
-
-        Parameters:
-            chunks (List[Dict[str, Any]]): List of chunk records from chunker.py.
-            batch_size (int): Number of chunks to embed and upsert per batch.
-
-        Returns:
-            int: Number of chunks successfully upserted.
+        Thread-safe: acquires write lock to prevent concurrent indexing corruption.
         """
         if not chunks:
             print("[embed_store] No chunks provided for indexing.")
@@ -117,34 +116,35 @@ class LegalEmbedStore:
         print(f"[embed_store] Indexing {total_chunks} chunks into collection '{COLLECTION_NAME}'...")
 
         upserted_count = 0
-        for i in range(0, total_chunks, batch_size):
-            batch = chunks[i : i + batch_size]
+        with self._lock:  # exclusive write lock
+            for i in range(0, total_chunks, batch_size):
+                batch = chunks[i : i + batch_size]
 
-            ids = [c["chunk_id"] for c in batch]
-            texts = [c["text"] for c in batch]
-            metadatas = [
-                {
-                    "source": str(c.get("source", "unknown")),
-                    "page": int(c.get("page", 1)),
-                    "section": str(c.get("section", "General")),
-                    "section_title": str(c.get("section_title", "")),
-                    "token_count": int(c.get("token_count", 0)),
-                }
-                for c in batch
-            ]
+                ids = [c["chunk_id"] for c in batch]
+                texts = [c["text"] for c in batch]
+                metadatas = [
+                    {
+                        "source": str(c.get("source", "unknown")),
+                        "page": int(c.get("page", 1)),
+                        "section": str(c.get("section", "General")),
+                        "section_title": str(c.get("section_title", "")),
+                        "token_count": int(c.get("token_count", 0)),
+                    }
+                    for c in batch
+                ]
 
-            # Compute dense embeddings locally on CPU
-            embeddings = self.model.encode(texts, show_progress_bar=False, convert_to_numpy=True).tolist()
+                # Compute dense embeddings locally on CPU
+                embeddings = self.model.encode(texts, show_progress_bar=False, convert_to_numpy=True).tolist()
 
-            # Upsert into ChromaDB (inserts new or updates existing chunk_ids)
-            self.collection.upsert(
-                ids=ids,
-                documents=texts,
-                embeddings=embeddings,
-                metadatas=metadatas
-            )
-            upserted_count += len(batch)
-            print(f"[embed_store] Processed {upserted_count}/{total_chunks} chunks...")
+                # Upsert into ChromaDB (inserts new or updates existing chunk_ids)
+                self.collection.upsert(
+                    ids=ids,
+                    documents=texts,
+                    embeddings=embeddings,
+                    metadatas=metadatas
+                )
+                upserted_count += len(batch)
+                print(f"[embed_store] Processed {upserted_count}/{total_chunks} chunks...")
 
         print(f"[embed_store] Indexing complete! Total collection count: {self.collection.count()} chunks.")
         return upserted_count
@@ -191,8 +191,17 @@ class LegalEmbedStore:
     def index_from_json(self, json_path: str = "processed/chunks.json") -> int:
         """
         Helper method to load chunks from a JSON file and index them.
+        Path-traversal protected: only allows paths within the backend root.
         """
-        p = Path(json_path)
+        p = Path(json_path).resolve()
+        root = Path(self.db_path).parent.resolve()   # backend root
+
+        # Ensure the resolved path stays within the backend directory
+        if not str(p).startswith(str(root)):
+            raise PermissionError(
+                f"[embed_store] Path traversal denied: '{json_path}' is outside the backend root."
+            )
+
         if not p.exists():
             raise FileNotFoundError(f"Chunks file not found at: {json_path}")
 
@@ -233,6 +242,9 @@ class LegalEmbedStore:
         """
         if not query_text.strip():
             return []
+
+        # Guard top_k independently of any API-level validation
+        top_k = max(1, min(int(top_k or 5), 50))
 
         # Encode question using the same embedding model
         query_embedding = self.model.encode([query_text], convert_to_numpy=True).tolist()
@@ -298,14 +310,17 @@ class LegalEmbedStore:
     def reset_collection(self):
         """
         Deletes and recreates the collection for a clean re-indexing.
+        Thread-safe: acquires exclusive write lock — no concurrent query/write allowed.
         """
-        print(f"[embed_store] Resetting collection '{COLLECTION_NAME}'...")
-        self.client.delete_collection(name=COLLECTION_NAME)
-        self.collection = self.client.get_or_create_collection(
-            name=COLLECTION_NAME,
-            metadata={"hnsw:space": "cosine"}
-        )
-        print(f"[embed_store] Collection reset successfully.")
+        with self._lock:
+            print(f"[embed_store] Resetting collection '{COLLECTION_NAME}'...")
+            self.client.delete_collection(name=COLLECTION_NAME)
+            self.collection = self.client.get_or_create_collection(
+                name=COLLECTION_NAME,
+                metadata={"hnsw:space": "cosine"}
+            )
+            print("[embed_store] Collection reset successfully.")
+
 
 
 if __name__ == "__main__":
