@@ -3,11 +3,10 @@ import LandingStyles from './landing/LandingStyles';
 import LandingNavbar from './landing/LandingNavbar';
 import HeroSection from './landing/HeroSection';
 import LogoMarquee from './landing/LogoMarquee';
-import VideoDemoSection from './landing/VideoDemoSection';
 import HowItWorksSection from './landing/HowItWorksSection';
 import InteractiveDemo from './landing/InteractiveDemo';
-import FeaturesSection from './landing/FeaturesSection';
 import ToolkitSection from './landing/ToolkitSection';
+import FeaturesSection from './landing/FeaturesSection';
 import ComparisonSection from './landing/ComparisonSection';
 import SecuritySection from './landing/SecuritySection';
 import IntegrationsSection from './landing/IntegrationsSection';
@@ -24,74 +23,72 @@ export default function LandingPage({ onExplore }) {
   const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 25);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div className="dhaara-landing" style={{
-      backgroundColor: '#f1f5f9',
-      backgroundImage: `linear-gradient(rgba(203, 213, 225, 0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(203, 213, 225, 0.45) 1px, transparent 1px)`,
-      backgroundSize: '48px 48px',
-      color: '#0f172a',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      backgroundColor: '#faf8f5',
+      backgroundImage: `radial-gradient(#e7e3da 0.75px, transparent 0.75px), radial-gradient(#e7e3da 0.75px, #faf8f5 0.75px)`,
+      backgroundSize: '36px 36px',
+      backgroundPosition: '0 0, 18px 18px',
+      color: '#0b1329',
+      minHeight: '100vh',
       overflowX: 'hidden'
     }}>
       <LandingStyles />
 
-      {/* 1. Navbar */}
+      {/* 1. Sticky Frosted Navbar */}
       <LandingNavbar isScrolled={isScrolled} onExplore={onExplore} />
 
-      {/* 2. Hero Section */}
+      {/* 2. Hero Section with Authentic Indian Legal Imagery + Laptop Studio */}
       <HeroSection onExplore={onExplore} />
 
-      {/* 3. 'Trusted By' Logo Marquee */}
+      {/* 3. Trust & Statistics Strip + Marquee */}
       <LogoMarquee />
 
-      {/* 4. Video Demo / App Walkthrough Placeholder */}
-      <VideoDemoSection />
-
-      {/* 5. 'How It Works' 3-Step Flow */}
+      {/* 4. How DhaaraAI Works (3 Steps + Supreme Court Sketch) */}
       <HowItWorksSection />
 
-      {/* 6. Interactive Mini-Playground */}
+      {/* 5. Interactive Demo (See DhaaraAI in Action + Try It Yourself) */}
       <InteractiveDemo />
 
-      {/* 7. Core Features Deep Dive */}
-      <FeaturesSection />
-
-      {/* 8. Specialized Legal Toolkit */}
+      {/* 6. Core Capabilities & Specialized Legal Toolkit */}
       <ToolkitSection />
 
-      {/* 9. Comparison: Traditional vs DhaaraAI */}
+      {/* 7. Deep-Dive Capabilities (Research, Precedents, Contract Review) */}
+      <FeaturesSection />
+
+      {/* 8. Traditional Legal Research vs. DhaaraAI */}
       <ComparisonSection />
 
-      {/* 10. Security & Privacy Dedicated Banner */}
+      {/* 9. Security & Privacy Dedicated Section */}
       <SecuritySection />
 
-      {/* 11. Integrations Ecosystem */}
+      {/* 10. Workflow Integrations Ecosystem */}
       <IntegrationsSection />
 
-      {/* 12. 'Wall of Love' Testimonials */}
+      {/* 11. Advocates & In-House Counsel Testimonials */}
       <TestimonialsSection />
 
-      {/* 13. Pricing Plans */}
+      {/* 12. Transparent Pricing Plans */}
       <PricingSection onExplore={onExplore} />
 
-      {/* 14. Latest Legal Tech Insights */}
+      {/* 13. Latest Legal Tech Insights */}
       <BlogSection onSelectArticle={(key) => setActiveModal(key)} />
 
-      {/* 15. FAQ Section */}
+      {/* 14. Frequently Asked Questions */}
       <FAQSection />
 
-      {/* 16. Final High-Impact CTA Banner */}
+      {/* 15. Final High-Impact CTA Banner */}
       <CtaBanner onExplore={onExplore} />
 
-      {/* 17. Multi-column Footer */}
+      {/* 16. Multi-Column Footer */}
       <LandingFooter onOpenModal={(modal) => setActiveModal(modal)} />
 
-      {/* Universal Reader Modal */}
+      {/* Universal Modal */}
       <UniversalModal activeModal={activeModal} onClose={() => setActiveModal(null)} />
     </div>
   );

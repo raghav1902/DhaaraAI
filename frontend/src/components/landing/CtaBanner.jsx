@@ -1,51 +1,128 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function CtaBanner({ onExplore }) {
   return (
-    <section className="section-container" style={{ paddingBottom: '5rem' }}>
+    <section className="landing-section" style={{ paddingBottom: '5rem' }}>
       <div style={{
-        background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
-        borderRadius: '26px',
-        padding: '4.5rem 2.5rem',
-        textAlign: 'center',
-        color: 'white',
-        boxShadow: '0 25px 60px -12px rgba(37, 99, 235, 0.45)',
         position: 'relative',
-        overflow: 'hidden'
+        borderRadius: '28px',
+        overflow: 'hidden',
+        boxShadow: '0 25px 65px -15px rgba(11, 19, 41, 0.25)',
+        border: '1px solid rgba(226, 232, 240, 0.8)'
       }}>
-        {/* Subtle decorative shapes */}
-        <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-80px', left: '-80px', width: '260px', height: '260px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
+        {/* Supreme Court Panoramic Image Background */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'url(/assets/legal/hero/supreme_court_hero.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 45%',
+          zIndex: 1
+        }} />
 
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: '680px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: '800', marginBottom: '1rem', color: 'white', lineHeight: '1.2' }}>
+        {/* Deep Navy/Twilight Gradient Overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(180deg, rgba(8, 15, 36, 0.75) 0%, rgba(8, 15, 36, 0.94) 85%)',
+          zIndex: 2
+        }} />
+
+        {/* Content Container */}
+        <div style={{
+          position: 'relative',
+          zIndex: 10,
+          padding: '5rem 2rem',
+          textAlign: 'center',
+          maxWidth: '780px',
+          margin: '0 auto',
+          color: '#ffffff'
+        }}>
+          <h2 style={{
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontSize: 'clamp(2.1rem, 4.4vw, 3.2rem)',
+            fontWeight: '600',
+            lineHeight: '1.2',
+            marginBottom: '1rem',
+            letterSpacing: '-0.02em',
+            color: '#ffffff'
+          }}>
             Ready to transform your legal practice?
           </h2>
-          <p style={{ fontSize: '1.02rem', opacity: 0.92, marginBottom: '2.25rem', lineHeight: '1.6' }}>
+
+          <p style={{
+            fontSize: '1.05rem',
+            lineHeight: '1.65',
+            color: '#cbd5e1',
+            maxWidth: '640px',
+            margin: '0 auto 2.5rem',
+            fontWeight: '400'
+          }}>
             Join 10,000+ advocates, corporate counsels, and startups delivering precise legal research in a fraction of the time.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onExplore} style={{
-              background: 'white',
-              color: '#1e40af',
-              padding: '0.85rem 2.25rem',
-              borderRadius: '999px',
-              fontWeight: '700',
-              fontSize: '1.05rem',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-              transition: 'all 0.2s ease',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              Start Your 3-Day Free Trial <ArrowRight size={18} />
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '1.75rem'
+          }}>
+            <button
+              onClick={onExplore}
+              style={{
+                background: '#ffffff',
+                color: '#1d4ed8',
+                padding: '0.85rem 2.4rem',
+                borderRadius: '999px',
+                fontWeight: '700',
+                fontSize: '1.02rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.65rem',
+                transition: 'all 0.25s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 12px 35px rgba(0,0,0,0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.3)';
+              }}
+            >
+              <span>Start Your 3-Day Free Trial</span>
+              <ArrowRight size={18} />
             </button>
           </div>
-          <div style={{ marginTop: '1.5rem', fontSize: '0.82rem', opacity: 0.85 }}>
-            Instant access • No credit card required • Cancel anytime
+
+          {/* Micro-trust indicators */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '1.75rem',
+            flexWrap: 'wrap',
+            fontSize: '0.82rem',
+            color: '#94a3b8'
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <CheckCircle2 size={15} color="#60a5fa" /> No credit card needed
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <CheckCircle2 size={15} color="#60a5fa" /> Instant Access
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <CheckCircle2 size={15} color="#60a5fa" /> Cancel anytime
+            </span>
           </div>
         </div>
       </div>

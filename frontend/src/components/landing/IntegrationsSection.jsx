@@ -1,52 +1,136 @@
 import React from 'react';
-import { Globe, FileText, FileCheck, Send, Layers, Search } from 'lucide-react';
+import { Workflow, FileText, HardDrive, FileCheck, Mail, Layers, Compass } from 'lucide-react';
 
 export default function IntegrationsSection() {
   const tools = [
-    { name: 'Microsoft Word', desc: 'Add-in for drafting', icon: FileText, color: '#2563eb' },
-    { name: 'Google Drive', desc: 'Direct contract sync', icon: Globe, color: '#ea4335' },
-    { name: 'Adobe Acrobat / PDF', desc: 'One-click clause audit', icon: FileCheck, color: '#dc2626' },
-    { name: 'Microsoft Outlook', desc: 'Analyze email agreements', icon: Send, color: '#0284c7' },
-    { name: 'Clio & Practice Suite', desc: 'Case file connector', icon: Layers, color: '#16a34a' },
-    { name: 'Chrome Browser Ext.', desc: 'Audit clauses on the web', icon: Search, color: '#f59e0b' }
+    {
+      name: 'Microsoft Word',
+      desc: 'Add-in for drafting',
+      icon: FileText,
+      color: '#1d4ed8',
+      bg: '#eff6ff'
+    },
+    {
+      name: 'Google Drive',
+      desc: 'Direct contract sync',
+      icon: HardDrive,
+      color: '#059669',
+      bg: '#ecfdf5'
+    },
+    {
+      name: 'Adobe Acrobat',
+      desc: 'One-click audit',
+      icon: FileCheck,
+      color: '#dc2626',
+      bg: '#fef2f2'
+    },
+    {
+      name: 'Microsoft Outlook',
+      desc: 'Analyze emails',
+      icon: Mail,
+      color: '#0284c7',
+      bg: '#f0f9ff'
+    },
+    {
+      name: 'Clio & Practice Suite',
+      desc: 'Case file connector',
+      icon: Layers,
+      color: '#16a34a',
+      bg: '#f0fdf4'
+    },
+    {
+      name: 'Chrome Extension',
+      desc: 'Audit web content',
+      icon: Compass,
+      color: '#ea580c',
+      bg: '#fff7ed'
+    }
   ];
 
   return (
-    <section className="section-container" style={{ textAlign: 'center' }}>
-      <div className="section-header">
-        <div className="feature-badge"><Globe size={14} /> Ecosystem</div>
-        <h2 className="section-title">Integrates With Your Legal Workflow</h2>
-        <p className="section-desc">Connect DhaaraAI seamlessly to the software you and your team already use every single day.</p>
+    <section className="landing-section" style={{ textAlign: 'center', paddingTop: '3rem', paddingBottom: '3rem' }}>
+      {/* Header */}
+      <div className="landing-section-header" style={{ marginBottom: '2.5rem' }}>
+        <div className="eyebrow-badge">
+          <Workflow size={14} /> INTEGRATES WITH YOUR LEGAL WORKFLOW
+        </div>
+        <h2 className="landing-section-title">
+          Connect DhaaraAI to the tools you already use.
+        </h2>
+        <p className="landing-section-desc">
+          Seamlessly integrate intelligent legal research, redlining, and citations directly into your existing software stack.
+        </p>
       </div>
 
+      {/* 6 Integration Cards */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+        gridTemplateColumns: 'repeat(6, 1fr)',
         gap: '1.25rem',
-        maxWidth: '860px',
+        maxWidth: '1180px',
         margin: '0 auto'
-      }}>
+      }} className="integrations-grid">
         {tools.map((tool, i) => (
-          <div key={i} style={{
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '16px',
-            padding: '1.25rem 1rem',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: `${tool.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <tool.icon size={20} color={tool.color} />
+          <div
+            key={i}
+            className="premium-card"
+            style={{
+              padding: '1.5rem 1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: '0.65rem',
+              background: '#ffffff',
+              border: '1px solid #e7e3da',
+              borderRadius: '16px'
+            }}
+          >
+            <div style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '12px',
+              background: tool.bg,
+              color: tool.color,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '0.35rem'
+            }}>
+              <tool.icon size={22} />
             </div>
-            <div style={{ fontWeight: '700', fontSize: '0.88rem', color: '#0f172a' }}>{tool.name}</div>
-            <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{tool.desc}</div>
+            <div style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: '700',
+              fontSize: '0.92rem',
+              color: '#0b1329',
+              lineHeight: 1.2
+            }}>
+              {tool.name}
+            </div>
+            <div style={{
+              fontSize: '0.76rem',
+              color: '#64748b',
+              lineHeight: 1.4
+            }}>
+              {tool.desc}
+            </div>
           </div>
         ))}
       </div>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          .integrations-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .integrations-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

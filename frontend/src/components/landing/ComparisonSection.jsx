@@ -1,108 +1,279 @@
 import React from 'react';
-import { Sparkles, X, Check } from 'lucide-react';
+import { Scale, X, Check } from 'lucide-react';
 
 export default function ComparisonSection() {
+  const traditionalPoints = [
+    'Manual law library searches (hours)',
+    'High retainer & hourly costs',
+    'Slow turnaround (days)',
+    'BNS confusion across sections',
+    'Limited access to precedents'
+  ];
+
+  const dhaaraPoints = [
+    'AI-powered semantic retrieval (seconds)',
+    'Cost-efficient and transparent pricing',
+    'Instant results with citations',
+    'Automated BNS ↔ IPC conversion',
+    'Access to latest laws and judgments'
+  ];
+
   return (
-    <section id="comparison" className="section-container">
-      <div className="section-header">
-        <div className="feature-badge"><Sparkles size={14} /> The Competitive Advantage</div>
-        <h2 className="section-title">Traditional Lawyering vs. DhaaraAI</h2>
-        <p className="section-desc">See how modern AI infrastructure transforms time-sink administrative tasks into high-leverage legal counsel.</p>
+    <section id="comparison" className="landing-section">
+      {/* Header */}
+      <div className="landing-section-header">
+        <div className="eyebrow-badge">
+          <Scale size={14} /> THE COMPETITIVE ADVANTAGE
+        </div>
+        <h2 className="landing-section-title">
+          Traditional Legal Research vs. DhaaraAI
+        </h2>
+        <p className="landing-section-desc">
+          See how modern AI infrastructure transforms time-sink administrative tasks into high-leverage legal counsel.
+        </p>
       </div>
 
+      {/* 2-Column Container: Comparison Split on Left, Photo & Quote on Right */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: '2rem',
-        maxWidth: '960px',
-        margin: '0 auto'
-      }}>
-        {/* Traditional Card */}
-        <div style={{
-          background: 'white',
-          border: '1px solid #fecaca',
-          borderRadius: '20px',
-          padding: '2.25rem 2rem',
-          boxShadow: '0 4px 15px rgba(239, 68, 68, 0.05)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#dc2626', fontWeight: '700', fontSize: '1.15rem', marginBottom: '1.25rem' }}>
-            <div style={{ background: '#fef2f2', padding: '0.4rem', borderRadius: '8px' }}>
-              <X size={20} color="#dc2626" />
-            </div>
-            Traditional Legal Work
-          </div>
+        gridTemplateColumns: '1.25fr 0.75fr',
+        gap: '2.5rem',
+        alignItems: 'stretch'
+      }} className="comparison-layout-grid">
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: '#475569' }}>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#ef4444', fontWeight: 'bold' }}>✕</span>
-              <span><strong>Manual Law Library Searches:</strong> Hours spent flipping through physical law digests and sluggish portals.</span>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#ef4444', fontWeight: 'bold' }}>✕</span>
-              <span><strong>High Retainer & Hourly Costs:</strong> ₹5,000 to ₹25,000 per hour for basic contract audits and initial drafts.</span>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#ef4444', fontWeight: 'bold' }}>✕</span>
-              <span><strong>Slow Turnaround:</strong> Waiting 3 to 7 days for a draft or clause risk analysis.</span>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#ef4444', fontWeight: 'bold' }}>✕</span>
-              <span><strong>BNS Confusion:</strong> Manual cross-checking old IPC sections against the new 2023 Sanhita codes.</span>
-            </div>
-          </div>
-        </div>
-
-        {/* DhaaraAI Card */}
+        {/* Left: Two-sided comparison box with VS badge */}
         <div style={{
-          background: '#0f172a',
-          border: '2px solid #2563eb',
-          borderRadius: '20px',
-          padding: '2.25rem 2rem',
-          boxShadow: '0 15px 40px rgba(37, 99, 235, 0.2)',
-          color: 'white',
+          background: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid #e7e3da',
+          boxShadow: '0 10px 35px rgba(11, 19, 41, 0.04)',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           position: 'relative'
-        }}>
+        }} className="comparison-split-box">
+
+          {/* VS Center Badge */}
           <div style={{
             position: 'absolute',
-            top: '-12px',
-            right: '24px',
-            background: '#2563eb',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: '#1d4ed8',
             color: 'white',
-            fontSize: '0.72rem',
-            fontWeight: '700',
-            padding: '3px 12px',
-            borderRadius: '999px',
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase'
-          }}>Modern Standard</div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#60a5fa', fontWeight: '700', fontSize: '1.15rem', marginBottom: '1.25rem' }}>
-            <div style={{ background: 'rgba(37, 99, 235, 0.3)', padding: '0.4rem', borderRadius: '8px' }}>
-              <Check size={20} color="#60a5fa" />
-            </div>
-            With DhaaraAI
+            fontWeight: '800',
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: '0.85rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 14px rgba(29, 78, 216, 0.35)',
+            zIndex: 10,
+            border: '3px solid #ffffff'
+          }}>
+            VS
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', color: '#cbd5e1' }}>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span>
-              <span><strong>Sub-Second Semantic Retrieval:</strong> Instant AI synthesis of Supreme Court & High Court rulings.</span>
+          {/* Left Column: Traditional Legal Work */}
+          <div style={{
+            background: '#fffdfd',
+            padding: '2.25rem 2rem',
+            borderRight: '1px solid #fee2e2',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              color: '#dc2626',
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: '700',
+              fontSize: '1.15rem',
+              marginBottom: '1.75rem'
+            }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '8px',
+                background: '#fee2e2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <X size={16} color="#dc2626" />
+              </div>
+              <span>Traditional Legal Work</span>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span>
-              <span><strong>90% Cost Reduction:</strong> Flat monthly fee with unlimited queries and document analysis.</span>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              {traditionalPoints.map((text, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#fef2f2',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    flexShrink: 0,
+                    marginTop: '2px'
+                  }}>
+                    ✕
+                  </div>
+                  <span style={{ color: '#475569', fontSize: '0.86rem', lineHeight: '1.5' }}>
+                    {text}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span>
-              <span><strong>24/7 Real-Time Delivery:</strong> Generate petitions, legal notices, and risk audits in under 60 seconds.</span>
+          </div>
+
+          {/* Right Column: With DhaaraAI */}
+          <div style={{
+            background: '#f0fdf4',
+            padding: '2.25rem 2rem',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              color: '#059669',
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: '700',
+              fontSize: '1.15rem',
+              marginBottom: '1.75rem'
+            }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '8px',
+                background: '#dcfce7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Check size={16} color="#059669" />
+              </div>
+              <span>With DhaaraAI</span>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span>
-              <span><strong>Native BNS 2023 Intelligence:</strong> Automated real-time translation between old and new legal statutes.</span>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              {dhaaraPoints.map((text, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#dcfce7',
+                    color: '#059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    flexShrink: 0,
+                    marginTop: '2px'
+                  }}>
+                    ✓
+                  </div>
+                  <span style={{ color: '#14532d', fontSize: '0.86rem', fontWeight: '500', lineHeight: '1.5' }}>
+                    {text}
+                  </span>
+                </div>
+              ))}
             </div>
+          </div>
+
+        </div>
+
+        {/* Right: Authentic Scales of Justice Image & Serif Quote */}
+        <div style={{
+          position: 'relative',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          border: '1px solid #e7e3da',
+          background: '#070e20',
+          boxShadow: '0 14px 40px rgba(11, 19, 41, 0.12)',
+          display: 'flex',
+          flexDirection: 'column'
+        }} className="scales-photo-card">
+          <img
+            src="/assets/legal/comparison/scales_of_justice.jpg"
+            alt="Brass scales of justice on antique Indian legal reports"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              minHeight: '380px'
+            }}
+          />
+          {/* Dark luxury vignette overlay */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'linear-gradient(180deg, rgba(7, 14, 32, 0.2) 0%, rgba(7, 14, 32, 0.85) 90%)'
+          }} />
+
+          {/* Golden Serif Quotation Overlay */}
+          <div style={{
+            position: 'absolute',
+            bottom: '2rem',
+            left: '1.75rem',
+            right: '1.75rem',
+            textAlign: 'center',
+            zIndex: 10
+          }}>
+            <h3 style={{
+              fontFamily: "'Newsreader', Georgia, serif",
+              fontSize: '2rem',
+              color: '#fef08a',
+              fontWeight: '600',
+              fontStyle: 'italic',
+              margin: '0 0 0.5rem 0',
+              lineHeight: 1.2,
+              textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+            }}>
+              “Same Law. Smarter Research.”
+            </h3>
+            <p style={{
+              color: '#cbd5e1',
+              fontSize: '0.8rem',
+              margin: 0,
+              letterSpacing: '0.04em'
+            }}>
+              Accelerating Indian jurisprudence without compromising accuracy.
+            </p>
           </div>
         </div>
+
       </div>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          .comparison-layout-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .comparison-split-box {
+            grid-template-columns: 1fr !important;
+          }
+          .comparison-split-box > div:first-child {
+            border-right: none !important;
+            border-bottom: 1px solid #fee2e2;
+          }
+        }
+      `}</style>
     </section>
   );
 }

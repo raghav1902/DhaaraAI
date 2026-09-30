@@ -1,105 +1,205 @@
 import React from 'react';
-import { Layers } from 'lucide-react';
+import { Layers, FileUp, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function HowItWorksSection() {
+  const steps = [
+    {
+      num: '1',
+      icon: FileUp,
+      title: 'Ask or Upload',
+      desc: 'Type your legal question or upload contracts, petitions, or FIR drafts in PDF or Word formats.',
+      accent: '#2563eb',
+      bg: '#eff6ff'
+    },
+    {
+      num: '2',
+      icon: Sparkles,
+      title: 'AI Analyzes Precedents',
+      desc: 'Our RAG engine cross-checks Supreme Court judgments, High Court rulings, statutory acts, and the new BNS framework.',
+      accent: '#1d4ed8',
+      bg: '#eff6ff'
+    },
+    {
+      num: '3',
+      icon: CheckCircle2,
+      title: 'Get Actionable Intelligence',
+      desc: 'Receive clear explanations, risk assessments, citations, and ready to use legal drafts.',
+      accent: '#059669',
+      bg: '#ecfdf5'
+    }
+  ];
+
   return (
-    <section id="how-it-works" className="section-container" style={{ background: 'white', borderRadius: '28px', margin: '3rem auto', border: '1px solid #e2e8f0' }}>
-      <div className="section-header">
-        <div className="feature-badge"><Layers size={14} /> Seamless Workflow</div>
-        <h2 className="section-title">How DhaaraAI Works</h2>
-        <p className="section-desc">From raw legal query to court-admissible research and customized drafts in three intuitive steps.</p>
+    <section id="how-it-works" className="landing-section" style={{
+      background: '#ffffff',
+      borderRadius: '28px',
+      margin: '4rem auto',
+      border: '1px solid #e7e3da',
+      boxShadow: '0 8px 30px rgba(11, 19, 41, 0.03)'
+    }}>
+      {/* Header */}
+      <div className="landing-section-header" style={{ textAlign: 'left', maxWidth: '850px' }}>
+        <div className="eyebrow-badge">
+          <Layers size={14} /> HOW IT WORKS
+        </div>
+        <h2 className="landing-section-title">
+          From legal query to actionable results in three simple steps
+        </h2>
+        <p className="landing-section-desc" style={{ margin: 0, maxWidth: '780px' }}>
+          DhaaraAI combines India's legal database with advanced AI to give you accurate, practical and easy-to-understand answers.
+        </p>
       </div>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '2rem',
-        position: 'relative'
-      }}>
-        {/* Step 1 */}
+        gridTemplateColumns: '1.25fr 0.75fr',
+        gap: '3rem',
+        alignItems: 'center'
+      }} className="how-it-works-grid">
+        {/* Left: 3 Connected Steps */}
         <div style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '20px',
-          padding: '2rem 1.75rem',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '1.25rem',
           position: 'relative'
-        }}>
-          <div style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '12px',
-            background: '#eff6ff',
-            color: '#2563eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '800',
-            fontFamily: 'Outfit',
-            fontSize: '1.15rem',
-            marginBottom: '1.25rem'
-          }}>01</div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#0f172a' }}>Ask or Upload</h3>
-          <p style={{ color: '#64748b', fontSize: '0.88rem', lineHeight: '1.6' }}>
-            Type any legal question in plain English or Hindi, or simply drag-and-drop contracts, petitions, or FIR drafts in PDF or Word formats.
-          </p>
+        }} className="steps-cards-row">
+          {steps.map((step, idx) => (
+            <div
+              key={idx}
+              className="premium-card"
+              style={{
+                position: 'relative',
+                padding: '1.75rem 1.4rem',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '18px',
+                background: '#faf8f5',
+                border: '1px solid #e7e3da'
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: step.accent,
+                  color: 'white',
+                  fontFamily: "'Outfit', sans-serif",
+                  fontWeight: '800',
+                  fontSize: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: `0 4px 10px ${step.accent}33`
+                }}>
+                  {step.num}
+                </div>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  background: step.bg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: step.accent
+                }}>
+                  <step.icon size={18} />
+                </div>
+              </div>
+
+              <h3 style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: '1.15rem',
+                fontWeight: '700',
+                color: '#0b1329',
+                marginBottom: '0.65rem',
+                lineHeight: 1.3
+              }}>
+                {step.title}
+              </h3>
+
+              <p style={{
+                color: '#64748b',
+                fontSize: '0.86rem',
+                lineHeight: '1.6',
+                margin: 0
+              }}>
+                {step.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* Step 2 */}
+        {/* Right: Architectural Illustration of Supreme Court */}
         <div style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
+          position: 'relative',
           borderRadius: '20px',
-          padding: '2rem 1.75rem',
-          position: 'relative'
-        }}>
-          <div style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '12px',
-            background: '#f0fdf4',
-            color: '#16a34a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '800',
-            fontFamily: 'Outfit',
-            fontSize: '1.15rem',
-            marginBottom: '1.25rem'
-          }}>02</div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#0f172a' }}>AI Analyzes Precedents</h3>
-          <p style={{ color: '#64748b', fontSize: '0.88rem', lineHeight: '1.6' }}>
-            Our RAG engine cross-checks millions of Supreme Court judgments, High Court rulings, statutory acts, and the new BNS criminal sections.
-          </p>
-        </div>
+          overflow: 'hidden',
+          border: '1px solid #e7e3da',
+          background: '#faf8f5',
+          boxShadow: '0 10px 25px rgba(11, 19, 41, 0.04)',
+          display: 'flex',
+          flexDirection: 'column'
+        }} className="architectural-vignette">
+          <div style={{ position: 'relative' }}>
+            <img
+              src="/assets/legal/how/court_dome_sketch.jpg"
+              alt="Supreme Court of India Architectural Sketch"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                maxHeight: '270px',
+                objectFit: 'cover'
+              }}
+            />
+            {/* Soft parchment gradient blend */}
+            <div style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'linear-gradient(180deg, rgba(250, 248, 245, 0.1) 0%, rgba(250, 248, 245, 0.8) 95%)'
+            }} />
+          </div>
 
-        {/* Step 3 */}
-        <div style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '20px',
-          padding: '2rem 1.75rem',
-          position: 'relative'
-        }}>
           <div style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '12px',
-            background: '#faf5ff',
-            color: '#9333ea',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '800',
-            fontFamily: 'Outfit',
-            fontSize: '1.15rem',
-            marginBottom: '1.25rem'
-          }}>03</div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#0f172a' }}>Get Actionable Intelligence</h3>
-          <p style={{ color: '#64748b', fontSize: '0.88rem', lineHeight: '1.6' }}>
-            Receive structured legal memos, clause risk assessments, verified statutory citations, and customizable legal notices ready for printing.
-          </p>
+            padding: '1.25rem 1.5rem',
+            background: '#ffffff',
+            borderTop: '1px solid #e7e3da',
+            textAlign: 'center'
+          }}>
+            <p style={{
+              fontFamily: "'Caveat', cursive",
+              fontSize: '1.35rem',
+              color: '#1e3a8a',
+              fontWeight: '700',
+              margin: '0 0 0.25rem 0',
+              lineHeight: 1.2
+            }}>
+              “Grounded in the Indian Constitution. Powered by AI”
+            </p>
+            <span style={{ fontSize: '0.74rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '600' }}>
+              Supreme Court of India • New Delhi
+            </span>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          .how-it-works-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .steps-cards-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
