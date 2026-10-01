@@ -1,9 +1,20 @@
+<<<<<<< Updated upstream
 """
 main.py — DhaaraAI LegalGPT Backend
 =====================================
 Enterprise-grade FastAPI server with strong input validation, null-safety,
 size limits, enum guards, and graceful fallbacks on every endpoint.
 """
+=======
+import sys
+from pathlib import Path
+from typing import Optional, List, Dict, Any
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+import os
+import io
+>>>>>>> Stashed changes
 
 import sys
 import re
@@ -198,10 +209,13 @@ class QueryResponse(BaseModel):
     question: str
     language: str
     concordance: dict
+    statutory_sources: Optional[list] = []
+    case_law_sources: Optional[list] = []
 
 
 @app.post("/api/query", response_model=QueryResponse)
 def query_legal_gpt(req: QueryRequest):
+<<<<<<< Updated upstream
     """
     Primary statutory intelligence endpoint.
     Runs semantic RAG retrieval + Groq LLM with dual-model fallback.
@@ -267,6 +281,30 @@ VALID_DOC_TYPES = {
     "Bail Application",
     "General Complaint",
 }
+=======
+    if not engine:
+        raise HTTPException(status_code=500, detail="RAG Engine is not initialized properly.")
+    
+    try:
+        res = engine.query(
+            question=req.question,
+            language=req.language,
+            user_role=req.user_role,
+            top_k=req.top_k,
+            stream=False
+        )
+        return QueryResponse(
+            answer=res["answer"],
+            sources=res["sources"],
+            question=res["question"],
+            language=res["language"],
+            concordance=res["concordance"],
+            statutory_sources=res.get("statutory_sources", []),
+            case_law_sources=res.get("case_law_sources", [])
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+>>>>>>> Stashed changes
 
 class DraftRequest(BaseModel):
     document_type:     str            = Field(default="FIR Application", max_length=80)
@@ -922,6 +960,7 @@ def calculate_statutory_fee(req: FeeCalculationRequest):
 
 @app.get("/api/health")
 def health_check():
+<<<<<<< Updated upstream
     """Returns service health, engine status, and loaded resource counts."""
     eng = get_engine()
     return {
@@ -932,3 +971,101 @@ def health_check():
         "concordance_sections": len(CONCORDANCE_DB),
         "helplines_count":      len(OFFICIAL_LEGAL_HELPLINES),
     }
+=======
+    return {"status": "ok", "engine_loaded": engine is not None}
+
+from src.case_law_landmarks import (
+    LANDMARK_JUDGMENTS_REGISTRY,
+    get_landmark_categories,
+    get_landmark_cases_by_category,
+    get_precedents_for_statute,
+)
+
+@app.get("/api/case-law/search")
+def search_case_law(
+    query: str,
+    top_k: int = 5,
+    category: Optional[str] = None,
+    act: Optional[str] = None,
+    year_min: Optional[int] = None,
+    year_max: Optional[int] = None,
+):
+    """
+    Dedicated search API for Supreme Court Case Law with hybrid ranking and metadata filtering.
+    """
+    if not engine or not engine.case_law_retriever:
+        raise HTTPException(status_code=500, detail="Case law retrieval service is not available.")
+    
+    results = engine.case_law_retriever.retrieve_cases(
+        query=query,
+        top_k=top_k,
+        year_min=year_min,
+        year_max=year_max,
+        category_filter=category,
+        act_filter=act,
+    )
+    return {
+        "query": query,
+        "total": len(results),
+        "results": results
+    }
+
+@app.get("/api/case-law/landmarks")
+def get_landmarks(category: Optional[str] = None):
+    """
+    Returns curated landmark Supreme Court judgments grouped by category.
+    """
+    cats = get_landmark_categories()
+    if category and category.lower() != "all":
+        items = get_landmark_cases_by_category(category)
+    else:
+        items = LANDMARK_JUDGMENTS_REGISTRY
+    return {
+        "categories": cats,
+        "total": len(items),
+        "landmarks": items
+    }
+
+@app.get("/api/case-law/stats")
+def get_case_law_stats():
+    """
+    Returns comprehensive metrics for the Supreme Court case-law repository.
+    """
+    from src.embed_store import LegalEmbedStore
+    checkpoint_file = ROOT_DIR / "data" / "case_law_checkpoint.json"
+    cp_data = {}
+    if checkpoint_file.exists():
+        try:
+            with open(checkpoint_file, "r", encoding="utf-8") as f:
+                cp_data = json.load(f)
+        except Exception:
+            pass
+
+    vector_count = 0
+    if engine and engine.embed_store:
+        vector_count = engine.embed_store.case_law_collection.count()
+
+    return {
+        "status": "active",
+        "collection_name": "dhaara_case_law",
+        "indexed_chunks": vector_count,
+        "unique_judgments": cp_data.get("unique_judgments", 0),
+        "total_judgments_inspected": cp_data.get("total_judgments_processed", 0),
+        "duplicates_skipped": cp_data.get("duplicate_judgments", 0),
+        "category_distribution": cp_data.get("category_counts", {}),
+        "last_updated": cp_data.get("last_updated", "")
+    }
+
+@app.get("/api/case-law/precedents-by-statute")
+def get_statute_precedents(statute_key: str):
+    """
+    Returns Supreme Court landmark precedents mapped to a specific statutory provision.
+    """
+    precedents = get_precedents_for_statute(statute_key)
+    return {
+        "statute_key": statute_key,
+        "precedents": precedents
+    }
+
+
+>>>>>>> Stashed changes

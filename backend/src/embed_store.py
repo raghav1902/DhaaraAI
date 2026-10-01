@@ -38,9 +38,10 @@ HAS_SENTENCE_TRANSFORMERS = False
 import chromadb.utils.embedding_functions as ef
 import numpy as np
 
-# Default persistent database folder and collection name
+# Default persistent database folder and collection names
 DEFAULT_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
 COLLECTION_NAME = "dhaara_legal_kb"
+CASE_LAW_COLLECTION_NAME = "dhaara_case_law"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
@@ -102,6 +103,13 @@ class LegalEmbedStore:
             metadata={"hnsw:space": "cosine"}
         )
         print(f"[embed_store] Collection '{COLLECTION_NAME}' ready. Current count: {self.collection.count()} chunks.")
+
+        # Dedicated Supreme Court Case Law collection
+        self.case_law_collection = self.client.get_or_create_collection(
+            name=CASE_LAW_COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
+        )
+        print(f"[embed_store] Collection '{CASE_LAW_COLLECTION_NAME}' ready. Current count: {self.case_law_collection.count()} chunks.")
 
     def add_chunks(self, chunks: List[Dict[str, Any]], batch_size: int = 64) -> int:
         """
@@ -307,8 +315,9 @@ class LegalEmbedStore:
             "db_path": self.db_path
         }
 
-    def reset_collection(self):
+    def add_case_law_chunks(self, chunks: List[Dict[str, Any]], batch_size: int = 64) -> int:
         """
+<<<<<<< Updated upstream
         Deletes and recreates the collection for a clean re-indexing.
         Thread-safe: acquires exclusive write lock — no concurrent query/write allowed.
         """
@@ -321,6 +330,137 @@ class LegalEmbedStore:
             )
             print("[embed_store] Collection reset successfully.")
 
+=======
+        Embeds and upserts case-law chunks into the dedicated dhaara_case_law collection.
+        """
+        if not chunks:
+            return 0
+
+        total_chunks = len(chunks)
+        upserted_count = 0
+
+        for i in range(0, total_chunks, batch_size):
+            batch = chunks[i : i + batch_size]
+            ids = [c["chunk_id"] for c in batch]
+            texts = [c["text"] for c in batch]
+            metadatas = [
+                {
+                    "case_id": str(c["metadata"].get("case_id", "")),
+                    "case_name": str(c["metadata"].get("case_name", "")),
+                    "court": str(c["metadata"].get("court", "Supreme Court of India")),
+                    "judgment_date": str(c["metadata"].get("judgment_date", "")),
+                    "year": int(c["metadata"].get("year", 1950)),
+                    "bench": str(c["metadata"].get("bench", "")),
+                    "citation": str(c["metadata"].get("citation", "")),
+                    "case_type": str(c["metadata"].get("case_type", "")),
+                    "source": str(c["metadata"].get("source", "Supreme Court Reports")),
+                    "source_url": str(c["metadata"].get("source_url", "https://digiscr.sci.gov.in/")),
+                    "acts": str(c["metadata"].get("acts", "")),
+                    "sections": str(c["metadata"].get("sections", "")),
+                    "articles": str(c["metadata"].get("articles", "")),
+                    "keywords": str(c["metadata"].get("keywords", "")),
+                    "landmark_category": str(c["metadata"].get("landmark_category", "General")),
+                    "ratio_summary": str(c["metadata"].get("ratio_summary", "")),
+                    "structural_section": str(c["metadata"].get("structural_section", "")),
+                    "chunk_index": int(c["metadata"].get("chunk_index", 1)),
+                    "total_chunks": int(c["metadata"].get("total_chunks", 1)),
+                    "source_type": "case_law",
+                }
+                for c in batch
+            ]
+
+            embeddings = self.model.encode(texts, show_progress_bar=False, convert_to_numpy=True).tolist()
+            self.case_law_collection.upsert(
+                ids=ids,
+                documents=texts,
+                embeddings=embeddings,
+                metadatas=metadatas
+            )
+            upserted_count += len(batch)
+
+        print(f"[embed_store] Upserted {upserted_count} chunks into '{CASE_LAW_COLLECTION_NAME}'. Total count: {self.case_law_collection.count()}")
+        return upserted_count
+
+    def query_case_law(
+        self,
+        query_text: str,
+        top_k: int = 5,
+        where_filter: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Queries the dhaara_case_law collection for relevant Supreme Court precedents.
+        """
+        if not query_text.strip():
+            return []
+
+        if self.case_law_collection.count() == 0:
+            return []
+
+        query_embedding = self.model.encode([query_text], convert_to_numpy=True).tolist()
+        results = self.case_law_collection.query(
+            query_embeddings=query_embedding,
+            n_results=min(top_k, self.case_law_collection.count()),
+            where=where_filter,
+            include=["documents", "metadatas", "distances"]
+        )
+
+        retrieved = []
+        if results and results.get("documents") and results["documents"][0]:
+            docs = results["documents"][0]
+            metas = results["metadatas"][0]
+            dists = results["distances"][0]
+            ids = results["ids"][0]
+
+            for doc, meta, dist, cid in zip(docs, metas, dists, ids):
+                similarity = max(0.0, min(1.0, 1.0 - dist))
+                retrieved.append({
+                    "chunk_id": cid,
+                    "text": doc,
+                    "case_id": meta.get("case_id", ""),
+                    "case_name": meta.get("case_name", "Supreme Court Judgment"),
+                    "court": meta.get("court", "Supreme Court of India"),
+                    "judgment_date": meta.get("judgment_date", ""),
+                    "year": meta.get("year", 1950),
+                    "bench": meta.get("bench", ""),
+                    "citation": meta.get("citation", ""),
+                    "case_type": meta.get("case_type", "Judgment"),
+                    "source": meta.get("source", "Supreme Court Reports"),
+                    "source_url": meta.get("source_url", "https://digiscr.sci.gov.in/"),
+                    "acts": meta.get("acts", ""),
+                    "sections": meta.get("sections", ""),
+                    "articles": meta.get("articles", ""),
+                    "keywords": meta.get("keywords", ""),
+                    "landmark_category": meta.get("landmark_category", "General"),
+                    "ratio_summary": meta.get("ratio_summary", ""),
+                    "structural_section": meta.get("structural_section", ""),
+                    "similarity_score": round(similarity, 4),
+                    "source_type": "case_law"
+                })
+
+        return retrieved
+
+    def get_case_law_stats(self) -> Dict[str, Any]:
+        """
+        Returns stats about the case law collection.
+        """
+        count = self.case_law_collection.count()
+        return {
+            "collection_name": CASE_LAW_COLLECTION_NAME,
+            "total_chunks": count,
+            "model_name": self.model_name
+        }
+
+    def reset_case_law_collection(self):
+        """
+        Deletes and recreates the case law collection.
+        """
+        print(f"[embed_store] Resetting collection '{CASE_LAW_COLLECTION_NAME}'...")
+        self.client.delete_collection(name=CASE_LAW_COLLECTION_NAME)
+        self.case_law_collection = self.client.get_or_create_collection(
+            name=CASE_LAW_COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
+        )
+>>>>>>> Stashed changes
 
 
 if __name__ == "__main__":

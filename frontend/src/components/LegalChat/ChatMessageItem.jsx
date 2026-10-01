@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Volume2, Square, ShieldCheck, Copy, Check, Scale } from 'lucide-react';
+import { Bot, Volume2, Square, ShieldCheck, Copy, Check, Scale, Landmark, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleSpeak, isHindi }) {
@@ -151,16 +151,91 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
             <div className="markdown-content" style={{ fontSize: '14px', color: msg.isError ? 'var(--danger)' : 'inherit' }}>
               <ReactMarkdown>{msg.content}</ReactMarkdown>
 
-              {msg.sources && msg.sources.length > 0 && (
+              {/* Verified Statutory Sources (IndiaCode) */}
+              {((msg.statutory_sources && msg.statutory_sources.length > 0) || (msg.sources && msg.sources.some(s => s.source_type !== 'case_law'))) && (
                 <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
-                  <p className="ask-ai-citations-heading">
-                    <ShieldCheck size={13} />
+                  <p className="ask-ai-citations-heading" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontWeight: '700', fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
+                    <ShieldCheck size={14} />
                     {isHindi ? 'वैधानिक संदर्भ एवं धाराएं (IndiaCode)' : 'VERIFIED STATUTORY PROVISIONS (IndiaCode)'}
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
-                    {msg.sources.slice(0, 3).map((src, i) => (
-                      <div key={i} className="ask-ai-citation">
-                        <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Legal Reference'}
+                    {(msg.statutory_sources?.length > 0 ? msg.statutory_sources : (msg.sources || []).filter(s => s.source_type !== 'case_law')).slice(0, 3).map((src, i) => (
+                      <div key={i} className="ask-ai-citation" style={{ background: 'rgba(5, 150, 105, 0.05)', border: '1px solid rgba(5, 150, 105, 0.2)', borderRadius: '8px', padding: '8px 10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <strong style={{ color: '#047857', fontSize: '12px' }}>{src.section || 'Statute'}</strong>
+                          <span style={{ fontSize: '9px', background: '#ecfdf5', color: '#047857', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>STATUTORY</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          {src.section_title || src.title || 'Official IndiaCode Provision'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Supreme Court Case Law Precedents (eSCR) */}
+              {((msg.case_law_sources && msg.case_law_sources.length > 0) || (msg.sources && msg.sources.some(s => s.source_type === 'case_law'))) && (
+                <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
+                  <p className="ask-ai-citations-heading" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d4ed8', fontWeight: '700', fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
+                    <Landmark size={14} />
+                    {isHindi ? 'सर्वोच्च न्यायालय के न्यायिक दृष्टांत (Supreme Court Precedents)' : 'SUPREME COURT JUDICIAL PRECEDENTS (Case Law)'}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {(msg.case_law_sources?.length > 0 ? msg.case_law_sources : (msg.sources || []).filter(s => s.source_type === 'case_law')).slice(0, 3).map((cl, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: 'rgba(37, 99, 235, 0.04)',
+                          border: '1px solid rgba(37, 99, 235, 0.22)',
+                          borderRadius: '8px',
+                          padding: '10px 12px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                          <div style={{ flex: 1 }}>
+                            <a
+                              href={cl.source_url || 'https://digiscr.sci.gov.in/'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: '#1d4ed8',
+                                fontWeight: '700',
+                                fontSize: '12.5px',
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              {cl.case_name || 'Supreme Court Judgment'}
+                              <ExternalLink size={11} />
+                            </a>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                              <span>{cl.court || 'Supreme Court of India'}</span>
+                              {cl.judgment_date && <span> • {cl.judgment_date}</span>}
+                              {cl.citation && <span style={{ fontWeight: '600' }}> • {cl.citation}</span>}
+                            </div>
+                          </div>
+                          <span style={{ fontSize: '9px', background: '#eff6ff', color: '#1d4ed8', padding: '2px 6px', borderRadius: '4px', fontWeight: '700', whiteSpace: 'nowrap' }}>
+                            CASE-LAW
+                          </span>
+                        </div>
+
+                        {cl.relevant_passage && (
+                          <div style={{
+                            marginTop: '6px',
+                            fontSize: '11.5px',
+                            color: 'var(--text-primary)',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            padding: '6px 8px',
+                            borderRadius: '4px',
+                            borderLeft: '2px solid #2563eb',
+                            lineHeight: '1.4'
+                          }}>
+                            <strong>Ratio Decidendi:</strong> {cl.relevant_passage}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -15,6 +15,7 @@ from groq import Groq
 load_dotenv()
 
 from embed_store import LegalEmbedStore
+from case_law_retriever import CaseLawRetriever
 from bns_concordance import diagnose_situation, get_transition_alert
 from real_legal_fetcher import RealLegalDataService, OFFICIAL_LEGAL_HELPLINES
 from rag_offline_fallbacks import generate_offline_concordance_fallback
@@ -37,7 +38,7 @@ from prompts import (
 class DhaaraRAGEngine:
     """
     Orchestrates semantic retrieval from ChromaDB, BNS 2023 concordance,
-    and grounded answer generation via Groq Llama 3.3 70B.
+    Supreme Court Case-Law hybrid retrieval, and grounded answer generation via Groq.
     """
 
     def __init__(
@@ -48,6 +49,7 @@ class DhaaraRAGEngine:
     ):
         self.embed_store = embed_store or LegalEmbedStore()
         self.embed_store.seed_defaults_if_empty()
+        self.case_law_retriever = CaseLawRetriever(self.embed_store)
         self.model_name = model_name
         self.api_key = api_key or os.getenv("GROQ_API_KEY", "").strip()
         self.client = None
@@ -123,6 +125,26 @@ class DhaaraRAGEngine:
 
         return "\n".join(formatted_blocks)
 
+    def _format_case_law_context(self, case_chunks: List[Dict[str, Any]]) -> str:
+        if not case_chunks:
+            return "No specific Supreme Court precedent retrieved for this inquiry."
+
+        formatted_blocks = []
+        for idx, chunk in enumerate(case_chunks, 1):
+            block = (
+                f"[Supreme Court Precedent {idx}]\n"
+                f"• Court: {chunk.get('court', 'Supreme Court of India')}\n"
+                f"• Case Name: {chunk.get('case_name', 'Supreme Court Precedent')}\n"
+                f"• Citation: {chunk.get('citation', '')}\n"
+                f"• Date / Bench: {chunk.get('judgment_date', '')} | {chunk.get('bench', 'Supreme Court Bench')}\n"
+                f"• Domain: {chunk.get('landmark_category', 'General')} | Acts: {chunk.get('acts', '')} | Sections: {chunk.get('sections', '')}\n"
+                f"• Key Holding / Ratio Decidendi:\n  {chunk.get('relevant_passage', chunk.get('ratio_summary', ''))}\n"
+                f"• Official Source: {chunk.get('source', 'Supreme Court Reports')} ({chunk.get('source_url', 'https://digiscr.sci.gov.in/')})\n"
+            )
+            formatted_blocks.append(block)
+
+        return "\n".join(formatted_blocks)
+
     def _generate_offline_concordance_fallback(
         self,
         question: str,
@@ -146,33 +168,50 @@ class DhaaraRAGEngine:
         stream: bool = False
     ) -> Dict[str, Any]:
         """
-        Executes end-to-end situational legal intelligence query with robust fallbacks.
+        Executes end-to-end situational legal intelligence query with dual retrieval:
+        1. IndiaCode Statutory Provisions (BNS 2023 / Legacy Codes)
+        2. Supreme Court of India Precedents (eSCR Case-Law RAG Layer)
         """
         safe_question = str(question or "").strip()
         if not safe_question:
             safe_question = "general legal rights and statutory remedies"
         is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
 
+<<<<<<< Updated upstream
         # 1. Retrieve top_k chunks from ChromaDB
         raw_chunks = self.embed_store.query(safe_question, top_k=top_k)
 
         # Filter chunks by similarity threshold
+=======
+        # 1. Retrieve statutory chunks from ChromaDB
+        raw_chunks = self.embed_store.query(question, top_k=top_k)
+>>>>>>> Stashed changes
         relevant_chunks = [
             c for c in raw_chunks
             if c.get("similarity_score", 0.0) >= SIMILARITY_THRESHOLD
         ]
-
         used_chunks = relevant_chunks if relevant_chunks else (raw_chunks[:2] if raw_chunks else [])
+        for c in used_chunks:
+            c["source_type"] = "statute"
 
-        # 2. Build enriched context
+        # 2. Retrieve Supreme Court case-law precedents
+        case_law_chunks = self.case_law_retriever.retrieve_cases(question, top_k=3)
+        for cl in case_law_chunks:
+            cl["source_type"] = "case_law"
+
+        all_sources = used_chunks + case_law_chunks
+
+        # 3. Build enriched dual context
         concordance_ctx = self._format_concordance_context(question, user_role)
         retrieved_ctx = self._format_retrieved_chunks(used_chunks)
+        case_law_ctx = self._format_case_law_context(case_law_chunks)
 
         if is_hindi:
             system_prompt = SYSTEM_PROMPT_HI.format(
                 disclaimer=LEGAL_DISCLAIMER_HI,
                 concordance_context=concordance_ctx,
-                retrieved_context=retrieved_ctx
+                retrieved_context=retrieved_ctx,
+                case_law_context=case_law_ctx
             )
             user_prompt = (
                 f"नागरिक का सवाल / स्थिति: {question}\n"
@@ -184,7 +223,8 @@ class DhaaraRAGEngine:
             system_prompt = SYSTEM_PROMPT_EN.format(
                 disclaimer=LEGAL_DISCLAIMER_EN,
                 concordance_context=concordance_ctx,
-                retrieved_context=retrieved_ctx
+                retrieved_context=retrieved_ctx,
+                case_law_context=case_law_ctx
             )
             user_prompt = (
                 f"Citizen Query / Situation: {question}\n"
@@ -193,7 +233,7 @@ class DhaaraRAGEngine:
             )
             active_disclaimer = LEGAL_DISCLAIMER_EN
 
-        # 3. Check Groq Client Availability
+        # 4. Check Groq Client Availability
         if not self.client:
             if not self.api_key:
                 offline_resp = self._generate_offline_concordance_fallback(
@@ -204,7 +244,9 @@ class DhaaraRAGEngine:
                 )
                 return {
                     "answer": offline_resp,
-                    "sources": used_chunks,
+                    "sources": all_sources,
+                    "statutory_sources": used_chunks,
+                    "case_law_sources": case_law_chunks,
                     "question": question,
                     "language": language,
                     "concordance": diagnose_situation(question, user_role)
@@ -216,14 +258,14 @@ class DhaaraRAGEngine:
             {"role": "user", "content": user_prompt}
         ]
 
-        # 4. Invoke Groq API with robust Try/Except fallback
+        # 5. Invoke Groq API with robust multi-model fallback
         try:
             if stream:
                 response_stream = self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
                     temperature=0.1,
-                    max_tokens=900,
+                    max_tokens=1500,
                     stream=True
                 )
 
@@ -234,7 +276,9 @@ class DhaaraRAGEngine:
 
                 return {
                     "answer_stream": token_generator(),
-                    "sources": used_chunks,
+                    "sources": all_sources,
+                    "statutory_sources": used_chunks,
+                    "case_law_sources": case_law_chunks,
                     "question": question,
                     "language": language,
                     "concordance": diagnose_situation(question, user_role)
@@ -244,23 +288,38 @@ class DhaaraRAGEngine:
                     model=self.model_name,
                     messages=messages,
                     temperature=0.1,
-                    max_tokens=900,
+                    max_tokens=1500,
                     stream=False
                 )
-                answer_text = response.choices[0].message.content.strip()
+                answer_text = (response.choices[0].message.content or "").strip()
+
+                # If primary model returned empty content (e.g. token limit consumed by reasoning), fallback to secondary model
+                if not answer_text:
+                    print(f"[rag_engine] Primary model '{self.model_name}' produced empty content. Falling back to '{FALLBACK_MODEL}'.")
+                    fb_response = self.client.chat.completions.create(
+                        model=FALLBACK_MODEL,
+                        messages=messages,
+                        temperature=0.1,
+                        max_tokens=1200,
+                        stream=False
+                    )
+                    answer_text = (fb_response.choices[0].message.content or "").strip()
 
                 if active_disclaimer not in answer_text:
                     answer_text += f"\n\n*{active_disclaimer}*"
 
                 return {
                     "answer": answer_text,
-                    "sources": used_chunks,
+                    "sources": all_sources,
+                    "statutory_sources": used_chunks,
+                    "case_law_sources": case_law_chunks,
                     "question": question,
                     "language": language,
                     "concordance": diagnose_situation(question, user_role)
                 }
 
         except Exception as api_err:
+<<<<<<< Updated upstream
             print(f"[rag_engine] Primary model ({self.model_name}) call failed: {api_err}. Trying fallback model {FALLBACK_MODEL}.")
             try:
                 response = self.client.chat.completions.create(
@@ -301,6 +360,54 @@ class DhaaraRAGEngine:
                     "language": language,
                     "concordance": diagnose_situation(question, user_role)
                 }
+=======
+            print(f"[rag_engine] Primary model API call failed: {api_err}. Trying fallback model {FALLBACK_MODEL}...")
+            try:
+                fb_response = self.client.chat.completions.create(
+                    model=FALLBACK_MODEL,
+                    messages=messages,
+                    temperature=0.1,
+                    max_tokens=1200,
+                    stream=False
+                )
+                answer_text = (fb_response.choices[0].message.content or "").strip()
+                if answer_text:
+                    if active_disclaimer not in answer_text:
+                        answer_text += f"\n\n*{active_disclaimer}*"
+                    return {
+                        "answer": answer_text,
+                        "sources": all_sources,
+                        "statutory_sources": used_chunks,
+                        "case_law_sources": case_law_chunks,
+                        "question": question,
+                        "language": language,
+                        "concordance": diagnose_situation(question, user_role)
+                    }
+            except Exception as fb_err:
+                print(f"[rag_engine] Fallback model also failed: {fb_err}. Activating offline concordance.")
+
+            error_reason = (
+                "AI सेवा अस्थायी रूप से अनुपलब्ध है। त्वरित वैधानिक जानकारी नीचे उपलब्ध है:"
+                if is_hindi else
+                "AI service temporarily unavailable. Direct statutory guidance is provided below:"
+            )
+            fallback_text = self._generate_offline_concordance_fallback(
+                question=question,
+                user_role=user_role,
+                reason=error_reason,
+                language=language
+            )
+
+            return {
+                "answer": fallback_text,
+                "sources": all_sources,
+                "statutory_sources": used_chunks,
+                "case_law_sources": case_law_chunks,
+                "question": question,
+                "language": language,
+                "concordance": diagnose_situation(question, user_role)
+            }
+>>>>>>> Stashed changes
 
     def generate_legal_draft(
         self,

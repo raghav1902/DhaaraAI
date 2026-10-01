@@ -191,6 +191,8 @@ export default function LegalChat({
         role: 'assistant',
         content: response.data.answer,
         sources: response.data.sources || [],
+        statutory_sources: response.data.statutory_sources || [],
+        case_law_sources: response.data.case_law_sources || [],
         language: response.data.language,
         concordance: response.data.concordance || null
       }]);
@@ -216,8 +218,15 @@ export default function LegalChat({
   // Collect all verified sources across the conversation
   const activeSources = messages
     .filter(m => m.role === 'assistant' && m.sources && m.sources.length > 0)
-    .flatMap(m => m.sources)
+    .flatMap(m => m.sources);
+
+  const activeStatutes = activeSources
+    .filter(s => s.source_type !== 'case_law')
     .slice(-4);
+
+  const activeCaseLaws = activeSources
+    .filter(s => s.source_type === 'case_law')
+    .slice(-3);
 
   const promptSuggestions = getPromptSuggestions(isHindi);
   const suggestedQuestions = isHindi ? [
@@ -421,15 +430,15 @@ export default function LegalChat({
         <section className="ask-ai-rail-card">
           <h3>
             <span className="rail-icon rail-green"><BookMarked size={14} /></span>
-            {isHindi ? 'प्रमाणित संदर्भ (Sources)' : 'Active Citations'}
+            {isHindi ? 'वैधानिक संदर्भ (IndiaCode)' : 'Statutory Provisions'}
           </h3>
-          {activeSources.length > 0 ? (
+          {activeStatutes.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {activeSources.map((src, i) => (
+              {activeStatutes.map((src, i) => (
                 <div key={i} className="ask-ai-rail-citation">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <b style={{ color: 'var(--primary)', fontSize: '11px' }}>{src.section || 'Statute'}</b>
-                    <span style={{ fontSize: '9px', background: 'var(--accent-light)', color: 'var(--accent)', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>IndiaCode</span>
+                    <span style={{ fontSize: '9px', background: 'rgba(5, 150, 105, 0.1)', color: '#047857', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>STATUTORY</span>
                   </div>
                   <small style={{ color: 'var(--text-secondary)', fontSize: '10.5px', marginTop: '2px', display: 'block' }}>
                     {src.section_title || src.title || 'Official Provision'}
@@ -439,7 +448,42 @@ export default function LegalChat({
             </div>
           ) : (
             <p className="ask-ai-rail-empty">
-              {isHindi ? 'सवालों के साथ वैधानिक धाराएं यहाँ सूचीबद्ध होंगी।' : 'Statutory references from IndiaCode will populate here during the consultation.'}
+              {isHindi ? 'सवालों के साथ वैधानिक धाराएं यहाँ सूचीबद्ध होंगी।' : 'Statutory references will populate here during consultation.'}
+            </p>
+          )}
+        </section>
+
+        {/* Supreme Court Case Law Precedents card */}
+        <section className="ask-ai-rail-card">
+          <h3>
+            <span className="rail-icon rail-blue"><Landmark size={14} /></span>
+            {isHindi ? 'सर्वोच्च न्यायालय दृष्टांत (Case Law)' : 'Supreme Court Precedents'}
+          </h3>
+          {activeCaseLaws.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {activeCaseLaws.map((cl, i) => (
+                <div key={i} className="ask-ai-rail-citation" style={{ borderLeft: '3px solid #2563eb' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '4px' }}>
+                    <a
+                      href={cl.source_url || 'https://digiscr.sci.gov.in/'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                    >
+                      {cl.case_name || 'Supreme Court Case'}
+                      <ExternalLink size={10} />
+                    </a>
+                    <span style={{ fontSize: '8.5px', background: 'rgba(37, 99, 235, 0.1)', color: '#1d4ed8', padding: '1px 4px', borderRadius: '3px', fontWeight: '700' }}>eSCR</span>
+                  </div>
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '10px', marginTop: '2px', display: 'block' }}>
+                    {cl.citation} {cl.judgment_date ? `(${cl.judgment_date})` : ''}
+                  </small>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="ask-ai-rail-empty">
+              {isHindi ? 'सर्वोच्च न्यायालय के प्रासंगिक फैसले यहाँ दिखेंगे।' : 'Supreme Court judicial precedents will populate here.'}
             </p>
           )}
         </section>
