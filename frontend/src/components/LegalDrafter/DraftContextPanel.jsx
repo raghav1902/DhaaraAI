@@ -5,11 +5,7 @@ import {
   Circle,
   UserRound,
   MapPin,
-  CalendarDays,
-  Paperclip,
-  Stamp,
-  ShieldCheck,
-  Printer
+  CalendarDays
 } from 'lucide-react';
 import { EVIDENCE_PRESETS } from './DrafterConstants';
 
@@ -89,14 +85,12 @@ export default function DraftContextPanel({
             {isHindi ? '॥ सत्यमेव जयते ॥' : '॥ SATYAMEVA JAYATE ॥'}
           </div>
           <h2 className="a4-title">
-            {isFir
-              ? (isHindi ? 'प्रथम सूचना रिपोर्ट (FIR) हेतु औपचारिक शिकायत' : 'FORMAL POLICE COMPLAINT / INFORMATION')
-              : (isHindi ? 'विधिक मांग नोटिस' : 'STATUTORY LEGAL DEMAND NOTICE')}
+            {documentType ? String(documentType).toUpperCase() : (isHindi ? 'विधिक दस्तावेज़ प्रारूप' : 'FORMAL LEGAL INSTRUMENT')}
           </h2>
           <div className="a4-subtitle">
             {isFir
               ? '[ UNDER SECTION 173 OF BHARATIYA NAGARIK SURAKSHA SANHITA, 2023 ]'
-              : '[ UNDER SECTION 138 OF NEGOTIABLE INSTRUMENTS ACT / CONTRACT ACT ]'}
+              : `[ DRAFTING INTELLIGENCE • RELEVANT STATUTORY PROVISIONS ]`}
           </div>
         </div>
 

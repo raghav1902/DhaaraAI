@@ -19,7 +19,7 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
 
-from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request
+from fastapi import FastAPI, HTTPException, File, UploadFile, Query, Request, Form, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -32,11 +32,15 @@ sys.path.insert(0, str(ROOT_DIR / "src"))
 
 from src.rag_engine import DhaaraRAGEngine
 from src.concordance_data import CONCORDANCE_DB
-from src.bns_concordance import diagnose_situation
+from src.bns_concordance import diagnose_situation, get_full_concordance_db, lookup_by_section
 from src.real_legal_fetcher import OFFICIAL_LEGAL_HELPLINES, LANDMARK_LEGAL_GUIDELINES
 from src.draft_templates import generate_fallback_draft
 from src.contract_analyzer import heuristic_contract_analysis
 from src.rag_offline_fallbacks import generate_offline_concordance_fallback
+import draft_templates
+import legal_glossary
+import chat_history_db
+import vault_share_db
 
 # ---------------------------------------------------------------------------
 # FastAPI app
@@ -129,7 +133,7 @@ HINDI_TOKENS    = {"hindi", "hi", "हिंदी"}
 def _is_hindi(language: str) -> bool:
     return str(language or "").strip().lower() in HINDI_TOKENS
 
-ALLOWED_UPLOAD_EXT = {".pdf", ".txt", ".md"}
+ALLOWED_UPLOAD_EXT = {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg"}
 MAX_UPLOAD_BYTES   = 15 * 1024 * 1024  # 15 MB
 
 EMAIL_RE = re.compile(r"^[a-z0-9_.+%-]+@[a-z0-9.-]+\.[a-z]{2,10}$")
@@ -159,9 +163,203 @@ def get_engine() -> Optional[DhaaraRAGEngine]:
                     # _engine stays None — callers fall back to offline concordance
     return _engine
 
+engine = get_engine()
 
 # ==============================================================================
-# 1. RAG Intelligence & Statutory Query Endpoint
+# SERVER-SIDE AUTHENTICATION & STRICT USER ISOLATION DEPENDENCY
+# ==============================================================================
+
+def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """
+    Enforces server-side authentication for every conversation operation.
+    Validates HMAC-SHA256 bearer token. Never trusts client-supplied user_id.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication token required. Please sign in to access conversations."
+        )
+    token = authorization.split("Bearer ", 1)[1].strip()
+    payload = chat_history_db.verify_signed_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired session token. Please sign in again."
+        )
+    user = chat_history_db.get_user_by_id(payload["uid"])
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="User account not found."
+        )
+    return user
+
+def get_optional_user(authorization: Optional[str] = Header(None)) -> Optional[Dict[str, Any]]:
+    """Optional authentication for endpoints that allow anonymous querying."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization.split("Bearer ", 1)[1].strip()
+    payload = chat_history_db.verify_signed_token(token)
+    if not payload:
+        return None
+    return chat_history_db.get_user_by_id(payload["uid"])
+
+# ==============================================================================
+# AUTH API ENDPOINTS
+# ==============================================================================
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/register")
+def register_endpoint(req: RegisterRequest):
+    try:
+        user_info = chat_history_db.register_user(req.email, req.password, req.name)
+        return user_info
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal registration error")
+
+@app.post("/api/auth/login")
+def login_endpoint(req: LoginRequest):
+    try:
+        user_info = chat_history_db.authenticate_user(req.email, req.password)
+        return user_info
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal authentication error")
+
+@app.get("/api/auth/me")
+def me_endpoint(current_user: Dict[str, Any] = Depends(get_current_user)):
+    return current_user
+
+# ==============================================================================
+# CONVERSATIONS & CHAT HISTORY API (STRICT USER ISOLATION)
+# ==============================================================================
+
+class CreateConversationRequest(BaseModel):
+    title: Optional[str] = "New Consultation"
+
+class RenameConversationRequest(BaseModel):
+    title: str
+
+class AddMessageRequest(BaseModel):
+    role: str
+    content: str
+    sources: Optional[List[Dict[str, Any]]] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+@app.get("/api/conversations")
+def list_conversations(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Lists conversations strictly scoped to the authenticated user."""
+    return chat_history_db.list_user_conversations(owner_id=current_user["user_id"])
+
+@app.post("/api/conversations")
+def create_new_conversation(
+    req: CreateConversationRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Creates a new conversation owned by current_user."""
+    return chat_history_db.create_conversation(owner_id=current_user["user_id"], title=req.title)
+
+@app.get("/api/conversations/search")
+def search_conversations(
+    q: str = "",
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Searches conversations exclusively within the authenticated user's data."""
+    if not q.strip():
+        return []
+    return chat_history_db.search_user_conversations(owner_id=current_user["user_id"], query=q)
+
+@app.get("/api/conversations/{conversation_id}")
+def get_conversation_endpoint(
+    conversation_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Fetches full conversation history with IDOR protection.
+    Returns 404 if conversation does not exist or belongs to another user.
+    """
+    conv = chat_history_db.get_conversation_with_messages(
+        conversation_id=conversation_id,
+        owner_id=current_user["user_id"]
+    )
+    if not conv:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found or access denied."
+        )
+    return conv
+
+@app.patch("/api/conversations/{conversation_id}")
+def rename_conversation_endpoint(
+    conversation_id: str,
+    req: RenameConversationRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Renames conversation with strict ownership verification."""
+    success = chat_history_db.rename_conversation(
+        conversation_id=conversation_id,
+        owner_id=current_user["user_id"],
+        new_title=req.title
+    )
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found or access denied."
+        )
+    return {"status": "success", "title": req.title.strip()}
+
+@app.delete("/api/conversations/{conversation_id}")
+def delete_conversation_endpoint(
+    conversation_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Deletes conversation with strict ownership verification."""
+    success = chat_history_db.delete_conversation(
+        conversation_id=conversation_id,
+        owner_id=current_user["user_id"]
+    )
+    if not success:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found or access denied."
+        )
+    return {"status": "success", "deleted_id": conversation_id}
+
+@app.post("/api/conversations/{conversation_id}/messages")
+def add_message_endpoint(
+    conversation_id: str,
+    req: AddMessageRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Adds a message to a conversation owned strictly by the authenticated user."""
+    msg = chat_history_db.add_message_to_conversation(
+        conversation_id=conversation_id,
+        owner_id=current_user["user_id"],
+        role=req.role,
+        content=req.content,
+        sources=req.sources,
+        metadata=req.metadata
+    )
+    if not msg:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found or access denied."
+        )
+    return msg
+
+# ==============================================================================
+# ASK AI QUERY ENDPOINT (INTEGRATED WITH CHAT HISTORY)
 # ==============================================================================
 
 class QueryRequest(BaseModel):
@@ -170,6 +368,7 @@ class QueryRequest(BaseModel):
     language: str  = Field(default="English", max_length=20)
     user_role: str = Field(default="general", max_length=60)
     top_k: int     = Field(default=5, ge=1, le=10)
+    conversation_id: Optional[str] = None
 
     @field_validator("question")
     @classmethod
@@ -198,13 +397,19 @@ class QueryResponse(BaseModel):
     question: str
     language: str
     concordance: dict
+    conversation_id: Optional[str] = None
+    user_message_id: Optional[str] = None
+    assistant_message_id: Optional[str] = None
 
 
 @app.post("/api/query", response_model=QueryResponse)
-def query_legal_gpt(req: QueryRequest):
+def query_legal_gpt(
+    req: QueryRequest,
+    current_user: Optional[Dict[str, Any]] = Depends(get_optional_user)
+):
     """
     Primary statutory intelligence endpoint.
-    Runs semantic RAG retrieval + Groq LLM with dual-model fallback.
+    Runs semantic RAG retrieval + Groq LLM with multi-model fallback and chat history persistence.
     Falls back to offline concordance if AI is unavailable.
     """
     clean_q  = _safe(req.question, max_len=2000)
@@ -213,45 +418,106 @@ def query_legal_gpt(req: QueryRequest):
     top_k    = max(1, min(int(req.top_k or 5), 10))
     hindi    = _is_hindi(language)
 
-    engine = get_engine()
-    if engine is not None:
+    if not clean_q:
+        raise HTTPException(status_code=400, detail="Query question cannot be empty.")
+
+    # 1. Resolve and authenticate conversation ownership if conversation_id or current_user is provided
+    conversation_id = req.conversation_id
+    history_for_llm: Optional[List[Dict[str, str]]] = None
+
+    if current_user:
+        owner_id = current_user["user_id"]
+
+        # If conversation_id is provided, verify ownership strictly
+        if conversation_id:
+            existing_conv = chat_history_db.get_conversation_with_messages(
+                conversation_id=conversation_id,
+                owner_id=owner_id
+            )
+            if not existing_conv:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Conversation not found or access denied."
+                )
+            # Extract previous messages for multi-turn LLM context (up to last 6)
+            history_for_llm = [
+                {"role": m["role"], "content": m["content"]}
+                for m in existing_conv.get("messages", [])
+            ]
+        else:
+            # Create a new conversation for this authenticated user
+            new_conv = chat_history_db.create_conversation(owner_id=owner_id)
+            conversation_id = new_conv["id"]
+
+        # Save user message immediately
+        user_msg = chat_history_db.add_message_to_conversation(
+            conversation_id=conversation_id,
+            owner_id=owner_id,
+            role="user",
+            content=clean_q
+        )
+        user_msg_id = user_msg["id"] if user_msg else None
+    else:
+        user_msg_id = None
+
+    eng = get_engine()
+    res = None
+    if eng is not None:
         try:
-            res = engine.query(
+            res = eng.query(
                 question=clean_q,
                 language=language,
                 user_role=role,
                 top_k=top_k,
-                stream=False
-            )
-            answer = _safe(res.get("answer", ""), max_len=20000)
-            return QueryResponse(
-                answer=answer,
-                sources=res.get("sources", []) or [],
-                question=clean_q,
-                language=res.get("language", language),
-                concordance=res.get("concordance", {}) or {}
+                stream=False,
+                conversation_history=history_for_llm
             )
         except Exception as exc:
             print(f"[main] engine.query failed: {exc}. Falling back to offline concordance.")
 
-    # Graceful offline fallback
-    diagnosis = diagnose_situation(clean_q, user_role=role)
-    fallback_text = generate_offline_concordance_fallback(
-        question=clean_q,
-        user_role=role,
-        reason=(
-            "Groq AI सेवा अस्थायी रूप से ऑफलाइन है। सत्यापित वैधानिक दिशानिर्देश नीचे दिए गए हैं:"
-            if hindi else
-            "AI service temporarily unavailable. Verified statutory guidance and procedural steps provided below:"
-        ),
-        language=language
-    )
+    if not res or not res.get("answer"):
+        # Graceful offline fallback
+        diagnosis = diagnose_situation(clean_q, user_role=role)
+        fallback_text = generate_offline_concordance_fallback(
+            question=clean_q,
+            user_role=role,
+            reason=(
+                "Groq AI सेवा अस्थायी रूप से ऑफलाइन है। सत्यापित वैधानिक दिशानिर्देश नीचे दिए गए हैं:"
+                if hindi else
+                "AI service temporarily unavailable. Verified statutory guidance and procedural steps provided below:"
+            ),
+            language=language
+        )
+        res = {
+            "answer": _safe(fallback_text, max_len=20000),
+            "sources": [],
+            "question": clean_q,
+            "language": language,
+            "concordance": diagnosis or {}
+        }
+
+    # Save assistant response if authenticated conversation
+    assistant_msg_id = None
+    if current_user and conversation_id:
+        assistant_msg = chat_history_db.add_message_to_conversation(
+            conversation_id=conversation_id,
+            owner_id=current_user["user_id"],
+            role="assistant",
+            content=res["answer"],
+            sources=res.get("sources", []),
+            metadata={"concordance": res.get("concordance", {})}
+        )
+        assistant_msg_id = assistant_msg["id"] if assistant_msg else None
+
     return QueryResponse(
-        answer=_safe(fallback_text, max_len=20000),
-        sources=[],
+        answer=res["answer"],
+        sources=res.get("sources", []) or [],
         question=clean_q,
-        language=language,
-        concordance=diagnosis or {}
+        language=res.get("language", language),
+        concordance=res.get("concordance", {}) or {},
+        conversation_id=conversation_id,
+        user_message_id=user_msg_id,
+        assistant_message_id=assistant_msg_id
     )
 
 
@@ -279,28 +545,24 @@ class DraftRequest(BaseModel):
     facts:             str            = Field(default="", max_length=5000)
     evidence:          str            = Field(default="", max_length=2000)
     relief_sought:     str            = Field(default="", max_length=1000)
+    extra_fields:      Dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("document_type")
     @classmethod
     def validate_doc_type(cls, v: str) -> str:
-        # Accept the closest match, fall back to FIR Application
         clean = v.strip()
         if clean in VALID_DOC_TYPES:
             return clean
-        # Partial match for convenience
         for vdt in VALID_DOC_TYPES:
             if clean.lower() in vdt.lower() or vdt.lower() in clean.lower():
                 return vdt
-        return "FIR Application"
+        return clean or "FIR Application"
 
     @field_validator("complainant", "accused", mode="before")
     @classmethod
     def validate_party_dict(cls, v: Any) -> Dict[str, Any]:
-        if v is None:
+        if v is None or not isinstance(v, dict):
             return {}
-        if not isinstance(v, dict):
-            return {}
-        # Strip each value; only allow string/int/float values (no nested injection objects)
         cleaned: Dict[str, Any] = {}
         for k, val in v.items():
             if isinstance(k, str) and len(k) <= 50:
@@ -310,9 +572,7 @@ class DraftRequest(BaseModel):
 
     @model_validator(mode="after")
     def require_facts_or_relief(self) -> "DraftRequest":
-        # At least facts OR relief_sought must be non-empty for a meaningful draft
         if not self.facts.strip() and not self.relief_sought.strip():
-            # Soft default — don't reject, just set a placeholder
             self.facts = self.facts or "Facts and circumstances to be described."
         return self
 
@@ -328,11 +588,12 @@ def generate_draft(req: DraftRequest):
     hindi       = _is_hindi(req.language)
     language    = _safe(req.language, "English", max_len=20)
     doc_type    = _safe(req.document_type, "FIR Application", max_len=80)
+    extras      = req.extra_fields if isinstance(req.extra_fields, dict) else {}
 
-    engine = get_engine()
-    if engine is not None:
+    eng = get_engine()
+    if eng is not None:
         try:
-            res = engine.generate_legal_draft(
+            res = eng.generate_legal_draft(
                 document_type=doc_type,
                 language=language,
                 complainant=complainant,
@@ -342,7 +603,8 @@ def generate_draft(req: DraftRequest):
                 incident_location=_safe(req.incident_location, max_len=300),
                 facts=_safe(req.facts, max_len=5000),
                 evidence=_safe(req.evidence, max_len=2000),
-                relief_sought=_safe(req.relief_sought, max_len=1000)
+                relief_sought=_safe(req.relief_sought, max_len=1000),
+                extra_fields=extras
             )
             return res
         except Exception as exc:
@@ -370,10 +632,63 @@ def generate_draft(req: DraftRequest):
         "mode": "statutory_verified_template"
     }
 
+@app.get("/api/draft/templates")
+def get_draft_templates(category: Optional[str] = None):
+    """
+    Returns the comprehensive list of 12 Indian legal draft templates with structured metadata.
+    """
+    templates = draft_templates.get_all_templates()
+    if category and category.lower() != "all":
+        templates = [t for t in templates if category.lower() in t.get("category", "").lower()]
+    return {
+        "total": len(templates),
+        "templates": templates
+    }
 
-# ==============================================================================
-# 3. Contract Risk & Clause Audit Endpoint
-# ==============================================================================
+@app.get("/api/draft/templates/{template_id}")
+def get_draft_template(template_id: str):
+    """
+    Returns specific legal draft template metadata, required fields, and skeleton.
+    """
+    tmpl = draft_templates.get_template_by_id(template_id)
+    if not tmpl:
+        raise HTTPException(status_code=404, detail=f"Template '{template_id}' not found.")
+    return tmpl
+
+@app.get("/api/glossary")
+def get_legal_glossary(
+    q: Optional[str] = None,
+    category: Optional[str] = None,
+    limit: int = 60
+):
+    """
+    Search and filter authentic Indian legal glossary terms across 14 legal domains.
+    """
+    terms = legal_glossary.search_glossary(query=q or "", category=category, limit=limit)
+    return {
+        "total": len(terms),
+        "categories": legal_glossary.get_categories(),
+        "terms": terms
+    }
+
+@app.get("/api/glossary/categories")
+def get_legal_glossary_categories():
+    """
+    Returns available legal glossary categories.
+    """
+    return {
+        "categories": legal_glossary.get_categories()
+    }
+
+@app.get("/api/glossary/{term_id}")
+def get_legal_glossary_term(term_id: str):
+    """
+    Returns detailed glossary term particulars, statutory provisions, and landmark cases.
+    """
+    term = legal_glossary.get_term_by_id(term_id)
+    if not term:
+        raise HTTPException(status_code=404, detail=f"Glossary term '{term_id}' not found.")
+    return term
 
 class ContractAnalysisRequest(BaseModel):
     document_text: str = Field(..., min_length=10, max_length=50000,
@@ -473,6 +788,38 @@ async def upload_document(file: UploadFile = File(...)):
             raise
         except Exception as exc:
             raise HTTPException(status_code=422, detail=f"Failed to parse PDF: {exc}")
+    elif ext in {".png", ".jpg", ".jpeg"}:
+        try:
+            import base64
+            mime_type = "image/png" if ext == ".png" else "image/jpeg"
+            base64_image = base64.b64encode(contents).decode("utf-8")
+            eng = get_engine()
+            if eng and eng.client:
+                chat_completion = eng.client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": "Extract all text from this image exactly as written. Do not add any extra commentary or formatting. Just pure raw text."},
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:{mime_type};base64,{base64_image}",
+                                    },
+                                },
+                            ],
+                        }
+                    ],
+                    model="qwen/qwen3.8-27b",
+                    temperature=0.0
+                )
+                extracted_text = chat_completion.choices[0].message.content or ""
+            else:
+                raise HTTPException(status_code=400, detail="Image text extraction requires an active Groq API connection.")
+        except Exception as e:
+            if isinstance(e, HTTPException):
+                raise e
+            raise HTTPException(status_code=422, detail=f"Failed to extract text from image: {str(e)}")
     else:
         # .txt / .md — try UTF-8 then Latin-1
         try:
@@ -491,7 +838,6 @@ async def upload_document(file: UploadFile = File(...)):
         "char_count": len(extracted_text)
     }
 
-
 # ==============================================================================
 # 5. Statutory Concordance & Legal Library Endpoints
 # ==============================================================================
@@ -501,22 +847,32 @@ def get_bns_ipc_mappings(
     query: Optional[str] = Query(default=None, max_length=200,
                                   description="Search term to filter concordance")
 ):
-    """Returns BNS 2023 <-> IPC 1860 cross-reference dataset."""
-    items = list(CONCORDANCE_DB)
-    if query:
+    """
+    Returns BNS <-> IPC / BNSS <-> CrPC / BSA <-> IEA cross-reference dataset for rapid conversion and search.
+    Covers all 2,016+ verified statutory concordance mappings.
+    """
+    items = get_full_concordance_db()
+    if query and query.strip():
         q = _safe(query, max_len=200).lower()
         if q:
             items = [
                 item for item in items
                 if q in str(item.get("bns_section", "")).lower()
                 or q in str(item.get("ipc_section", "")).lower()
-                or q in str(item.get("offense_en",  "")).lower()
-                or q in str(item.get("offense_hi",  "")).lower()
-                or q in str(item.get("bns_title",   "")).lower()
-                or q in str(item.get("category",    "")).lower()
+                or q in str(item.get("offense_en", "")).lower()
+                or q in str(item.get("offense_hi", "")).lower()
+                or q in str(item.get("bns_title", "")).lower()
+                or q in str(item.get("category", "")).lower()
             ]
     return {"total": len(items), "mappings": items}
 
+@app.get("/api/converter/lookup/{section}")
+def lookup_converter_section(section: str):
+    """
+    Instant statutory section lookup across all 2,016+ concordance mappings.
+    """
+    matches = lookup_by_section(section)
+    return {"total": len(matches), "section": section, "results": matches}
 
 @app.get("/api/library")
 def get_legal_library(
@@ -525,9 +881,8 @@ def get_legal_library(
 ):
     """Returns comprehensive legal statutes, BNS/IPC concordance provisions, and statutory acts."""
     results = []
-
-    # Primary concordance database — safe field access
-    for item in CONCORDANCE_DB:
+    # Primary concordance database with full 2,016+ mappings
+    for item in get_full_concordance_db():
         results.append({
             "id":              item.get("id"),
             "category":        _safe(item.get("category"),       "General Crime"),
@@ -920,6 +1275,28 @@ def calculate_statutory_fee(req: FeeCalculationRequest):
 # 9. Health Check & Diagnostics
 # ==============================================================================
 
+@app.get("/api/rights/emergency-contacts")
+def get_emergency_contacts():
+    """
+    Returns official 24x7 verified Indian emergency and statutory legal helplines.
+    """
+    try:
+        from src.real_legal_fetcher import OFFICIAL_LEGAL_HELPLINES
+        return {"status": "success", "total": len(OFFICIAL_LEGAL_HELPLINES), "contacts": OFFICIAL_LEGAL_HELPLINES}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/rights/landmark-guidelines")
+def get_landmark_guidelines():
+    """
+    Returns binding Supreme Court procedural directives (Arnesh Kumar, Lalita Kumari, D.K. Basu).
+    """
+    try:
+        from src.real_legal_fetcher import LANDMARK_LEGAL_GUIDELINES
+        return {"status": "success", "total": len(LANDMARK_LEGAL_GUIDELINES), "guidelines": LANDMARK_LEGAL_GUIDELINES}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.get("/api/health")
 def health_check():
     """Returns service health, engine status, and loaded resource counts."""
@@ -929,6 +1306,54 @@ def health_check():
         "service":              "DhaaraAI-LegalGPT-Backend",
         "version":              "2.1.0",
         "engine_loaded":        eng is not None,
-        "concordance_sections": len(CONCORDANCE_DB),
+        "concordance_sections": len(get_full_concordance_db()),
         "helplines_count":      len(OFFICIAL_LEGAL_HELPLINES),
     }
+
+# ==============================================================================
+# SECURE SELF-DESTRUCTING VAULT SHARE ENDPOINTS
+# ==============================================================================
+
+class CreateVaultShareRequest(BaseModel):
+    title: str
+    doc_type: str = "Legal Document"
+    content: str
+    password: str
+    folder: Optional[str] = "Legal Document"
+    expires_hours: Optional[float] = 24.0
+    one_time_view: Optional[bool] = True
+
+class UnlockVaultShareRequest(BaseModel):
+    password: str
+
+@app.post("/api/vault/share")
+def create_vault_share(req: CreateVaultShareRequest):
+    try:
+        res = vault_share_db.create_shared_document(
+            title=req.title,
+            doc_type=req.doc_type,
+            content=req.content,
+            password=req.password,
+            folder=req.folder or "Legal Document",
+            expires_hours=req.expires_hours or 24.0,
+            one_time_view=bool(req.one_time_view)
+        )
+        return {"status": "success", "data": res}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate secure link: {str(e)}")
+
+@app.get("/api/vault/shared/{share_id}")
+def get_vault_share_info(share_id: str):
+    meta = vault_share_db.get_shared_document_meta(share_id)
+    if not meta:
+        raise HTTPException(status_code=404, detail="Shared document not found or permanently destroyed.")
+    return {"status": "success", "data": meta}
+
+@app.post("/api/vault/shared/{share_id}/unlock")
+def unlock_vault_share(share_id: str, req: UnlockVaultShareRequest):
+    success, message, doc = vault_share_db.unlock_shared_document(share_id, req.password)
+    if not success:
+        raise HTTPException(status_code=403, detail=message)
+    return {"status": "success", "data": doc}

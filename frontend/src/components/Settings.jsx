@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Key, Languages, Moon, Sun, CheckCircle2, AlertCircle, User, Shield, Info, Smartphone, Database } from 'lucide-react';
+import { Settings as SettingsIcon, Key, Languages, Moon, Sun, CheckCircle2, AlertCircle, User, Info } from 'lucide-react';
 import './Settings.css';
 
 export default function Settings({ language, onLanguageChange, theme, onThemeChange, user, onUserChange }) {

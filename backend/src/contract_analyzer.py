@@ -19,6 +19,14 @@ def heuristic_contract_analysis(text: str, doc_type: str, is_hindi: bool) -> Dic
     missing = []
     score = 20
 
+    # Non-legal document rejection heuristic
+    non_legal_keywords = ["marks statement", "secondary school examination", "board of secondary education", "cbse", "university", "marksheet", "digilocker", "fo|ky;", "çek.k"]
+    if any(k in text_lower for k in non_legal_keywords) and "agreement" not in text_lower and "contract" not in text_lower:
+        return {
+            "success": False,
+            "error": "This document appears to be an academic certificate, marksheet, or non-legal record, not a legal contract. Please upload a valid legal agreement, notice, or contract for audit." if not is_hindi else "यह दस्तावेज़ एक शैक्षणिक प्रमाणपत्र या मार्कशीट प्रतीत होता है, कानूनी अनुबंध नहीं। कृपया ऑडिट के लिए एक वैध कानूनी समझौता या नोटिस अपलोड करें।"
+        }
+
     # Check 1: Non-compete restraint of trade (Sec 27 Indian Contract Act)
     if any(k in text_lower for k in ["non-compete", "not work for any competitor", "restraint of trade", "shall not engage in any other business", "प्रतिस्पर्धी"]):
         score += 25
@@ -136,6 +144,12 @@ def analyze_contract_document(
             raw_content = chat_completion.choices[0].message.content or "{}"
             parsed = json.loads(raw_content)
 
+            if not parsed.get("is_legal_contract", True):
+                return {
+                    "success": False,
+                    "error": "This document does not appear to be a legal contract, agreement, or notice. Please upload a valid legal document for audit." if not is_hindi else "यह दस्तावेज़ कोई कानूनी अनुबंध, समझौता या नोटिस प्रतीत नहीं होता है। कृपया ऑडिट के लिए एक वैध कानूनी दस्तावेज़ अपलोड करें।"
+                }
+
             # Validate that the AI response has required schema fields
             if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
                 raise ValueError(f"AI response missing required fields: {REQUIRED_FIELDS - set(parsed.keys())}")
@@ -159,6 +173,12 @@ def analyze_contract_document(
                 )
                 raw_content = chat_completion.choices[0].message.content or "{}"
                 parsed = json.loads(raw_content)
+
+                if not parsed.get("is_legal_contract", True):
+                    return {
+                        "success": False,
+                        "error": "This document does not appear to be a legal contract, agreement, or notice. Please upload a valid legal document for audit." if not is_hindi else "यह दस्तावेज़ कोई कानूनी अनुबंध, समझौता या नोटिस प्रतीत नहीं होता है। कृपया ऑडिट के लिए एक वैध कानूनी दस्तावेज़ अपलोड करें।"
+                    }
 
                 if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
                     raise ValueError("Fallback AI response also missing required fields")

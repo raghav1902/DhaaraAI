@@ -153,16 +153,47 @@ export default function ChatMessageItem({ msg, idx, speakingIndex, handleToggleS
 
               {msg.sources && msg.sources.length > 0 && (
                 <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
-                  <p className="ask-ai-citations-heading">
-                    <ShieldCheck size={13} />
-                    {isHindi ? 'वैधानिक संदर्भ एवं धाराएं (IndiaCode)' : 'VERIFIED STATUTORY PROVISIONS (IndiaCode)'}
+                  <p className="ask-ai-citations-heading" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '700', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '0 0 8px' }}>
+                    <ShieldCheck size={13} color="var(--primary)" />
+                    {isHindi ? 'सत्यापित विधिक संदर्भ एवं स्रोत (VERIFIED SOURCES)' : 'VERIFIED LEGAL SOURCES & CITATIONS'}
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
-                    {msg.sources.slice(0, 3).map((src, i) => (
-                      <div key={i} className="ask-ai-citation">
-                        <strong>{src.section || 'Statute'}</strong> — {src.section_title || 'Legal Reference'}
-                      </div>
-                    ))}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '8px' }}>
+                    {msg.sources.slice(0, 4).map((src, i) => {
+                      const st = src.source_type || 'Statutory Sources';
+                      let badgeColor = 'var(--primary)';
+                      let badgeBg = 'rgba(59, 130, 246, 0.1)';
+                      let label = 'Statutory Source';
+
+                      if (st === 'Draft Template') {
+                        badgeColor = '#8b5cf6';
+                        badgeBg = 'rgba(139, 92, 246, 0.12)';
+                        label = isHindi ? 'विधिक प्रारूप (Draft Template)' : 'Legal Draft Template';
+                      } else if (st === 'Legal Glossary') {
+                        badgeColor = '#059669';
+                        badgeBg = 'rgba(16, 185, 129, 0.12)';
+                        label = isHindi ? 'कानूनी शब्दावली (Glossary)' : 'Legal Glossary Entry';
+                      } else if (st === 'Case Law') {
+                        badgeColor = '#d97706';
+                        badgeBg = 'rgba(245, 158, 11, 0.12)';
+                        label = isHindi ? 'सुप्रीम कोर्ट दृष्टांत (Case Law)' : 'Supreme Court Precedent';
+                      } else {
+                        label = isHindi ? 'वैधानिक प्रावधान (Statute)' : 'Statutory Provision';
+                      }
+
+                      return (
+                        <div key={i} className="ask-ai-citation" style={{ borderLeft: `3px solid ${badgeColor}`, background: 'var(--subtle-bg)', padding: '8px 12px', borderRadius: '6px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '700', color: badgeColor, textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
+                            {label}
+                          </span>
+                          <strong style={{ fontSize: '12px', display: 'block', color: 'var(--text-main)' }}>
+                            {src.case_name || src.section || src.term || 'Reference'}
+                          </strong>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', lineHeight: '1.3' }}>
+                            {src.citation || src.section_title || src.source || src.title || ''}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -279,11 +279,66 @@ class LegalEmbedStore:
                     "section": meta.get("section", "General"),
                     "section_title": meta.get("section_title", ""),
                     "source": meta.get("source", "unknown"),
+                    "source_type": "Statutory Sources",
                     "page": meta.get("page", 1),
                     "similarity_score": round(similarity, 4)
                 })
 
         return retrieved_chunks
+
+    def query_case_law(
+        self,
+        query_text: str,
+        top_k: int = 3
+    ) -> List[Dict[str, Any]]:
+        """
+        Queries the Supreme Court case-law collection 'dhaara_case_law'.
+        """
+        if not query_text.strip():
+            return []
+        try:
+            case_col = self.client.get_collection("dhaara_case_law")
+        except Exception:
+            return []
+
+        query_embedding = self.model.encode([query_text], convert_to_numpy=True).tolist()
+        try:
+            results = case_col.query(
+                query_embeddings=query_embedding,
+                n_results=top_k,
+                include=["documents", "metadatas", "distances"]
+            )
+        except Exception as e:
+            print(f"[embed_store] Case law query error: {e}")
+            return []
+
+        chunks = []
+        if results and results.get("documents") and results["documents"][0]:
+            docs = results["documents"][0]
+            metas = results["metadatas"][0]
+            dists = results["distances"][0]
+            ids = results["ids"][0]
+            for doc, meta, dist, cid in zip(docs, metas, dists, ids):
+                similarity = max(0.0, min(1.0, 1.0 - dist))
+                case_title = meta.get("case_name") or meta.get("title") or "Indian Judicial Precedent"
+                citation = meta.get("citation") or meta.get("case_id") or "Precedent"
+                court_name = meta.get("court") or ("Supreme Court of India" if meta.get("court_level") == "SC" else "High Court")
+                court_level = meta.get("court_level") or ("SC" if "supreme" in court_name.lower() else "HC")
+                chunks.append({
+                    "chunk_id": cid,
+                    "text": doc,
+                    "section": citation,
+                    "section_title": case_title,
+                    "source": f"{court_name}: {case_title}",
+                    "case_name": case_title,
+                    "citation": citation,
+                    "court": court_name,
+                    "court_level": court_level,
+                    "judgment_date": meta.get("judgment_date", ""),
+                    "source_type": "Case Law",
+                    "similarity_score": round(similarity, 4)
+                })
+        return chunks
 
     def get_stats(self) -> Dict[str, Any]:
         """

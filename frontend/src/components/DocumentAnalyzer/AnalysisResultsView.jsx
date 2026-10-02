@@ -8,8 +8,7 @@ import {
   Save,
   Check,
   AlertTriangle,
-  FileCheck2,
-  BookOpen
+  FileCheck2
 } from 'lucide-react';
 
 export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
@@ -81,6 +80,7 @@ export default function AnalysisResultsView({ analysis, isHindi, copyClause }) {
       drafts.push({
         id: Date.now().toString(),
         type: 'Contract Audit Report',
+        folder: 'Audited Contracts',
         title: `Audit Report - ${analysis.risk_score} Risk (${new Date().toLocaleDateString()})`,
         content: formattedAudit,
         date: new Date().toISOString()

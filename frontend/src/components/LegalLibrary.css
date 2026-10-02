@@ -236,6 +236,7 @@ body.dark-theme .legal-library__banner-gradient {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  align-items: start;
 }
 
 .legal-library__card {
@@ -247,6 +248,8 @@ body.dark-theme .legal-library__banner-gradient {
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
   display: flex;
   flex-direction: column;
+  height: fit-content;
+  align-self: start;
 }
 
 .legal-library__card:hover {

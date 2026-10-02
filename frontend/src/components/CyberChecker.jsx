@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ShieldAlert, Mail, Search, AlertTriangle, ShieldCheck, Lock, Globe, Database, PhoneCall, ExternalLink } from 'lucide-react';
+import { ShieldAlert, Mail, Search, AlertTriangle, ShieldCheck, Lock, Database } from 'lucide-react';
 import './CyberChecker.css';
 
 export default function CyberChecker({ language = 'English' }) {

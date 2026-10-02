@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
   Bot,
@@ -19,33 +19,177 @@ import {
   BookOpen,
   ChevronDown,
   ExternalLink,
-  BookMarked
+  BookMarked,
+  Plus
 } from 'lucide-react';
 import { sanitizeMarkdownForSpeech, getPromptSuggestions } from './LegalChat/speechUtils';
 import ChatMessageItem from './LegalChat/ChatMessageItem';
 import ChatInputArea from './LegalChat/ChatInputArea';
+import ChatHistorySidebar from './LegalChat/ChatHistorySidebar';
 import './LegalChat/LegalChat.css';
 
 export default function LegalChat({
   initialQuery = null,
   onQueryConsumed = () => { },
   language = 'English',
-  onLanguageChange = () => { }
+  onLanguageChange = () => { },
+  user = null
 }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: isHindi
-        ? 'नमस्ते! लीगलजीपीटी (DhaaraAI) में आपका स्वागत है। मैं आपका AI विधिक सहायक हूँ। आप भारतीय कानूनों (BNS 2023, BNSS 2023, IPC, मोटर वाहन आदि) के बारे में कोई भी प्रश्न पूछ सकते हैं। मैं आपको प्रमाणित धाराओं और वैधानिक प्रक्रियाओं के साथ समाधान प्रदान करूँगा।'
-        : 'Namaste! Welcome to LegalGPT (DhaaraAI). I am your AI Legal Intelligence Assistant. Ask any question regarding Indian criminal or civil laws (BNS 2023, BNSS, BSA, Contract Act, Motor Vehicles, etc.). I will provide clear statutory guidance with cited legal provisions.',
-      language: language
+  // Helper for auth headers
+  const getAuthHeaders = useCallback(() => {
+    if (user && user.token) {
+      return { Authorization: `Bearer ${user.token}` };
     }
-  ]);
+    return {};
+  }, [user]);
+
+  // Initial welcome message
+  const getWelcomeMessage = useCallback(() => ({
+    role: 'assistant',
+    content: isHindi
+      ? 'नमस्ते! लीगलजीपीटी (DhaaraAI) में आपका स्वागत है। मैं आपका AI विधिक सहायक हूँ। आप भारतीय कानूनों (BNS 2023, BNSS 2023, IPC, मोटर वाहन आदि) के बारे में कोई भी प्रश्न पूछ सकते हैं। मैं आपको प्रमाणित धाराओं और वैधानिक प्रक्रियाओं के साथ समाधान प्रदान करूँगा।'
+      : 'Namaste! Welcome to LegalGPT (DhaaraAI). I am your AI Legal Intelligence Assistant. Ask any question regarding Indian criminal or civil laws (BNS 2023, BNSS, BSA, Contract Act, Motor Vehicles, etc.). I will provide clear statutory guidance with cited legal provisions.',
+    language: language
+  }), [isHindi, language]);
+
+  // Conversation states
+  const [conversations, setConversations] = useState([]);
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [isLoadingList, setIsLoadingList] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const [messages, setMessages] = useState([getWelcomeMessage()]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Fetch conversations list for authenticated user
+  const fetchConversations = useCallback(async () => {
+    if (!user || !user.token) return;
+    setIsLoadingList(true);
+    try {
+      const res = await axios.get('http://localhost:8000/api/conversations', {
+        headers: getAuthHeaders()
+      });
+      setConversations(res.data || []);
+    } catch (err) {
+      console.error('Failed to load conversations:', err);
+    } finally {
+      setIsLoadingList(false);
+    }
+  }, [user, getAuthHeaders]);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
+  // Handle Search in conversations
+  useEffect(() => {
+    if (!user || !user.token) return;
+    const timer = setTimeout(async () => {
+      if (!searchQuery.trim()) {
+        fetchConversations();
+        return;
+      }
+      try {
+        setIsLoadingList(true);
+        const res = await axios.get(`http://localhost:8000/api/conversations/search?q=${encodeURIComponent(searchQuery)}`, {
+          headers: getAuthHeaders()
+        });
+        setConversations(res.data || []);
+      } catch (err) {
+        console.error('Search failed:', err);
+      } finally {
+        setIsLoadingList(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, user, getAuthHeaders, fetchConversations]);
+
+  // Select and load a conversation (Strict User Isolation)
+  const handleSelectConversation = async (convId) => {
+    if (convId === activeConversationId || isLoading) return;
+    setActiveConversationId(convId);
+    setIsLoading(true);
+
+    try {
+      const res = await axios.get(`http://localhost:8000/api/conversations/${convId}`, {
+        headers: getAuthHeaders()
+      });
+
+      if (res.data && res.data.messages && res.data.messages.length > 0) {
+        setMessages(res.data.messages.map(m => ({
+          role: m.role,
+          content: m.content,
+          sources: m.sources || [],
+          language: language,
+          concordance: m.metadata?.concordance || null
+        })));
+      } else {
+        setMessages([getWelcomeMessage()]);
+      }
+    } catch (err) {
+      console.error('Error fetching conversation:', err);
+      setMessages([
+        getWelcomeMessage(),
+        {
+          role: 'assistant',
+          content: isHindi
+            ? 'त्रुटि: बातचीत लोड करने में असमर्थ। कृपया पुनः प्रयास करें।'
+            : 'Error: Unable to load this conversation. Please try again.',
+          isError: true
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Start a clean New Chat
+  const handleNewChat = () => {
+    setActiveConversationId(null);
+    setMessages([getWelcomeMessage()]);
+    setInput('');
+    if (synthRef.current) {
+      synthRef.current.cancel();
+      setSpeakingIndex(null);
+    }
+    // Refresh conversation list to ensure previously saved chats are up to date
+    fetchConversations();
+  };
+
+  // Rename a conversation
+  const handleRenameConversation = async (convId, newTitle) => {
+    try {
+      await axios.patch(`http://localhost:8000/api/conversations/${convId}`, {
+        title: newTitle
+      }, {
+        headers: getAuthHeaders()
+      });
+      setConversations(prev => prev.map(c => c.id === convId ? { ...c, title: newTitle } : c));
+    } catch (err) {
+      console.error('Failed to rename conversation:', err);
+    }
+  };
+
+  // Delete a conversation
+  const handleDeleteConversation = async (convId) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/conversations/${convId}`, {
+        headers: getAuthHeaders()
+      });
+      setConversations(prev => prev.filter(c => c.id !== convId));
+      if (activeConversationId === convId) {
+        handleNewChat();
+      }
+    } catch (err) {
+      console.error('Failed to delete conversation:', err);
+    }
+  };
 
   // Speech-to-Text States
   const [isListening, setIsListening] = useState(false);
@@ -184,8 +328,21 @@ export default function LegalChat({
         question: userMessage.content,
         language: userMessage.language,
         user_role: 'general',
-        top_k: 5
+        top_k: 5,
+        conversation_id: activeConversationId
+      }, {
+        headers: getAuthHeaders()
       });
+
+      // Update activeConversationId if this query created a new one
+      const returnedConvId = response.data.conversation_id;
+      if (returnedConvId) {
+        if (returnedConvId !== activeConversationId) {
+          setActiveConversationId(returnedConvId);
+        }
+        // Always refresh conversation titles and timestamps in the sidebar
+        fetchConversations();
+      }
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -239,114 +396,101 @@ export default function LegalChat({
   return (
     <div className="ask-ai animate-fade-in">
       <div className="ask-ai-main-column">
-        {/* Authoritative Legal Intelligence Header */}
-        <section className="ask-ai-hero" aria-labelledby="ask-ai-title">
-          <div className="ask-ai-hero-copy">
-            <div className="ask-ai-brand">
-              <span className="ask-ai-brand-mark"><Scale size={16} /></span>
-              <span>DhaaraAI LegalGPT Workspace</span>
-              <span className="ask-ai-bns-badge">BNS 2023 • BNSS 2023 • BSA 2023 Verified</span>
-            </div>
-
-            <div className="ask-ai-heading-row">
-              <div>
-                <h2 id="ask-ai-title">
-                  {isHindi ? (
-                    <>भारतीय विधिक <em>इंटेलिजेंस वर्कस्पेस</em></>
-                  ) : (
-                    <>Indian Statutory & Case Law <em>Intelligence Studio</em></>
-                  )}
-                </h2>
-                <p className="ask-ai-description">
-                  {isHindi
-                    ? 'नवीनतम भारतीय न्याय संहिता (BNS), नागरिक सुरक्षा संहिता (BNSS) व सुप्रीम कोर्ट नज़ीरों पर आधारित सटीक समाधान।'
-                    : 'Statutory research, FIR guidance, bail procedures, and cross-statute concordance powered by Indian legal intelligence.'}
-                </p>
+        {/* Dynamic Header: Active Consultation Bar when chat active, or Full Studio Hero on empty state */}
+        {messages.length > 1 ? (
+          <div className="ask-ai-active-session-bar">
+            <div className="ask-ai-session-left">
+              <span className="ask-ai-pulse-dot" />
+              <div className="ask-ai-session-info">
+                <span className="ask-ai-session-title">
+                  {conversations.find(c => c.id === activeConversationId)?.title || (isHindi ? 'सक्रिय विधिक परामर्श सत्र' : 'Active Legal Intelligence Consultation')}
+                </span>
+                <span className="ask-ai-session-meta">
+                  <ShieldCheck size={12} color="var(--emerald-600)" />
+                  {isHindi ? 'BNS / BNSS 2023 प्रमाणित' : 'BNS 2023 • BNSS 2023 • BSA 2023 Verified'}
+                </span>
               </div>
-
+            </div>
+            <div className="ask-ai-session-actions">
               <button
                 type="button"
-                onClick={() => setMessages([{
-                  role: 'assistant',
-                  content: isHindi
-                    ? 'नमस्ते! लीगलजीपीटी में आपका स्वागत है। आप भारतीय कानूनों के बारे में कोई भी प्रश्न पूछ सकते हैं।'
-                    : 'Namaste! Welcome to LegalGPT. How can I assist you with Indian law or case procedures today?',
-                  language
-                }])}
-                className="ask-ai-reset"
-                title={isHindi ? "नया चैट शुरू करें" : "Reset Conversation"}
-                aria-label={isHindi ? 'नई बातचीत शुरू करें' : 'Start a new conversation'}
+                onClick={handleNewChat}
+                className="ask-ai-new-session-btn"
+                title={isHindi ? 'नया विधिक सत्र शुरू करें' : 'Start New Legal Consultation'}
               >
-                <RefreshCw size={13} />
-                <span>{isHindi ? 'नया संवाद' : 'New Session'}</span>
+                <Plus size={14} />
+                <span>{isHindi ? 'नया परामर्श' : 'New Consultation'}</span>
               </button>
             </div>
+          </div>
+        ) : (
+          <section className="ask-ai-hero" aria-labelledby="ask-ai-title">
+            <div className="ask-ai-hero-copy">
+              <div className="ask-ai-brand">
+                <span className="ask-ai-brand-mark"><Scale size={16} /></span>
+                <span>DhaaraAI LegalGPT Workspace</span>
+                <span className="ask-ai-bns-badge">BNS 2023 • BNSS 2023 • BSA 2023 Verified</span>
+              </div>
 
-            <div className="ask-ai-feature-row">
-              <div className="ask-ai-feature-card feature-blue">
-                <span><BookOpen size={16} /></span>
+              <div className="ask-ai-heading-row">
                 <div>
-                  <b>BNS / BNSS 2023</b>
-                  <small>{isHindi ? 'नई विधिक संहिता' : 'New Penal Codes'}</small>
+                  <h2 id="ask-ai-title">
+                    {isHindi ? (
+                      <>भारतीय विधिक <em>इंटेलिजेंस वर्कस्पेस</em></>
+                    ) : (
+                      <>Indian Statutory & Case Law <em>Intelligence Studio</em></>
+                    )}
+                  </h2>
+                  <p className="ask-ai-description">
+                    {isHindi
+                      ? 'नवीनतम भारतीय न्याय संहिता (BNS), नागरिक सुरक्षा संहिता (BNSS) व सुप्रीम कोर्ट नज़ीरों पर आधारित सटीक समाधान।'
+                      : 'Statutory research, FIR guidance, bail procedures, and cross-statute concordance powered by Indian legal intelligence.'}
+                  </p>
                 </div>
               </div>
-              <div className="ask-ai-feature-card feature-purple">
-                <span><Scale size={16} /></span>
-                <div>
-                  <b>{isHindi ? 'केस लॉ व मिसालें' : 'Supreme Court Precedents'}</b>
-                  <small>{isHindi ? 'अदालती निर्णय' : 'Leading Judgments'}</small>
+
+              <div className="ask-ai-feature-row">
+                <div className="ask-ai-feature-card feature-blue">
+                  <span><BookOpen size={15} /></span>
+                  <div>
+                    <b>BNS / BNSS 2023</b>
+                    <small>{isHindi ? 'नई विधिक संहिता' : 'New Penal Codes'}</small>
+                  </div>
                 </div>
-              </div>
-              <div className="ask-ai-feature-card feature-green">
-                <span><ScrollText size={16} /></span>
-                <div>
-                  <b>{isHindi ? 'प्रक्रियात्मक उपाय' : 'Statutory Remedies'}</b>
-                  <small>{isHindi ? 'चरण-दर-चरण विधिक कदम' : 'Step-by-step guidance'}</small>
+                <div className="ask-ai-feature-card feature-purple">
+                  <span><Scale size={15} /></span>
+                  <div>
+                    <b>{isHindi ? 'केस लॉ व नज़ीरें' : 'Supreme Court Precedents'}</b>
+                    <small>{isHindi ? 'अदालती निर्णय' : 'Leading Judgments'}</small>
+                  </div>
                 </div>
-              </div>
-              <div className="ask-ai-feature-card feature-orange">
-                <span><ShieldCheck size={16} /></span>
-                <div>
-                  <b>{isHindi ? 'नागरिक अधिकार' : 'Constitutional Rights'}</b>
-                  <small>{isHindi ? 'अनुच्छेद 21 व जमानत' : 'Art. 21 & Bail safeguards'}</small>
+                <div className="ask-ai-feature-card feature-green">
+                  <span><ScrollText size={15} /></span>
+                  <div>
+                    <b>{isHindi ? 'प्रक्रियात्मक उपाय' : 'Statutory Remedies'}</b>
+                    <small>{isHindi ? 'चरण-दर-चरण विधिक कदम' : 'Step-by-step guidance'}</small>
+                  </div>
+                </div>
+                <div className="ask-ai-feature-card feature-orange">
+                  <span><ShieldCheck size={15} /></span>
+                  <div>
+                    <b>{isHindi ? 'नागरिक अधिकार' : 'Constitutional Rights'}</b>
+                    <small>{isHindi ? 'अनुच्छेद 21 व जमानत' : 'Art. 21 & Bail safeguards'}</small>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="ask-ai-hero-visual" aria-hidden="true">
-            <img
-              src="/assets/legal/hero/supreme_court_hero.webp"
-              alt="Supreme Court of India"
-              className="ask-ai-hero-image"
-              loading="eager"
-            />
-            <div className="ask-ai-hero-gradient-overlay" />
-          </div>
-        </section>
-
-        {/* Suggestion Chips */}
-        <section className="ask-ai-prompts" aria-label={isHindi ? 'त्वरित सवाल' : 'Quick questions'}>
-          <div className="ask-ai-section-heading">
-            <span className="ask-ai-section-icon"><Sparkles size={14} /></span>
-            <h3>{isHindi ? 'त्वरित विधिक प्रश्न:' : 'Recommended Queries:'}</h3>
-          </div>
-          <div className="ask-ai-prompt-list">
-            {promptSuggestions.map((item, idx) => {
-              const PromptIcon = [Landmark, ShieldCheck, FileSearch, Scale][idx % 4];
-              return (
-                <button
-                  className="ask-ai-prompt-chip"
-                  key={idx}
-                  onClick={() => handleSendWithText(item.query)}
-                  disabled={isLoading}
-                >
-                  <span className="ask-ai-prompt-icon"><PromptIcon size={14} /></span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
+            <div className="ask-ai-hero-visual" aria-hidden="true">
+              <img
+                src="/assets/legal/hero/supreme_court_hero.webp"
+                alt="Supreme Court of India"
+                className="ask-ai-hero-image"
+                loading="eager"
+              />
+              <div className="ask-ai-hero-gradient-overlay" />
+            </div>
+          </section>
+        )}
 
         {/* Chat Transcript Area */}
         <div className="ask-ai-transcript" aria-live="polite">
@@ -361,6 +505,30 @@ export default function LegalChat({
             />
           ))}
 
+          {/* Prompt scenario exploration inside transcript when conversation starts */}
+          {messages.length === 1 && !isLoading && (
+            <section className="ask-ai-suggested animate-fade-in">
+              <div className="ask-ai-suggested-heading">
+                <h3><span>💡</span> {isHindi ? 'त्वरित विधिक परिदृश्य (अनुशंसित प्रश्न):' : 'Explore Legal Scenarios (Recommended Inquiries):'}</h3>
+              </div>
+              <div className="ask-ai-suggested-grid">
+                {suggestedQuestions.map(({ icon: QuestionIcon, query, label }) => (
+                  <button
+                    type="button"
+                    key={query}
+                    className="ask-ai-suggested-card"
+                    onClick={() => handleSendWithText(query)}
+                    disabled={isLoading}
+                  >
+                    <span className="ask-ai-suggested-icon"><QuestionIcon size={16} /></span>
+                    <b className="ask-ai-suggested-label">{label}</b>
+                    <ChevronRight className="ask-ai-suggested-arrow" size={14} />
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
           {isLoading && (
             <div className="ask-ai-loading-row">
               <div className="ask-ai-avatar"><Bot size={18} /></div>
@@ -372,30 +540,6 @@ export default function LegalChat({
           )}
           <div ref={messagesEndRef} />
         </div>
-
-        {/* First query suggestions */}
-        {messages.length === 1 && !isLoading && (
-          <section className="ask-ai-suggested">
-            <div className="ask-ai-suggested-heading">
-              <h3><span>💡</span> {isHindi ? 'प्रारंभिक उदाहरण विषय:' : 'Explore Legal Scenarios:'}</h3>
-            </div>
-            <div className="ask-ai-suggested-grid">
-              {suggestedQuestions.map(({ icon: QuestionIcon, query, label }) => (
-                <button
-                  type="button"
-                  key={query}
-                  className="ask-ai-suggested-card"
-                  onClick={() => handleSendWithText(query)}
-                  disabled={isLoading}
-                >
-                  <span><QuestionIcon size={16} /></span>
-                  <b>{label}</b>
-                  <ChevronRight className="ask-ai-suggested-arrow" size={14} />
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Chat Input Dock Area */}
         <ChatInputArea
@@ -415,79 +559,19 @@ export default function LegalChat({
         </p>
       </div>
 
-      {/* Right Column: Context Rail & Citations Drawer */}
-      <aside className="ask-ai-context-rail" aria-label={isHindi ? 'विधिक संदर्भ पैनल' : 'Legal Context Panel'}>
-        {/* Verified Statutory Citations card */}
-        <section className="ask-ai-rail-card">
-          <h3>
-            <span className="rail-icon rail-green"><BookMarked size={14} /></span>
-            {isHindi ? 'प्रमाणित संदर्भ (Sources)' : 'Active Citations'}
-          </h3>
-          {activeSources.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {activeSources.map((src, i) => (
-                <div key={i} className="ask-ai-rail-citation">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <b style={{ color: 'var(--primary)', fontSize: '11px' }}>{src.section || 'Statute'}</b>
-                    <span style={{ fontSize: '9px', background: 'var(--accent-light)', color: 'var(--accent)', padding: '1px 5px', borderRadius: '4px', fontWeight: '700' }}>IndiaCode</span>
-                  </div>
-                  <small style={{ color: 'var(--text-secondary)', fontSize: '10.5px', marginTop: '2px', display: 'block' }}>
-                    {src.section_title || src.title || 'Official Provision'}
-                  </small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="ask-ai-rail-empty">
-              {isHindi ? 'सवालों के साथ वैधानिक धाराएं यहाँ सूचीबद्ध होंगी।' : 'Statutory references from IndiaCode will populate here during the consultation.'}
-            </p>
-          )}
-        </section>
-
-        {/* Statutory Code Quick References */}
-        <section className="ask-ai-rail-card">
-          <h3>
-            <span className="rail-icon rail-blue"><Scale size={14} /></span>
-            {isHindi ? 'कानूनी कोड संदर्भ' : 'Statute Concordance'}
-          </h3>
-          <div className="ask-ai-code-pills">
-            <div className="code-pill">
-              <b>BNS 2023</b>
-              <small>Replaces IPC 1860</small>
-            </div>
-            <div className="code-pill">
-              <b>BNSS 2023</b>
-              <small>Replaces CrPC 1973</small>
-            </div>
-            <div className="code-pill">
-              <b>BSA 2023</b>
-              <small>Replaces IEA 1872</small>
-            </div>
-          </div>
-        </section>
-
-        {/* Recent queries in session */}
-        <section className="ask-ai-rail-card ask-ai-recent-card">
-          <h3>
-            <span className="rail-icon rail-purple"><Clock3 size={14} /></span>
-            {isHindi ? 'संवाद प्रश्न' : 'In This Session'}
-          </h3>
-          {messages.filter(msg => msg.role === 'user').length ? (
-            <div className="ask-ai-recent-list">
-              {messages.filter(msg => msg.role === 'user').slice(-4).reverse().map((msg, index) => (
-                <div key={`${index}-${msg.content.slice(0, 10)}`} className="ask-ai-recent-item">
-                  <MessageSquare size={13} />
-                  <span>{msg.content}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="ask-ai-rail-empty">
-              {isHindi ? 'आपके सवाल यहाँ दर्ज होंगे।' : 'Your questions will appear here.'}
-            </p>
-          )}
-        </section>
-      </aside>
+      {/* Right Column: Dedicated Permanent Chat History Panel (Strict User Isolated) */}
+      <ChatHistorySidebar
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelectConversation={handleSelectConversation}
+        onNewChat={handleNewChat}
+        onRenameConversation={handleRenameConversation}
+        onDeleteConversation={handleDeleteConversation}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        isLoadingList={isLoadingList}
+        isHindi={isHindi}
+      />
     </div>
   );
 }

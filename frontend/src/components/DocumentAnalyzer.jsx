@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import {
   FileSearch,
@@ -44,8 +44,8 @@ export default function DocumentAnalyzer({ language = 'English' }) {
 
   const uploadFile = async (file) => {
     if (!file) return;
-    if (!/\.(pdf|txt|md)$/i.test(file.name)) {
-      setError(isHindi ? 'कृपया PDF, TXT या MD फ़ाइल चुनें।' : 'Choose a PDF, TXT, or MD file.');
+    if (!/\.(pdf|txt|md|png|jpg|jpeg)$/i.test(file.name)) {
+      setError(isHindi ? 'कृपया PDF, TXT या MD फ़ाइल चुनें।' : 'Choose a PDF, TXT, MD, or Image file.');
       return;
     }
 
@@ -239,7 +239,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 {isHindi ? 'PDF या टेक्स्ट दस्तावेज अपलोड करें' : 'Upload Contract / Legal PDF'}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                {isHindi ? 'समर्थित प्रारूप: .pdf, .txt, .md (स्वचालित टेक्स्ट निष्कर्षण)' : 'Supported formats: .pdf, .txt, .md (auto text extraction)'}
+                {isHindi ? 'समर्थित प्रारूप: .pdf, .txt, .md (स्वचालित टेक्स्ट निष्कर्षण)' : 'Supported formats: .pdf, .txt, .md, image (auto extraction)'}
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               type="file"
               ref={fileInputRef}
               onChange={handleFileUpload}
-              accept=".pdf,.txt,.md"
+              accept=".pdf,.txt,.md,.png,.jpg,.jpeg"
               style={{ display: 'none' }}
               id="contract-file-upload"
             />
@@ -278,7 +278,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               ) : (
                 <>
                   <Upload size={15} />
-                  {isHindi ? 'फाइल चुनें (.pdf / .txt / .md)' : 'Browse File'}
+                  {isHindi ? 'फाइल चुनें (.pdf / .txt / .md)' : 'Browse File/Image'}
                 </>
               )}
             </label>

@@ -196,7 +196,7 @@ export default function CitizenRights({ language = 'English' }) {
           </h3>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '10px', alignItems: 'start' }}>
           {[
             {
               icon: AlertTriangle,
