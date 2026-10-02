@@ -21,6 +21,10 @@ from rag_offline_fallbacks import generate_offline_concordance_fallback
 from draft_templates import generate_fallback_draft, find_matching_template_for_query
 import legal_glossary
 from contract_analyzer import analyze_contract_document, heuristic_contract_analysis
+from legal_validator import LegalAccuracyValidator
+
+# Singleton validator instance — shared across all requests (thread-safe, stateless)
+_validator = LegalAccuracyValidator()
 
 DEFAULT_MODEL = "qwen/qwen3.8-27b"
 FALLBACK_MODEL = "openai/gpt-oss-120b"
@@ -103,9 +107,24 @@ class DhaaraRAGEngine:
         if not chunks:
             return "No specific dense text chunks retrieved from IndiaCode repository."
 
-        formatted_blocks = []
+        # ── Manifest header: explicitly tells the model which sections are available ──
+        manifest_lines = [
+            "=== RETRIEVED STATUTORY SECTIONS — cite ONLY from this list ==="
+        ]
+        for i, chunk in enumerate(chunks, 1):
+            st = chunk.get("source_type", "Statutory Sources")
+            if st != "Case Law":
+                manifest_lines.append(
+                    f"  {i}. {chunk.get('source', 'Unknown Act')} "
+                    f"— Section {chunk.get('section', '?')}: {chunk.get('section_title', '')}"
+                )
+        manifest_lines.append("=== END STATUTORY MANIFEST ===")
+        manifest_header = "\n".join(manifest_lines)
+
+        formatted_blocks = [manifest_header]
         for idx, chunk in enumerate(chunks, 1):
             st = chunk.get("source_type", "Statutory Sources")
+            raw_text = chunk.get("text", "").strip()
             if st == "Case Law":
                 block = (
                     f"[Supreme Court Precedent Record {idx}]\n"
@@ -113,7 +132,7 @@ class DhaaraRAGEngine:
                     f"• Citation: {chunk.get('citation', '')}\n"
                     f"• Judgment Date: {chunk.get('judgment_date', '')}\n"
                     f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
-                    f"• Judgment Excerpt:\n{chunk.get('text', '').strip()}\n"
+                    f"• Judgment Excerpt:\n{raw_text[:1000]}\n"
                 )
             else:
                 block = (
@@ -121,7 +140,7 @@ class DhaaraRAGEngine:
                     f"• Source: {chunk.get('source', 'IndiaCode')}\n"
                     f"• Section: {chunk.get('section', 'General')} - {chunk.get('section_title', '')}\n"
                     f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
-                    f"• Statutory Text:\n{chunk.get('text', '').strip()}\n"
+                    f"• Statutory Text:\n{raw_text[:1000]}\n"
                 )
             formatted_blocks.append(block)
 
@@ -130,13 +149,16 @@ class DhaaraRAGEngine:
     def _format_case_law_chunks(self, chunks: List[Dict[str, Any]], question: str = "") -> str:
         """
         Formats retrieved Supreme Court case law chunks along with landmark judicial directives.
+        Prepends an explicit manifest so the model knows exactly which cases are available.
         """
         formatted_blocks = []
 
         # 1. Landmark directives matching query
+        landmark_names: List[str] = []
         if question:
             landmarks = RealLegalDataService.get_landmark_guidance_for_query(question)
             for g in landmarks:
+                landmark_names.append(g.get('case_name', ''))
                 formatted_blocks.append(
                     f"[Supreme Court Landmark Directive]\n"
                     f"• Ruling: {g.get('case_name')}\n"
@@ -146,10 +168,16 @@ class DhaaraRAGEngine:
                 )
 
         # 2. Dense case law vectors from dhaara_case_law
+        vector_names: List[str] = []
         for idx, chunk in enumerate(chunks, 1):
+            court_name = chunk.get("court") or ("Supreme Court of India" if chunk.get("court_level") == "SC" else "High Court")
+            court_level = chunk.get("court_level") or ("SC" if "supreme" in court_name.lower() else "HC")
+            case_name = chunk.get('case_name', 'Indian Judicial Precedent')
+            vector_names.append(f"{case_name} ({court_level})")
             block = (
-                f"[Supreme Court Precedent Record {idx}]\n"
-                f"• Case Name: {chunk.get('case_name', 'Supreme Court of India')}\n"
+                f"[Judicial Precedent Record {idx} - {court_name} ({court_level})]\n"
+                f"• Court: {court_name} [{court_level}]\n"
+                f"• Case Name: {case_name}\n"
                 f"• Citation: {chunk.get('citation', '')}\n"
                 f"• Judgment Date: {chunk.get('judgment_date', '')}\n"
                 f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
@@ -158,9 +186,25 @@ class DhaaraRAGEngine:
             formatted_blocks.append(block)
 
         if not formatted_blocks:
-            return "No specific case law records retrieved. Apply established Supreme Court precedents on point."
+            return (
+                "=== NO CASE LAW RETRIEVED ===\n"
+                "IMPORTANT: Do NOT cite any specific case name or holding. "
+                "State: 'No specific precedent retrieved; general statutory principles apply.'\n"
+                "=== END ===\n"
+            )
 
-        return "\n".join(formatted_blocks)
+        # 3. Prepend manifest so model knows the exact available cases
+        all_names = landmark_names + vector_names
+        manifest_lines = ["=== RETRIEVED CASE LAW — cite ONLY these cases in your answer ==="]
+        for i, name in enumerate(all_names, 1):
+            manifest_lines.append(f"  {i}. {name}")
+        manifest_lines.append(
+            "  If a case you want to cite is NOT in this list, do NOT cite it.\n"
+            "=== END CASE LAW MANIFEST ==="
+        )
+        manifest_header = "\n".join(manifest_lines)
+
+        return manifest_header + "\n\n" + "\n".join(formatted_blocks)
 
     def _build_template_guidance_response(
         self,
@@ -369,7 +413,7 @@ class DhaaraRAGEngine:
         statute_chunks = [
             c for c in raw_statute_chunks
             if c.get("similarity_score", 0.0) >= SIMILARITY_THRESHOLD
-        ]
+        ][:4]
         if not statute_chunks and raw_statute_chunks:
             statute_chunks = raw_statute_chunks[:3]
         for c in statute_chunks:
@@ -381,7 +425,7 @@ class DhaaraRAGEngine:
         case_chunks = [
             c for c in raw_case_chunks
             if c.get("similarity_score", 0.0) >= 0.35
-        ]
+        ][:3]
         if not case_chunks and raw_case_chunks:
             case_chunks = raw_case_chunks[:2]
         for c in case_chunks:
@@ -404,23 +448,60 @@ class DhaaraRAGEngine:
             any(question.strip().lower().startswith(w) for w in ["what is", "define", "kya hai", "meaning of"])
         )
         if is_simple_query:
-            token_budget = 600
+            token_budget = 1200
             depth_instruction = (
-                "Please provide a clear, concise, and focused legal explanation addressing the core definition, legal basis, and citizen significance."
+                "Provide a clear, focused legal explanation covering: "
+                "(1) ### Direct Answer — the core definition and legal position in 2–4 sentences; "
+                "(2) ### What the Law Says — the governing statute, exact section number, and its legal elements; "
+                "(3) ### Practical Next Steps — immediate citizen action if relevant."
                 if not is_hindi else
-                "कृपया मुख्य परिभाषा, कानूनी आधार और नागरिक महत्व को समझाते हुए एक स्पष्ट व संक्षिप्त कानूनी व्याख्या प्रदान करें।"
+                "कृपया निम्नलिखित अनुभागों में स्पष्ट व संक्षिप्त उत्तर दें: "
+                "(1) ### सीधा उत्तर — 2–4 वाक्यों में मूल परिभाषा व विधिक स्थिति; "
+                "(2) ### कानून क्या कहता है — शासी अधिनियम, सटीक धारा संख्या, व कानूनी तत्व; "
+                "(3) ### व्यावहारिक अगले कदम — यदि प्रासंगिक हो।"
             )
         else:
-            token_budget = 950
+            token_budget = 2200
             depth_instruction = (
-                "Please provide a comprehensive, authoritative legal research response. "
-                "Explain the exact legal issue, statutory provisions, procedural sequence, time limits, required documents, "
-                "application to the facts, exceptions, and practical next steps using the preferred structured format. "
-                "Do NOT default to a brief summary card or key-points only."
+                "MANDATORY — Produce a COMPLETE structured legal research response using ALL applicable sections below. "
+                "Do NOT truncate mid-section. Do NOT write a key-points-only card.\n\n"
+                "REQUIRED SECTIONS (include every section that applies to the query):\n"
+                "### Direct Answer\n"
+                "### What the Law Says\n"
+                "### How It Applies to Your Situation\n"
+                "### Procedure / What Happens Next\n"
+                "### Important Deadlines & Limitation\n"
+                "### Required Documents / Evidence\n"
+                "### Relevant Case Law\n"
+                "### Important Points / Exceptions\n"
+                "### Practical Next Steps\n"
+                "### Sources\n\n"
+                "HARD RULES:\n"
+                "- Start EVERY response with ### Direct Answer.\n"
+                "- ONLY cite case names that appear in the RETRIEVED CASE LAW context. Never fabricate citations.\n"
+                "- State exact act names + section numbers (e.g. Section 138 Negotiable Instruments Act, 1881 — NOT 'BNS 138').\n"
+                "- For criminal queries: note BNS/BNSS/BSA (current) AND IPC/CrPC/IEA (legacy) equivalents side-by-side.\n"
+                "- List numbered steps for ### Procedure and ### Practical Next Steps.\n"
+                "- End with the AI-generated disclaimer."
                 if not is_hindi else
-                "कृपया एक संपूर्ण, प्रामाणिक और विस्तृत कानूनी शोध समाधान प्रदान करें। "
-                "कानूनी मुद्दे, सांविधिक प्रावधानों, चरणबद्ध प्रक्रिया, समय-सीमाओं, आवश्यक दस्तावेजों, तथ्यों पर अनुप्रयोग, "
-                "अपवादों और व्यावहारिक अगले कदमों को अनुशंसित संरचना के अनुसार गहराई से समझाएं। केवल संक्षिप्त बुलेट पॉइंट्स तक सीमित न रहें।"
+                "अनिवार्य — नीचे दिए गए सभी लागू अनुभागों का उपयोग करते हुए एक संपूर्ण, बहु-अनुभागीय विधिक अनुसंधान उत्तर प्रस्तुत करें। "
+                "किसी भी अनुभाग को बीच में न छोड़ें। केवल 'Key Points' वाला संक्षिप्त उत्तर न दें।\n\n"
+                "अनिवार्य अनुभाग (जो भी प्रश्न पर लागू हों):\n"
+                "### सीधा उत्तर (Direct Answer)\n"
+                "### कानून क्या कहता है (What the Law Says)\n"
+                "### यह आपकी स्थिति पर कैसे लागू होता है\n"
+                "### प्रक्रिया / आगे क्या होगा\n"
+                "### महत्वपूर्ण समय-सीमाएं\n"
+                "### आवश्यक दस्तावेज / साक्ष्य\n"
+                "### प्रासंगिक केस लॉ\n"
+                "### महत्वपूर्ण बिंदु / अपवाद\n"
+                "### व्यावहारिक अगले कदम\n"
+                "### स्रोत\n\n"
+                "अनिवार्य नियम:\n"
+                "- हर उत्तर ### सीधा उत्तर से शुरू करें।\n"
+                "- केवल वही केस नाम उद्धृत करें जो RETRIEVED CASE LAW संदर्भ में उपलब्ध हों।\n"
+                "- सटीक अधिनियम नाम व धारा संख्या बताएं; BNS/BNSS/BSA और IPC/CrPC के समतुल्य एक साथ दर्शाएं।\n"
+                "- प्रक्रिया व अगले कदमों को क्रमांकित सूची में लिखें।"
             )
 
         if is_hindi:
@@ -505,9 +586,35 @@ class DhaaraRAGEngine:
                     )
 
                     def token_generator():
+                        collected = []
                         for chunk in response_stream:
                             if chunk.choices and chunk.choices[0].delta.content:
-                                yield chunk.choices[0].delta.content
+                                text_piece = chunk.choices[0].delta.content
+                                collected.append(text_piece)
+                                yield text_piece
+                        full_answer = "".join(collected)
+                        if active_disclaimer not in full_answer:
+                            yield f"\n\n*{active_disclaimer}*"
+                        try:
+                            _, warnings = _validator.validate_answer(
+                                answer=full_answer,
+                                statute_chunks=statute_chunks,
+                                case_chunks=case_chunks,
+                                question=question
+                            )
+                            if warnings:
+                                advisory_lines = [
+                                    "\n\n---",
+                                    "> ⚠️ **DhaaraAI Accuracy Advisory** *(auto-generated by citation validator)*",
+                                ]
+                                for w in warnings:
+                                    advisory_lines.append(f"> - {w}")
+                                advisory_lines.append(
+                                    "> \n> *Verify flagged citations with a practising advocate or primary statutory source before initiating formal legal proceedings.*"
+                                )
+                                yield "\n".join(advisory_lines)
+                        except Exception as ve:
+                            print(f"[legal_validator] Stream validation skipped: {ve}")
 
                     return {
                         "answer_stream": token_generator(),
@@ -529,6 +636,21 @@ class DhaaraRAGEngine:
                     if answer_text:
                         if active_disclaimer not in answer_text:
                             answer_text += f"\n\n*{active_disclaimer}*"
+
+                        # Post-generation accuracy validation
+                        try:
+                            answer_text, validation_warnings = _validator.validate_answer(
+                                answer=answer_text,
+                                statute_chunks=statute_chunks,
+                                case_chunks=case_chunks,
+                                question=question
+                            )
+                            if validation_warnings:
+                                print(f"[legal_validator] {len(validation_warnings)} issue(s) flagged for query: {question[:80]}")
+                                for w in validation_warnings:
+                                    print(f"  • {w}")
+                        except Exception as ve:
+                            print(f"[legal_validator] Validation skipped due to error: {ve}")
 
                         return {
                             "answer": answer_text,

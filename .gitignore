@@ -54,13 +54,16 @@ backend/data/data/
 *.db
 backend/data/*.db
 
-# Large Datasets & Parquet Files (>100MB)
+# Large Datasets & Parquet / JSONL Files (>100MB)
 *.parquet
 *.parquet.*
 backend/data/*.parquet
 backend/data/train.parquet
 backend/data/test.parquet
 backend/data/validation.parquet
+*.jsonl
+backend/data/*.jsonl
+backend/data/ingestion_progress.json
 
 # OS & Editor
 .DS_Store

@@ -308,16 +308,20 @@ class LegalEmbedStore:
             ids = results["ids"][0]
             for doc, meta, dist, cid in zip(docs, metas, dists, ids):
                 similarity = max(0.0, min(1.0, 1.0 - dist))
-                case_title = meta.get("case_name") or meta.get("title") or "Supreme Court of India"
-                citation = meta.get("citation") or meta.get("case_id") or "SC Precedent"
+                case_title = meta.get("case_name") or meta.get("title") or "Indian Judicial Precedent"
+                citation = meta.get("citation") or meta.get("case_id") or "Precedent"
+                court_name = meta.get("court") or ("Supreme Court of India" if meta.get("court_level") == "SC" else "High Court")
+                court_level = meta.get("court_level") or ("SC" if "supreme" in court_name.lower() else "HC")
                 chunks.append({
                     "chunk_id": cid,
                     "text": doc,
                     "section": citation,
                     "section_title": case_title,
-                    "source": f"Supreme Court: {case_title}",
+                    "source": f"{court_name}: {case_title}",
                     "case_name": case_title,
                     "citation": citation,
+                    "court": court_name,
+                    "court_level": court_level,
                     "judgment_date": meta.get("judgment_date", ""),
                     "source_type": "Case Law",
                     "similarity_score": round(similarity, 4)
