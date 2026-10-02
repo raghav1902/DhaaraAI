@@ -16,13 +16,14 @@ load_dotenv()
 
 from embed_store import LegalEmbedStore
 from bns_concordance import diagnose_situation, get_transition_alert
-from real_legal_fetcher import RealLegalDataService, OFFICIAL_LEGAL_HELPLINES
+from real_legal_fetcher import RealLegalDataService
 from rag_offline_fallbacks import generate_offline_concordance_fallback
-from draft_templates import generate_fallback_draft
+from draft_templates import generate_fallback_draft, find_matching_template_for_query
+import legal_glossary
 from contract_analyzer import analyze_contract_document, heuristic_contract_analysis
 
-DEFAULT_MODEL = "openai/gpt-oss-120b"
-FALLBACK_MODEL = "qwen/qwen3.8-27b"
+DEFAULT_MODEL = "qwen/qwen3.8-27b"
+FALLBACK_MODEL = "openai/gpt-oss-120b"
 SIMILARITY_THRESHOLD = 0.30
 
 from prompts import (
@@ -104,16 +105,215 @@ class DhaaraRAGEngine:
 
         formatted_blocks = []
         for idx, chunk in enumerate(chunks, 1):
-            block = (
-                f"[Statute Record {idx}]\n"
-                f"• Source: {chunk.get('source', 'IndiaCode')}\n"
-                f"• Section: {chunk.get('section', 'General')} - {chunk.get('section_title', '')}\n"
-                f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
-                f"• Statutory Text:\n{chunk.get('text', '').strip()}\n"
-            )
+            st = chunk.get("source_type", "Statutory Sources")
+            if st == "Case Law":
+                block = (
+                    f"[Supreme Court Precedent Record {idx}]\n"
+                    f"• Case Name: {chunk.get('case_name', 'Supreme Court of India')}\n"
+                    f"• Citation: {chunk.get('citation', '')}\n"
+                    f"• Judgment Date: {chunk.get('judgment_date', '')}\n"
+                    f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
+                    f"• Judgment Excerpt:\n{chunk.get('text', '').strip()}\n"
+                )
+            else:
+                block = (
+                    f"[Statute Record {idx}]\n"
+                    f"• Source: {chunk.get('source', 'IndiaCode')}\n"
+                    f"• Section: {chunk.get('section', 'General')} - {chunk.get('section_title', '')}\n"
+                    f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
+                    f"• Statutory Text:\n{chunk.get('text', '').strip()}\n"
+                )
             formatted_blocks.append(block)
 
         return "\n".join(formatted_blocks)
+
+    def _format_case_law_chunks(self, chunks: List[Dict[str, Any]], question: str = "") -> str:
+        """
+        Formats retrieved Supreme Court case law chunks along with landmark judicial directives.
+        """
+        formatted_blocks = []
+
+        # 1. Landmark directives matching query
+        if question:
+            landmarks = RealLegalDataService.get_landmark_guidance_for_query(question)
+            for g in landmarks:
+                formatted_blocks.append(
+                    f"[Supreme Court Landmark Directive]\n"
+                    f"• Ruling: {g.get('case_name')}\n"
+                    f"• Statute: {g.get('governing_statute')}\n"
+                    f"• Ratio / Rule: {g.get('key_rule')}\n"
+                    f"• Remedy: {g.get('citizen_remedy')}\n"
+                )
+
+        # 2. Dense case law vectors from dhaara_case_law
+        for idx, chunk in enumerate(chunks, 1):
+            block = (
+                f"[Supreme Court Precedent Record {idx}]\n"
+                f"• Case Name: {chunk.get('case_name', 'Supreme Court of India')}\n"
+                f"• Citation: {chunk.get('citation', '')}\n"
+                f"• Judgment Date: {chunk.get('judgment_date', '')}\n"
+                f"• Relevance: {chunk.get('similarity_score', 0.0):.4f}\n"
+                f"• Judicial Holding / Excerpt:\n{chunk.get('text', '').strip()[:800]}\n"
+            )
+            formatted_blocks.append(block)
+
+        if not formatted_blocks:
+            return "No specific case law records retrieved. Apply established Supreme Court precedents on point."
+
+        return "\n".join(formatted_blocks)
+
+    def _build_template_guidance_response(
+        self,
+        template: Dict[str, Any],
+        question: str,
+        language: str,
+        user_role: str
+    ) -> Dict[str, Any]:
+        is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
+        t_id = template["template_id"]
+        t_title = template.get("title_hi" if is_hindi else "title", template["title"])
+        t_basis = template.get("legal_basis", "")
+        t_act = template.get("relevant_act", "")
+        t_secs = template.get("relevant_sections", "")
+        t_desc = template.get("description_hi" if is_hindi else "description", template["description"])
+        t_req_fields = template.get("required_fields", [])
+        t_req_docs = template.get("required_documents", [])
+
+        if is_hindi:
+            ans = f"""### **{t_title}** — विधिक ड्राफ्ट प्रारूप एवं दिशानिर्देश
+
+#### **1. विधिक आधार व सांविधिक व्यवस्था**
+- **शासी अधिनियम**: {t_act}
+- **संबंधित धाराएं**: {t_secs}
+- **प्रक्रियात्मक अनिवार्यता**: {t_desc}
+- **कानूनी आधार**: {t_basis}
+
+#### **2. अनिवार्य आवश्यक विवरण व दस्तावेज**
+- **अनिवार्य विवरण**: {', '.join(t_req_fields) if t_req_fields else 'पक्षकारों का नाम, पता व घटना विवरण'}
+- **संलग्न किए जाने वाले दस्तावेज**: {', '.join(t_req_docs) if t_req_docs else 'साक्ष्य व पहचान प्रमाण'}
+
+#### **3. ड्राफ्टिंग एवं विधिक प्रक्रिया चरण**
+1. सभी आवश्यक तथ्य व विवरण (तारीख, स्थान, चेक/बैंक मेमो अथवा घटना विवरण) क्रमवार एकत्रित करें।
+2. अधिनियम के तहत निर्धारित 15-दिवसीय अथवा विहित वैधानिक समय-सीमा का पालन करें।
+3. ड्राफ्ट तैयार करने के बाद सक्षम प्राधिकारी / न्यायालय अथवा विपक्षी को प्रेषित करें।
+
+> ✍️ **सुझाव**: आप **DhaaraAI Drafting Studio** में जाकर इस दस्तावेज़ को सीधे जनरेट, एडिट तथा **Word (.doc) / PDF** में एक्सपोर्ट कर सकते हैं।
+
+*AI-assisted draft guidance — verify facts, applicable law, jurisdiction and procedural requirements before filing.*"""
+        else:
+            ans = f"""### **{t_title}** — Legal Draft Template & Procedure
+
+#### **1. Statutory Framework & Governing Law**
+- **Governing Enactment**: {t_act}
+- **Applicable Sections**: {t_secs}
+- **Legal Basis**: {t_basis}
+- **Procedural Mandate**: {t_desc}
+
+#### **2. Mandatory Information & Essential Documents**
+- **Required Fields**: {', '.join(t_req_fields) if t_req_fields else 'Party details, facts, date, jurisdiction'}
+- **Essential Documents**: {', '.join(t_req_docs) if t_req_docs else 'Identity proof, incident records, receipts'}
+
+#### **3. Step-by-Step Drafting Procedure**
+1. Collate chronological facts (dates, amounts, transaction IDs, return memos, or occurrence details).
+2. Adhere strictly to the statutory cure / limitation period (e.g., 15 days upon notice service for Sec 138 NI Act).
+3. Verify territorial jurisdiction (Magistrate court, Sessions court, or Consumer Commission) before dispatch/filing.
+
+> ✍️ **Drafting Studio Integration**: You can open **DhaaraAI Drafting Studio** to dynamically fill and export this complete legal document in **Word (.doc)** and **PDF** formats.
+
+*AI-assisted draft guidance — verify facts, applicable law, jurisdiction and procedural requirements before filing.*"""
+
+        sources = [{
+            "source_type": "Draft Template",
+            "template_id": t_id,
+            "title": t_title,
+            "section": t_secs,
+            "section_title": t_title,
+            "source": t_act,
+            "legal_basis": t_basis,
+            "action": "open_drafter"
+        }]
+
+        return {
+            "answer": ans,
+            "sources": sources,
+            "question": question,
+            "language": language,
+            "concordance": diagnose_situation(question, user_role)
+        }
+
+    def _build_glossary_definition_response(
+        self,
+        term: Dict[str, Any],
+        question: str,
+        language: str,
+        user_role: str
+    ) -> Dict[str, Any]:
+        is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
+        term_en = term["term"]
+        term_hi = term.get("hindi_term", "")
+        simple_exp = term.get("simple_hi_explanation" if is_hindi else "simple_en_explanation", "")
+        legal_ctx = term.get("legal_context", "")
+        acts = term.get("related_acts", [])
+        secs = term.get("related_sections", [])
+        cases = term.get("related_case_law_ids", [])
+        aliases = term.get("aliases_synonyms", [])
+
+        if is_hindi:
+            ans = f"""### **{term_hi or term_en}** ({term_en})
+
+#### **1. सरल व्याख्या (Plain Citizen Meaning)**
+{simple_exp}
+
+#### **2. औपचारिक प्रक्रियात्मक एवं विधिक संदर्भ (Legal Context)**
+{legal_ctx}
+
+#### **3. संबंधित अधिनियम एवं धाराएं (Governing Statutes)**
+- **अधिनियम**: {', '.join(acts) if acts else 'भारतीय संविधि'}
+- **सुसंगत धाराएं**: {', '.join(secs) if secs else 'विहित प्रावधान'}
+"""
+            if cases:
+                ans += f"\n#### **4. प्रमुख न्यायिक दृष्टांत (Landmark Case Law)**\n- {', '.join(cases)}\n"
+            if aliases:
+                ans += f"\n*समानार्थी / अन्य नाम: {', '.join(aliases)}*\n"
+        else:
+            ans = f"""### **{term_en}** {f'({term_hi})' if term_hi else ''}
+
+#### **1. Plain Meaning & Citizen Explanation**
+{simple_exp}
+
+#### **2. Procedural & Statutory Context**
+{legal_ctx}
+
+#### **3. Relevant Acts & Statutory Sections**
+- **Acts**: {', '.join(acts) if acts else 'Indian Statutes'}
+- **Governing Sections**: {', '.join(secs) if secs else 'Statutory provisions'}
+"""
+            if cases:
+                ans += f"\n#### **4. Landmark Precedents**\n- {', '.join(cases)}\n"
+            if aliases:
+                ans += f"\n*Common Aliases / Synonyms: {', '.join(aliases)}*\n"
+
+        ans += "\n*Reference from DhaaraAI Verified Legal Glossary. Consult professional counsel for case-specific legal strategy.*"
+
+        sources = [{
+            "source_type": "Legal Glossary",
+            "term_id": term["id"],
+            "term": term_en,
+            "hindi_term": term_hi,
+            "category": term.get("category", ""),
+            "section": ", ".join(secs) if secs else term_en,
+            "section_title": f"Legal Glossary — {term_en}",
+            "source": ", ".join(acts) if acts else "Indian Legal Glossary",
+            "action": "open_glossary"
+        }]
+
+        return {
+            "answer": ans,
+            "sources": sources,
+            "question": question,
+            "language": language,
+            "concordance": diagnose_situation(question, user_role)
+        }
 
     def _generate_offline_concordance_fallback(
         self,
@@ -135,54 +335,122 @@ class DhaaraRAGEngine:
         language: str = "English",
         user_role: str = "general",
         top_k: int = 5,
-        stream: bool = False
+        stream: bool = False,
+        conversation_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict[str, Any]:
         """
-        Executes end-to-end situational legal intelligence query with robust fallbacks.
+        Executes end-to-end situational legal intelligence query with multi-layer knowledge routing:
+        - Draft Templates Layer (e.g. 'Make a cheque bounce notice')
+        - Legal Glossary Layer (e.g. 'What does cognizance mean?')
+        - Supreme Court Case-Law RAG Layer (e.g. 'What did Supreme Court say about Section 41A?')
+        - Statutory RAG & Concordance Layer (e.g. 'What is BNS Section 318?')
         """
         is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
 
-        # 1. Retrieve top_k chunks from ChromaDB
-        raw_chunks = self.embed_store.query(question, top_k=top_k)
+        # Layer 1: Draft Template Intent Routing
+        matched_template = find_matching_template_for_query(question)
+        if matched_template:
+            return self._build_template_guidance_response(matched_template, question, language, user_role)
 
-        # Filter chunks by similarity threshold
-        relevant_chunks = [
-            c for c in raw_chunks
+        # Layer 2: Legal Glossary Definition Intent Routing
+        glossary_match = legal_glossary.find_glossary_match_for_query(question)
+        if glossary_match:
+            return self._build_glossary_definition_response(glossary_match, question, language, user_role)
+
+        # Layer 3 & 4: Dual Semantic RAG (Statutory Knowledge + Supreme Court Precedents)
+        q_lower = question.lower()
+        is_case_law_query = any(k in q_lower for k in [
+            "supreme court", "case law", "precedent", "judgment", "ruling", "arnesh kumar",
+            "bench", "held", "sc held", "sc ruled", "landmark case", "directive", "quashing guideline"
+        ])
+        
+        # 1. Statutory Retrieval
+        raw_statute_chunks = self.embed_store.query(question, top_k=top_k)
+        statute_chunks = [
+            c for c in raw_statute_chunks
             if c.get("similarity_score", 0.0) >= SIMILARITY_THRESHOLD
         ]
+        if not statute_chunks and raw_statute_chunks:
+            statute_chunks = raw_statute_chunks[:3]
+        for c in statute_chunks:
+            if "source_type" not in c:
+                c["source_type"] = "Statutory Sources"
 
-        used_chunks = relevant_chunks if relevant_chunks else (raw_chunks[:2] if raw_chunks else [])
+        # 2. Case Law Retrieval from dhaara_case_law (Supreme Court precedents)
+        raw_case_chunks = self.embed_store.query_case_law(question, top_k=4 if is_case_law_query else 3)
+        case_chunks = [
+            c for c in raw_case_chunks
+            if c.get("similarity_score", 0.0) >= 0.35
+        ]
+        if not case_chunks and raw_case_chunks:
+            case_chunks = raw_case_chunks[:2]
+        for c in case_chunks:
+            c["source_type"] = "Case Law"
 
-        # 2. Build enriched context
+        # Combined used chunks for source citation UI cards (order by relevance/intent)
+        if is_case_law_query:
+            used_chunks = case_chunks + statute_chunks
+        else:
+            used_chunks = statute_chunks + case_chunks
+
+        # Format context blocks
         concordance_ctx = self._format_concordance_context(question, user_role)
-        retrieved_ctx = self._format_retrieved_chunks(used_chunks)
+        retrieved_ctx = self._format_retrieved_chunks(statute_chunks)
+        case_law_ctx = self._format_case_law_chunks(case_chunks, question)
+
+        # Determine Query Complexity for Adaptive Depth
+        is_simple_query = (
+            len(question.strip().split()) <= 4 and
+            any(question.strip().lower().startswith(w) for w in ["what is", "define", "kya hai", "meaning of"])
+        )
+        if is_simple_query:
+            token_budget = 600
+            depth_instruction = (
+                "Please provide a clear, concise, and focused legal explanation addressing the core definition, legal basis, and citizen significance."
+                if not is_hindi else
+                "कृपया मुख्य परिभाषा, कानूनी आधार और नागरिक महत्व को समझाते हुए एक स्पष्ट व संक्षिप्त कानूनी व्याख्या प्रदान करें।"
+            )
+        else:
+            token_budget = 950
+            depth_instruction = (
+                "Please provide a comprehensive, authoritative legal research response. "
+                "Explain the exact legal issue, statutory provisions, procedural sequence, time limits, required documents, "
+                "application to the facts, exceptions, and practical next steps using the preferred structured format. "
+                "Do NOT default to a brief summary card or key-points only."
+                if not is_hindi else
+                "कृपया एक संपूर्ण, प्रामाणिक और विस्तृत कानूनी शोध समाधान प्रदान करें। "
+                "कानूनी मुद्दे, सांविधिक प्रावधानों, चरणबद्ध प्रक्रिया, समय-सीमाओं, आवश्यक दस्तावेजों, तथ्यों पर अनुप्रयोग, "
+                "अपवादों और व्यावहारिक अगले कदमों को अनुशंसित संरचना के अनुसार गहराई से समझाएं। केवल संक्षिप्त बुलेट पॉइंट्स तक सीमित न रहें।"
+            )
 
         if is_hindi:
             system_prompt = SYSTEM_PROMPT_HI.format(
                 disclaimer=LEGAL_DISCLAIMER_HI,
                 concordance_context=concordance_ctx,
-                retrieved_context=retrieved_ctx
+                retrieved_context=retrieved_ctx,
+                case_law_context=case_law_ctx
             )
             user_prompt = (
                 f"नागरिक का सवाल / स्थिति: {question}\n"
                 f"नागरिक का दृष्टिकोण: {user_role}\n\n"
-                f"कृपया 100% स्पष्ट, सरल हिंदी (देवनागरी लिपि) में बुलेट पॉइंट्स के साथ त्वरित, सीधा व पूरा कानूनी समाधान दें।"
+                f"{depth_instruction}"
             )
             active_disclaimer = LEGAL_DISCLAIMER_HI
         else:
             system_prompt = SYSTEM_PROMPT_EN.format(
                 disclaimer=LEGAL_DISCLAIMER_EN,
                 concordance_context=concordance_ctx,
-                retrieved_context=retrieved_ctx
+                retrieved_context=retrieved_ctx,
+                case_law_context=case_law_ctx
             )
             user_prompt = (
                 f"Citizen Query / Situation: {question}\n"
                 f"User Perspective: {user_role}\n\n"
-                f"Please provide a crisp, direct, concise legal solution in clean bullet points following the specified format."
+                f"{depth_instruction}"
             )
             active_disclaimer = LEGAL_DISCLAIMER_EN
 
-        # 3. Check Groq Client Availability
+        # Check Groq Client Availability
         if not self.client:
             if not self.api_key:
                 offline_resp = self._generate_offline_concordance_fallback(
@@ -201,75 +469,100 @@ class DhaaraRAGEngine:
             self._init_groq_client(self.api_key)
 
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
+            {"role": "system", "content": system_prompt}
         ]
 
-        # 4. Invoke Groq API with robust Try/Except fallback
-        try:
-            if stream:
-                response_stream = self.client.chat.completions.create(
-                    model=self.model_name,
-                    messages=messages,
-                    temperature=0.1,
-                    max_tokens=900,
-                    stream=True
-                )
+        # Inject up to the last 6 previous conversation turns if provided
+        if conversation_history:
+            recent_turns = conversation_history[-6:]
+            for turn in recent_turns:
+                t_role = turn.get("role")
+                t_content = turn.get("content", "")
+                if t_role in ["user", "assistant"] and t_content:
+                    # Truncate any oversized previous turns to save token budget
+                    trimmed_content = t_content if len(t_content) <= 1200 else t_content[:1200] + "... [context truncated]"
+                    messages.append({"role": t_role, "content": trimmed_content})
 
-                def token_generator():
-                    for chunk in response_stream:
-                        if chunk.choices and chunk.choices[0].delta.content:
-                            yield chunk.choices[0].delta.content
+        messages.append({"role": "user", "content": user_prompt})
 
-                return {
-                    "answer_stream": token_generator(),
-                    "sources": used_chunks,
-                    "question": question,
-                    "language": language,
-                    "concordance": diagnose_situation(question, user_role)
-                }
-            else:
-                response = self.client.chat.completions.create(
-                    model=self.model_name,
-                    messages=messages,
-                    temperature=0.1,
-                    max_tokens=900,
-                    stream=False
-                )
-                answer_text = response.choices[0].message.content.strip()
+        # Invoke Groq API with primary and fallback models
+        models_to_try = [self.model_name]
+        if FALLBACK_MODEL not in models_to_try:
+            models_to_try.append(FALLBACK_MODEL)
+        if "openai/gpt-oss-120b" not in models_to_try:
+            models_to_try.append("openai/gpt-oss-120b")
 
-                if active_disclaimer not in answer_text:
-                    answer_text += f"\n\n*{active_disclaimer}*"
+        last_err = None
+        for model in models_to_try:
+            try:
+                if stream:
+                    response_stream = self.client.chat.completions.create(
+                        model=model,
+                        messages=messages,
+                        temperature=0.1,
+                        max_tokens=token_budget,
+                        stream=True
+                    )
 
-                return {
-                    "answer": answer_text,
-                    "sources": used_chunks,
-                    "question": question,
-                    "language": language,
-                    "concordance": diagnose_situation(question, user_role)
-                }
+                    def token_generator():
+                        for chunk in response_stream:
+                            if chunk.choices and chunk.choices[0].delta.content:
+                                yield chunk.choices[0].delta.content
 
-        except Exception as api_err:
-            print(f"[rag_engine] Groq API call failed: {api_err}. Activating graceful fallback.")
-            error_reason = (
-                "AI सेवा अस्थायी रूप से अनुपलब्ध है। त्वरित वैधानिक जानकारी नीचे उपलब्ध है:"
-                if is_hindi else
-                "AI service temporarily unavailable. Direct statutory guidance is provided below:"
-            )
-            fallback_text = self._generate_offline_concordance_fallback(
-                question=question,
-                user_role=user_role,
-                reason=error_reason,
-                language=language
-            )
+                    return {
+                        "answer_stream": token_generator(),
+                        "sources": used_chunks,
+                        "question": question,
+                        "language": language,
+                        "concordance": diagnose_situation(question, user_role)
+                    }
+                else:
+                    response = self.client.chat.completions.create(
+                        model=model,
+                        messages=messages,
+                        temperature=0.1,
+                        max_tokens=token_budget,
+                        stream=False
+                    )
+                    answer_text = response.choices[0].message.content.strip()
 
-            return {
-                "answer": fallback_text,
-                "sources": used_chunks,
-                "question": question,
-                "language": language,
-                "concordance": diagnose_situation(question, user_role)
-            }
+                    if answer_text:
+                        if active_disclaimer not in answer_text:
+                            answer_text += f"\n\n*{active_disclaimer}*"
+
+                        return {
+                            "answer": answer_text,
+                            "sources": used_chunks,
+                            "question": question,
+                            "language": language,
+                            "concordance": diagnose_situation(question, user_role)
+                        }
+            except Exception as api_err:
+                print(f"[rag_engine] Model '{model}' failed: {api_err}. Trying next fallback...")
+                last_err = api_err
+                continue
+
+        # If all API calls fail, activate graceful offline fallback
+        print(f"[rag_engine] All model attempts failed. Last error: {last_err}. Activating offline fallback.")
+        error_reason = (
+            "AI सेवा अस्थायी रूप से अनुपलब्ध है। त्वरित वैधानिक जानकारी नीचे उपलब्ध है:"
+            if is_hindi else
+            "AI service temporarily unavailable. Direct statutory guidance is provided below:"
+        )
+        fallback_text = self._generate_offline_concordance_fallback(
+            question=question,
+            user_role=user_role,
+            reason=error_reason,
+            language=language
+        )
+
+        return {
+            "answer": fallback_text,
+            "sources": used_chunks,
+            "question": question,
+            "language": language,
+            "concordance": diagnose_situation(question, user_role)
+        }
 
     def generate_legal_draft(
         self,
@@ -282,12 +575,15 @@ class DhaaraRAGEngine:
         incident_location: str,
         facts: str,
         evidence: str,
-        relief_sought: str
+        relief_sought: str,
+        extra_fields: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Generates a formal, legally grounded FIR Application or Legal Demand Notice.
+        Generates a formal, legally grounded court-compliant draft across all 12 templates.
         """
         is_hindi = str(language).strip().lower() in ["hindi", "hi", "हिंदी"]
+        extras = extra_fields or {}
+        extra_info_str = ", ".join([f"{k}: {v}" for k, v in extras.items() if v]) if extras else ""
         
         # Diagnose incident to find relevant statutory sections
         diagnosis = diagnose_situation(f"{incident_category} {facts}")
@@ -306,12 +602,13 @@ class DhaaraRAGEngine:
 अपराध की श्रेणी: {incident_category}
 घटना की तारीख व समय: {incident_datetime}
 घटना स्थल: {incident_location}
+विशिष्ट विवरण / अतिरिक्त फील्ड्स: {extra_info_str or 'लागू नहीं'}
 घटना के मुख्य तथ्य: {facts}
 संलग्न साक्ष्य: {evidence}
 मांगी गई राहत / प्रार्थना: {relief_sought}
 पहचानी गई संभावित धाराएं: {sections_str}
 
-कृपया संपूर्ण, औपचारिक और प्रिंट करने योग्य विधिक ड्राफ्ट (FIR या लीगल नोटिस) तैयार करें।"""
+कृपया संपूर्ण, औपचारिक और प्रिंट करने योग्य विधिक ड्राफ्ट तैयार करें।"""
         else:
             system_prompt = DRAFTING_SYSTEM_PROMPT_EN
             user_prompt = f"""Document Type: {document_type}
@@ -321,12 +618,13 @@ Accused / Respondent: {accused.get('name', 'Unknown')}, Address/Contact: {accuse
 Incident Category: {incident_category}
 Incident Date & Time: {incident_datetime}
 Incident Location: {incident_location}
+Specific Template Particulars: {extra_info_str or 'None'}
 Statement of Facts: {facts}
 Attached Evidence / Documents: {evidence}
 Relief / Prayer Sought: {relief_sought}
 Suggested Governing Sections: {sections_str}
 
-Please produce a comprehensive, formal, print-ready legal draft adhering to Indian police/legal standards."""
+Please produce a comprehensive, formal, print-ready legal draft adhering to Indian court/police standards."""
 
         if not self.client:
             self._init_groq_client(self.api_key)
@@ -339,7 +637,7 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
                     {"role": "user", "content": user_prompt}
                 ],
                 temperature=0.15,
-                max_tokens=1500,
+                max_tokens=950,
                 stream=False
             )
             draft_text = response.choices[0].message.content.strip()
@@ -362,7 +660,8 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
                 facts=facts,
                 evidence=evidence,
                 relief=relief_sought,
-                sections=sections_str
+                sections=sections_str,
+                extra_fields=extras
             )
             return {
                 "success": True,
@@ -383,7 +682,8 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
         facts: str,
         evidence: str,
         relief: str,
-        sections: str
+        sections: str,
+        extra_fields: Optional[Dict[str, Any]] = None
     ) -> str:
         return generate_fallback_draft(
             document_type=document_type,
@@ -395,7 +695,8 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
             facts=facts,
             evidence=evidence,
             relief=relief,
-            sections=sections
+            sections=sections,
+            extra_fields=extra_fields
         )
 
     def analyze_legal_document(

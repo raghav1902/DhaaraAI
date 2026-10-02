@@ -1,3 +1,162 @@
+export const LEGAL_TEMPLATES = [
+  {
+    id: 'rti_application',
+    documentType: 'RTI Application',
+    title_en: 'RTI Application (Right to Information)',
+    title_hi: 'सूचना का अधिकार (RTI) आवेदन पत्र',
+    category: 'Administrative & Public Records',
+    desc_en: 'Formal citizen application to Public Information Officer (PIO) under Section 6(1) of RTI Act, 2005.',
+    desc_hi: 'सरकारी विभाग / लोक सूचना अधिकारी (PIO) से धारा 6(1) के तहत आधिकारिक व प्रमाणित रिकॉर्ड प्राप्त करने हेतु आवेदन।',
+    relevant_act: 'Right to Information Act, 2005',
+    relevant_sections: 'Section 6(1), Section 7(1) RTI Act',
+    defaultCategory: 'Other',
+    iconType: 'BookOpen'
+  },
+  {
+    id: 'legal_demand_notice',
+    documentType: 'Legal Demand Notice',
+    title_en: 'Statutory Legal Demand Notice',
+    title_hi: 'विधिक मांग नोटिस (Legal Demand Notice)',
+    category: 'Civil & Commercial Disputes',
+    desc_en: 'Formal notice served under Section 80 CPC / civil procedure giving 15-day cure period before filing suit.',
+    desc_hi: 'दूसरी पार्टी को 15 दिन की वैधानिक मोहलत, बकाया राशि या अनुबंध उल्लंघन के विरुद्ध कानूनी चेतावनी।',
+    relevant_act: 'Code of Civil Procedure, 1908 / Contract Act',
+    relevant_sections: 'Section 80 CPC / Specific Relief Act',
+    defaultCategory: 'Cheating',
+    iconType: 'Scale'
+  },
+  {
+    id: 'cheque_bounce_notice',
+    documentType: 'Cheque Bounce Notice (Section 138 NI Act)',
+    title_en: 'Cheque Bounce Legal Notice (NI Act Sec 138)',
+    title_hi: 'चेक बाउंस विधिक मांग नोटिस (धारा 138 NI Act)',
+    category: 'Banking & Financial Crimes',
+    desc_en: 'Mandatory statutory 15-day demand notice under Section 138 of Negotiable Instruments Act upon dishonour of cheque.',
+    desc_hi: 'बैंक से चेक अनादरित (बाउंस) होने पर 30 दिन के भीतर दूसरी पार्टी को 15 दिन का अनिवार्य भुगतान नोटिस।',
+    relevant_act: 'Negotiable Instruments Act, 1881',
+    relevant_sections: 'Section 138, Section 142 NI Act',
+    defaultCategory: 'Cheque Bounce',
+    iconType: 'FileSpreadsheet'
+  },
+  {
+    id: 'bail_application',
+    documentType: 'Regular Bail Application',
+    title_en: 'Regular Bail Application (Section 480 / 483 BNSS)',
+    title_hi: 'नियमित जमानत प्रार्थना पत्र (धारा 480 / 483 BNSS)',
+    category: 'Criminal Defense & Liberty',
+    desc_en: 'Application for release of accused from judicial or police custody under Section 480/483 of BNSS, 2023.',
+    desc_hi: 'गिरफ्तारी के उपरांत न्यायिक अथवा पुलिस हिरासत से रिहाई हेतु सक्षम न्यायालय के समक्ष जमानत याचिका।',
+    relevant_act: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
+    relevant_sections: 'Section 480, 483 BNSS 2023 (Legacy Sec 437/439 CrPC)',
+    defaultCategory: 'Other',
+    iconType: 'ShieldCheck'
+  },
+  {
+    id: 'anticipatory_bail_application',
+    documentType: 'Anticipatory Bail Application',
+    title_en: 'Anticipatory Bail Application (Section 482 BNSS)',
+    title_hi: 'अग्रिम जमानत प्रार्थना पत्र (धारा 482 BNSS)',
+    category: 'Criminal Defense & Liberty',
+    desc_en: 'Pre-arrest bail application filed before Sessions Court or High Court under Section 482 BNSS, 2023.',
+    desc_hi: 'गैर-जमानती अपराध में संभावित झूठी गिरफ्तारी से पूर्व सत्र न्यायालय या उच्च न्यायालय में संरक्षण याचिका।',
+    relevant_act: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
+    relevant_sections: 'Section 482 BNSS 2023 (Legacy Sec 438 CrPC)',
+    defaultCategory: 'Other',
+    iconType: 'ShieldCheck'
+  },
+  {
+    id: 'consumer_complaint',
+    documentType: 'Consumer Complaint',
+    title_en: 'Consumer Complaint (District Commission)',
+    title_hi: 'उपभोक्ता शिकायत (जिला उपभोक्ता आयोग)',
+    category: 'Consumer Protection',
+    desc_en: 'Formal petition under Section 35 of Consumer Protection Act, 2019 for defective goods or deficient services.',
+    desc_hi: 'दोषपूर्ण उत्पाद, अनुचित व्यापार प्रथा अथवा सेवा में कमी के विरुद्ध मुआवजा व रिफंड हेतु उपभोक्ता फोरम में वाद।',
+    relevant_act: 'Consumer Protection Act, 2019',
+    relevant_sections: 'Section 35, Section 38 CPA 2019',
+    defaultCategory: 'Cheating',
+    iconType: 'AlertTriangle'
+  },
+  {
+    id: 'maintenance_application',
+    documentType: 'Maintenance Application',
+    title_en: 'Maintenance Application (Section 144 BNSS)',
+    title_hi: 'भरण-पोषण आवेदन पत्र (धारा 144 BNSS)',
+    category: 'Family & Matrimonial',
+    desc_en: 'Application for monthly maintenance for wife, minor children, or elderly parents under Section 144 BNSS, 2023.',
+    desc_hi: 'पत्नी, नाबालिग बच्चों या बुजुर्ग माता-पिता के मासिक गुजारा भत्ता हेतु न्यायिक मजिस्ट्रेट के समक्ष याचिका।',
+    relevant_act: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
+    relevant_sections: 'Section 144 BNSS 2023 (Legacy Sec 125 CrPC)',
+    defaultCategory: 'Matrimonial',
+    iconType: 'FileText'
+  },
+  {
+    id: 'general_affidavit',
+    documentType: 'General Sworn Affidavit',
+    title_en: 'General Sworn Affidavit',
+    title_hi: 'सामान्य शपथपत्र (हलफनामा)',
+    category: 'Court & Official Procedure',
+    desc_en: 'Sworn legal statement of facts attested before Oath Commissioner / Notary Public under Order XIX CPC & Section 338 BNSS.',
+    desc_hi: 'सत्यनिष्ठापूर्वक तथ्यों के कथन का विधिक शपथपत्र (कोर्ट फाइलिंग, नाम शुद्धि या पता सत्यापन हेतु)।',
+    relevant_act: 'Code of Civil Procedure, 1908 / Notaries Act',
+    relevant_sections: 'Order 19 CPC, Section 338 BNSS 2023',
+    defaultCategory: 'Other',
+    iconType: 'Scroll'
+  },
+  {
+    id: 'fir_application',
+    documentType: 'FIR Application',
+    title_en: 'Police Complaint for FIR (Section 173 BNSS)',
+    title_hi: 'पुलिस प्राथमिकी (FIR) शिकायत आवेदन (धारा 173 BNSS)',
+    category: 'Police & Criminal Procedure',
+    desc_en: 'Formal complaint to Station House Officer (SHO) under Section 173 BNSS, 2023 for registration of FIR.',
+    desc_hi: 'थाना प्रभारी (SHO) को संज्ञेय अपराध की जांच व प्राथमिकी दर्ज कराने हेतु विधिक तहरीर।',
+    relevant_act: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
+    relevant_sections: 'Section 173 BNSS 2023 (Legacy Sec 154 CrPC)',
+    defaultCategory: 'Cyber Fraud',
+    iconType: 'ShieldCheck'
+  },
+  {
+    id: 'reply_legal_notice',
+    documentType: 'Reply to Legal Notice',
+    title_en: 'Reply to Legal Notice',
+    title_hi: 'विधिक नोटिस का औपचारिक प्रत्युत्तर (Reply)',
+    category: 'Civil & Commercial Disputes',
+    desc_en: 'Formal response rebutting false allegations and establishing legitimate defence to a legal notice received.',
+    desc_hi: 'प्राप्त लीगल नोटिस के झूठे दावों का विधिवत खंडन करते हुए भेजा जाने वाला आधिकारिक प्रत्युत्तर।',
+    relevant_act: 'Code of Civil Procedure, 1908 / Law of Pleadings',
+    relevant_sections: 'Civil Pleading & Contractual Principles',
+    defaultCategory: 'Cheating',
+    iconType: 'FileText'
+  },
+  {
+    id: 'rent_lease_notice',
+    documentType: 'Tenancy & Eviction Legal Notice',
+    title_en: 'Tenancy & Eviction Legal Notice',
+    title_hi: 'किरायेदारी व बेदखली विधिक नोटिस',
+    category: 'Property & Tenancy',
+    desc_en: 'Statutory eviction or rent default notice served under Section 106 of Transfer of Property Act, 1882.',
+    desc_hi: 'किराया बकाया चुकता करने अथवा 15/30 दिन में परिसर खाली करने हेतु मकान मालिक/किरायेदार नोटिस।',
+    relevant_act: 'Transfer of Property Act, 1882 / Model Tenancy Act',
+    relevant_sections: 'Section 106 Transfer of Property Act',
+    defaultCategory: 'Tenant/Landlord Dispute',
+    iconType: 'FileText'
+  },
+  {
+    id: 'general_petition',
+    documentType: 'General Representation / Citizen Petition',
+    title_en: 'General Administrative Representation / Petition',
+    title_hi: 'प्रशासनिक अभ्यावेदन / जनहित प्रार्थना पत्र',
+    category: 'Administrative & Public Records',
+    desc_en: 'Citizen representation submitted to public authority or District Magistrate under Article 350 of Constitution.',
+    desc_hi: 'जिला प्रशासन अथवा सक्षम अधिकारी को जनसमस्या निवारण व प्रशासनिक कार्रवाई हेतु प्रस्तुत ज्ञापन।',
+    relevant_act: 'Constitution of India',
+    relevant_sections: 'Article 350 of the Constitution of India',
+    defaultCategory: 'Other',
+    iconType: 'FileText'
+  }
+];
+
 export const CATEGORIES = [
   { id: 'Accident', en: 'Road Accident / Hit & Run (BNS 281, 125)', hi: 'सड़क दुर्घटना / टक्कर (BNS 281, 125)' },
   { id: 'Cyber Fraud', en: 'Cyber Fraud / UPI Scam (BNS 318(4), IT Act)', hi: 'साइबर ठगी / यूपीआई फ्रॉड (BNS 318(4))' },
@@ -7,7 +166,7 @@ export const CATEGORIES = [
   { id: 'Cheque Bounce', en: 'Cheque Bounce / Non-Payment (Sec 138 NI Act)', hi: 'चेक बाउंस / गैर-भुगतान (NI Act 138)' },
   { id: 'Tenant/Landlord Dispute', en: 'Tenant / Landlord Dispute & Deposit (Model Tenancy)', hi: 'किरायेदार-मकान मालिक विवाद व सिक्योरिटी डिपॉजिट' },
   { id: 'Matrimonial', en: 'Domestic Violence / Cruelty (BNS 85, 86)', hi: 'घरेलू हिंसा व प्रताड़ना (BNS 85, 86)' },
-  { id: 'Other', en: 'Other Statutory Dispute', hi: 'अन्य वैधानिक विवाद' }
+  { id: 'Other', en: 'Other Statutory Dispute / Representation', hi: 'अन्य वैधानिक विवाद / प्रशासनिक अभ्यावेदन' }
 ];
 
 export const EVIDENCE_PRESETS = [
@@ -17,5 +176,8 @@ export const EVIDENCE_PRESETS = [
   { id: 'photos', en: 'Photographs of Incident Spot & Physical Damage', hi: 'घटनास्थल एवं वाहन/क्षति के स्पष्ट फोटोग्राफ्स' },
   { id: 'medical_slip', en: 'Hospital Medical Examination Report (MLC / Prescription)', hi: 'अस्पताल की मेडिकल जांच रिपोर्ट (MLC पर्चा)' },
   { id: 'cheque_memo', en: 'Original Bounced Cheque & Bank Return Memo', hi: 'मूल चेक एवं बैंक का अनादरण मेमो (Return Memo)' },
-  { id: 'written_agreement', en: 'Written Agreement / Invoices / Payment Receipts', hi: 'लिखित इकरारनामा / बिल / भुगतान रसीद' }
+  { id: 'written_agreement', en: 'Written Agreement / Invoices / Payment Receipts', hi: 'लिखित इकरारनामा / बिल / भुगतान रसीद' },
+  { id: 'postal_receipt', en: 'Registered Speed Post Receipt & Tracking Report', hi: 'रजिस्टर्ड स्पीड पोस्ट रसीद एवं ट्रैकिंग रिपोर्ट' },
+  { id: 'fir_copy', en: 'Certified Copy of FIR & Case Diary Extract', hi: 'एफआईआर की प्रमाणित प्रतिलिपि व केस डायरी' },
+  { id: 'fee_receipt', en: 'RTI Application Fee IPO / Challan Copy', hi: 'आरटीआई आवेदन शुल्क पोस्टल आर्डर / चालान प्रति' }
 ];

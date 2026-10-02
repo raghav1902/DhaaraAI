@@ -14,73 +14,110 @@ export default function AuthPage({ onLogin, onBack }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
+    setIsSubmitting(true);
 
     const emailTrimmed = formData.email.trim().toLowerCase();
 
-    // Get existing registered users list from localStorage
-    let registeredUsers = [];
     try {
-      registeredUsers = JSON.parse(localStorage.getItem('dhaara_registered_users') || '[]');
-    } catch {
-      registeredUsers = [];
-    }
+      if (isLogin) {
+        // Authenticate with backend
+        const response = await fetch('http://localhost:8000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailTrimmed,
+            password: formData.password
+          })
+        });
 
-    if (isLogin) {
-      // Find matching user by email
-      const existingUser = registeredUsers.find(
-        u => u.email && u.email.trim().toLowerCase() === emailTrimmed
-      );
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Invalid email or password');
+        }
 
-      let userName = '';
-      if (existingUser && existingUser.name) {
-        userName = existingUser.name;
+        const data = await response.json();
+        onLogin({
+          user_id: data.user_id,
+          name: data.name,
+          email: data.email,
+          token: data.token
+        });
       } else {
-        const prefix = emailTrimmed.split('@')[0] || 'User';
-        userName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        // Registration flow
+        if (formData.password !== formData.confirmPassword) {
+          setAuthError('Passwords do not match. Please verify and try again.');
+          setIsSubmitting(false);
+          return;
+        }
+
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName.trim() || 'User';
+
+        const response = await fetch('http://localhost:8000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailTrimmed,
+            password: formData.password,
+            name: fullName
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Registration failed. User may already exist.');
+        }
+
+        const data = await response.json();
+        onLogin({
+          user_id: data.user_id,
+          name: data.name,
+          email: data.email,
+          token: data.token
+        });
       }
-
-      onLogin({
-        name: userName,
-        email: formData.email,
-        password: formData.password
-      });
-    } else {
-      // Registration flow
-      if (formData.password !== formData.confirmPassword) {
-        setAuthError('Passwords do not match. Please verify and try again.');
-        return;
-      }
-
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName.trim() || 'User';
-
-      const filtered = registeredUsers.filter(
-        u => u.email && u.email.trim().toLowerCase() !== emailTrimmed
-      );
-      filtered.push({
-        email: emailTrimmed,
-        name: fullName,
-        password: formData.password
-      });
-
-      localStorage.setItem('dhaara_registered_users', JSON.stringify(filtered));
-
-      onLogin({
-        name: fullName,
-        email: formData.email,
-        password: formData.password
-      });
+    } catch (err) {
+      setAuthError(err.message || 'Authentication failed. Please check server connection.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleGoogleAuth = () => {
-    onLogin({
-      name: 'Advocate User',
-      email: 'advocate.user@dhaaraai.com',
-      password: 'google-oauth-session'
-    });
+  const handleGoogleAuth = async () => {
+    setAuthError('');
+    setIsSubmitting(true);
+    try {
+      // Simulate OAuth redirect or dummy login
+      alert("Google Single Sign-On is in Sandbox mode. Logging in as Demo Advocate User.");
+      const response = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'advocate.user@dhaaraai.com',
+          password: 'google-oauth-session-key'
+        })
+      });
+      const data = await response.json();
+      onLogin({
+        user_id: data.user_id,
+        name: data.name,
+        email: data.email,
+        token: data.token
+      });
+    } catch {
+      onLogin({
+        user_id: 'usr_advocate_demo',
+        name: 'Advocate User',
+        email: 'advocate.user@dhaaraai.com',
+        token: 'local_token'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -688,11 +725,11 @@ export default function AuthPage({ onLogin, onBack }) {
             margin: '0.75rem 0 0 0'
           }}>
             By continuing, you agree to DhaaraAI’s{' '}
-            <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#475569', textDecoration: 'underline' }}>
+            <a href="#" onClick={(e) => { e.preventDefault(); alert("Terms of Service document will be available in production."); }} style={{ color: '#475569', textDecoration: 'underline' }}>
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="#" onClick={(e) => e.preventDefault()} style={{ color: '#475569', textDecoration: 'underline' }}>
+            <a href="#" onClick={(e) => { e.preventDefault(); alert("Privacy Policy document will be available in production."); }} style={{ color: '#475569', textDecoration: 'underline' }}>
               Privacy Policy
             </a>.
           </p>

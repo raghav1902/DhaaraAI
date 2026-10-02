@@ -7,11 +7,13 @@ import CitizenRights from './components/CitizenRights';
 import BnsConverter from './components/BnsConverter';
 import CyberChecker from './components/CyberChecker';
 import LegalVault from './components/LegalVault';
+import SharedDocumentViewer from './components/SharedDocumentViewer';
 import FeeCalculator from './components/FeeCalculator';
 import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
 import './WorkspaceVisuals.css';
+import './Sidebar.css';
 import {
   Scale,
   BookOpen,
@@ -27,10 +29,15 @@ import {
   Globe,
   Menu,
   X,
+  PanelLeftClose,
+  PanelLeft,
   Settings as SettingsIcon,
   LogOut,
   Smartphone,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles,
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 
 function App() {
@@ -51,6 +58,43 @@ function App() {
       return null;
     }
   });
+
+  const [sharedDocId, setSharedDocId] = useState(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('shared') || params.get('vault_share') || null;
+      }
+    } catch {}
+    return null;
+  });
+
+  // Ensure authenticated backend session token exists for active user
+  useEffect(() => {
+    const ensureToken = async () => {
+      if (user && !user.token && user.email) {
+        try {
+          const res = await fetch('http://localhost:8000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              password: user.password || 'session_sync_pwd_dhaara'
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const updated = { ...user, token: data.token, user_id: data.user_id };
+            setUser(updated);
+            localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
+          }
+        } catch (e) {
+          console.error('Failed to sync auth token:', e);
+        }
+      }
+    };
+    ensureToken();
+  }, [user]);
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
@@ -162,13 +206,23 @@ function App() {
 
   const [globalSearch, setGlobalSearch] = useState('');
   const searchInputRef = useRef(null);
+  const sidebarSearchRef = useRef(null);
+  const [sidebarSearchQuery, setSidebarSearchQuery] = useState('');
 
   // Global Ctrl + K search shortcut
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        if (sidebarSearchRef.current) {
+          sidebarSearchRef.current.focus();
+        } else if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        setIsSidebarOpen(prev => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -182,18 +236,52 @@ function App() {
     setGlobalSearch('');
   };
 
-  const navItems = [
-    { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Search, badge: 'LegalGPT' },
-    { id: 'drafting', label: isHindi ? 'ड्राफ्टिंग' : 'Legal Drafting', icon: FileText, badge: 'Sec 173' },
-    { id: 'analyzer', label: isHindi ? 'अनुबंध समीक्षक' : 'Contract Audit', icon: FileSearch, badge: 'Risk' },
-    { id: 'rights', label: isHindi ? 'नागरिक अधिकार & SOS' : 'Citizen Rights & SOS', icon: ShieldAlert, badge: 'Emergency' },
-    { id: 'converter', label: isHindi ? 'BNS ↔ IPC' : 'BNS ↔ IPC', icon: ArrowRightLeft, badge: '2024' },
-    { id: 'library', label: isHindi ? 'कानूनी लाइब्रेरी' : 'Legal Library', icon: BookOpen },
-    { id: 'vault', label: isHindi ? 'सुरक्षित वॉल्ट' : 'Legal Vault', icon: Lock },
-    { id: 'calculator', label: isHindi ? 'शुल्क कैलकुलेटर' : 'Fee Calculator', icon: Calculator },
-    { id: 'cyber', label: isHindi ? 'साइबर स्कैनर' : 'Cyber Scanner', icon: Globe },
-    { id: 'settings', label: isHindi ? 'सेटिंग्स' : 'Settings', icon: SettingsIcon },
+  const navSections = [
+    {
+      title: isHindi ? 'विधिक कार्यक्षेत्र' : 'LEGAL WORKSPACES',
+      items: [
+        { id: 'chat', label: isHindi ? 'AI से पूछें' : 'Ask AI', icon: Sparkles, badge: 'LegalGPT', badgeVariant: 'blue' },
+        { id: 'drafting', label: isHindi ? 'विधिक ड्राफ्टिंग' : 'Legal Drafting', icon: FileText, badge: 'Sec 173', badgeVariant: 'blue' },
+        { id: 'analyzer', label: isHindi ? 'अनुबंध समीक्षक' : 'Contract Audit', icon: FileSearch, badge: 'Risk', badgeVariant: 'amber' },
+        { id: 'rights', label: isHindi ? 'नागरिक अधिकार & SOS' : 'Citizen Rights & SOS', icon: Shield, badge: 'Emergency', badgeVariant: 'danger' },
+        { id: 'converter', label: isHindi ? 'BNS ↔ IPC' : 'BNS ↔ IPC', icon: ArrowRightLeft, badge: '2024', badgeVariant: 'blue' },
+        { id: 'library', label: isHindi ? 'कानूनी लाइब्रेरी' : 'Legal Library', icon: BookOpen },
+        { id: 'vault', label: isHindi ? 'सुरक्षित वॉल्ट' : 'Legal Vault', icon: Lock },
+      ]
+    },
+    {
+      title: isHindi ? 'उपयोगिताएं और उपकरण' : 'UTILITIES & TOOLS',
+      items: [
+        { id: 'calculator', label: isHindi ? 'शुल्क कैलकुलेटर' : 'Fee Calculator', icon: Calculator },
+        { id: 'cyber', label: isHindi ? 'साइबर स्कैनर' : 'Cyber Scanner', icon: Globe },
+      ]
+    },
+    {
+      title: isHindi ? 'सिस्टम' : 'SYSTEM',
+      items: [
+        { id: 'settings', label: isHindi ? 'सेटिंग्स' : 'Settings', icon: SettingsIcon },
+      ]
+    }
   ];
+
+  const navItems = navSections.flatMap(sec => sec.items);
+
+  if (sharedDocId) {
+    return (
+      <SharedDocumentViewer
+        shareId={sharedDocId}
+        onBack={() => {
+          setSharedDocId(null);
+          try {
+            const url = new URL(window.location);
+            url.searchParams.delete('shared');
+            url.searchParams.delete('vault_share');
+            window.history.replaceState({}, '', url.pathname || '/');
+          } catch {}
+        }}
+      />
+    );
+  }
 
   if (appView === 'landing') {
     return <LandingPage onExplore={() => setAppView('auth')} />;
@@ -240,228 +328,204 @@ function App() {
       <nav
         className={`no-print app-sidebar ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         aria-label="Main Navigation"
-        style={{
-          width: isSidebarOpen ? '260px' : '74px',
-          minWidth: isSidebarOpen ? '260px' : '74px',
-          padding: '16px 12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          position: 'sticky',
-          top: '0',
-          height: '100vh',
-          overflow: 'hidden',
-          background: 'var(--sidebar-bg)',
-          borderRight: '1px solid var(--card-border)',
-          boxShadow: 'var(--card-shadow)',
-          zIndex: 50,
-          transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}
       >
-        {/* Brand Header */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isSidebarOpen ? 'space-between' : 'center',
-          paddingBottom: '14px',
-          borderBottom: '1px solid var(--card-border)',
-          minHeight: '52px'
-        }}>
-          <div
-            style={{
-              display: isSidebarOpen ? 'flex' : 'none',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              overflow: 'hidden'
-            }}
-            onClick={() => {
-              setActiveTab('chat');
-              if (window.innerWidth <= 868) setIsSidebarOpen(false);
-            }}
-            title="DhaaraAI Home Workspace"
-          >
-            <div style={{
-              background: 'linear-gradient(135deg, var(--royal-700), #1e3a8a)',
-              padding: '8px',
-              borderRadius: 'var(--radius-sm)',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: '36px',
-              minHeight: '36px',
-              boxShadow: '0 3px 10px rgba(29, 78, 216, 0.3)'
-            }}>
-              <Scale size={18} />
-            </div>
-            <div style={{ whiteSpace: 'nowrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>DhaaraAI</span>
-                <span style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', padding: '1px 6px', borderRadius: 'var(--radius-full)', fontWeight: '700' }}>LegalGPT</span>
-              </div>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>Indian Legal Intelligence</p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            style={{
-              background: 'var(--subtle-bg)',
-              border: '1px solid var(--card-border)',
-              cursor: 'pointer',
-              color: 'var(--text-main)',
-              padding: '7px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 'var(--radius-xs)',
-              minWidth: '34px',
-              minHeight: '34px',
-              transition: 'all 0.2s ease'
-            }}
-            aria-label={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-            title={isSidebarOpen ? (isHindi ? "साइडबार बंद करें" : "Collapse Sidebar") : (isHindi ? "साइडबार खोलें" : "Expand Sidebar")}
-          >
-            {isSidebarOpen ? <X size={16} /> : <Menu size={18} />}
-          </button>
-        </div>
-
-        {/* Section Label */}
-        {isSidebarOpen && (
-          <div style={{ padding: '0 8px', fontSize: '10.5px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-dim)' }}>
-            {isHindi ? 'विधिक मॉड्यूल' : 'Legal Workspaces'}
-          </div>
-        )}
-
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}>
-          {navItems.map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (window.innerWidth <= 868) {
-                    setIsSidebarOpen(false);
-                  }
-                }}
-                title={tab.label}
-                aria-current={isActive ? 'page' : undefined}
-                style={{
-                  background: isActive ? 'var(--primary-light)' : 'transparent',
-                  border: isActive ? '1px solid var(--primary-border)' : '1px solid transparent',
-                  color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-                  fontWeight: isActive ? '700' : '500',
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                  gap: '10px',
-                  padding: isSidebarOpen ? '9px 12px' : '9px 0',
-                  borderRadius: 'var(--radius-sm)',
-                  transition: 'all 0.15s ease',
-                  textAlign: 'left',
-                  width: '100%',
-                  whiteSpace: 'nowrap',
-                  position: 'relative'
-                }}
-                onMouseEnter={e => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'var(--subtle-bg)';
-                    e.currentTarget.style.color = 'var(--text-main)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-muted)';
-                  }
-                }}
-              >
-                {isActive && (
-                  <div style={{
-                    position: 'absolute',
-                    left: '0',
-                    top: '20%',
-                    bottom: '20%',
-                    width: '3px',
-                    borderRadius: '0 4px 4px 0',
-                    background: 'var(--primary)'
-                  }} />
-                )}
-                <Icon size={isSidebarOpen ? 17 : 19} style={{ minWidth: isSidebarOpen ? '17px' : '19px', color: isActive ? 'var(--primary)' : 'inherit' }} />
-                {isSidebarOpen && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <span>{tab.label}</span>
-                    {tab.badge && (
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontWeight: '700',
-                        padding: '1px 6px',
-                        borderRadius: 'var(--radius-full)',
-                        background: tab.id === 'rights' ? 'var(--danger-light)' : 'var(--primary-light)',
-                        color: tab.id === 'rights' ? 'var(--danger)' : 'var(--primary)',
-                        border: `1px solid ${tab.id === 'rights' ? 'var(--danger-border)' : 'var(--primary-border)'}`
-                      }}>
-                        {tab.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* PWA Install Button */}
-        {isInstallable && (
-          <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid var(--card-border)' }}>
+        <div className="sidebar-scroll-body">
+          {/* Brand Header */}
+          <div className="sidebar-brand-row">
             <button
-              onClick={handleInstallApp}
-              title={isHindi ? "ऐप इंस्टॉल करें" : "Install App"}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, var(--emerald-600), var(--emerald-700))',
-                color: 'white',
-                border: 'none',
-                borderRadius: 'var(--radius-xs)',
-                padding: isSidebarOpen ? '8px 12px' : '8px 0',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                gap: '8px',
-                fontSize: '12px',
-                fontWeight: '600',
-                boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
+              className="sidebar-brand-btn"
+              onClick={() => {
+                if (!isSidebarOpen) {
+                  setIsSidebarOpen(true);
+                } else {
+                  setActiveTab('chat');
+                  if (window.innerWidth <= 868) setIsSidebarOpen(false);
+                }
               }}
+              title={isSidebarOpen ? "DhaaraAI Home Workspace" : (isHindi ? "साइडबार खोलें (Ctrl + B)" : "Expand Sidebar (Ctrl + B)")}
             >
-              <Smartphone size={16} style={{ minWidth: '16px' }} />
-              {isSidebarOpen && <span>{isHindi ? 'ऐप इंस्टॉल करें' : 'Install App'}</span>}
+              <div className="sidebar-logo-box">
+                <Scale size={22} strokeWidth={2.2} />
+              </div>
+              <div className="sidebar-brand-info">
+                <span className="sidebar-brand-title">DhaaraAI</span>
+                <span className="sidebar-brand-subtitle">Indian Legal Intelligence</span>
+              </div>
+            </button>
+
+            <button
+              className="sidebar-toggle-btn"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+              title={isSidebarOpen ? (isHindi ? "साइडबार समेटें (Ctrl + B)" : "Collapse Sidebar (Ctrl + B)") : (isHindi ? "साइडबार खोलें (Ctrl + B)" : "Expand Sidebar (Ctrl + B)")}
+            >
+              {isSidebarOpen ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
             </button>
           </div>
-        )}
+
+          {/* Search Workspace Input (Ctrl K) */}
+          <div className="sidebar-search-wrap">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!sidebarSearchQuery.trim()) return;
+                handleAskAiFromExternal(sidebarSearchQuery.trim());
+                setSidebarSearchQuery('');
+              }}
+              className="sidebar-search-box"
+            >
+              <Search size={15} className="sidebar-search-icon" />
+              <input
+                ref={sidebarSearchRef}
+                type="text"
+                placeholder={isHindi ? "कार्यक्षेत्र खोजें..." : "Search workspace..."}
+                value={sidebarSearchQuery}
+                onChange={(e) => setSidebarSearchQuery(e.target.value)}
+                className="sidebar-search-input"
+              />
+              <span className="sidebar-search-badge">Ctrl K</span>
+            </form>
+          </div>
+
+          {/* Grouped Nav Sections */}
+          {navSections.map((section) => {
+            const visibleItems = sidebarSearchQuery.trim()
+              ? section.items.filter(item =>
+                  item.label.toLowerCase().includes(sidebarSearchQuery.toLowerCase()) ||
+                  item.id.toLowerCase().includes(sidebarSearchQuery.toLowerCase()) ||
+                  (item.badge && item.badge.toLowerCase().includes(sidebarSearchQuery.toLowerCase()))
+                )
+              : section.items;
+
+            if (sidebarSearchQuery.trim() && visibleItems.length === 0) return null;
+
+            return (
+              <div key={section.title} className="sidebar-nav-section">
+                <div className="sidebar-section-header">
+                  {section.title}
+                </div>
+                <div className="sidebar-nav-group">
+                  {visibleItems.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => {
+                          setActiveTab(tab.id);
+                          if (window.innerWidth <= 868) {
+                            setIsSidebarOpen(false);
+                          }
+                        }}
+                        title={tab.label}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`sidebar-nav-item ${isActive ? 'sidebar-nav-item--active' : ''}`}
+                      >
+                        {isActive && <div className="sidebar-active-pill" />}
+                        <div className="sidebar-nav-icon-box">
+                          <Icon size={17} strokeWidth={isActive ? 2.3 : 1.8} />
+                        </div>
+                        <span className="sidebar-nav-label">{tab.label}</span>
+                        <div className="sidebar-badge-wrap">
+                          {tab.badge && (
+                            <span className={`sidebar-badge sidebar-badge--${tab.badgeVariant || 'blue'}`}>
+                              {tab.badge}
+                            </span>
+                          )}
+                          <ChevronRight size={15} className="sidebar-chevron" />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* PWA Install Button */}
+          {isInstallable && (
+            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(226, 232, 240, 0.6)' }}>
+              <button
+                onClick={handleInstallApp}
+                title={isHindi ? "ऐप इंस्टॉल करें" : "Install App"}
+                className="sidebar-nav-item"
+              >
+                <div className="sidebar-nav-icon-box" style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb' }}>
+                  <Smartphone size={16} />
+                </div>
+                <span className="sidebar-nav-label" style={{ color: '#2563eb' }}>
+                  {isHindi ? 'ऐप इंस्टॉल करें' : 'Install App'}
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* Sidebar Bottom Footer Cards */}
+          <div className="sidebar-footer">
+            {/* User Profile Card */}
+            <div
+              className="sidebar-user-card"
+              onClick={() => {
+                setActiveTab('settings');
+                if (window.innerWidth <= 868) setIsSidebarOpen(false);
+              }}
+              title="Advocate Account Settings"
+            >
+              <div className="sidebar-user-avatar">
+                {user?.name ? user.name[0].toUpperCase() : 'A'}
+              </div>
+              <div className="sidebar-user-meta">
+                <div className="sidebar-user-name">
+                  {user?.name || 'Advocate.user'}
+                </div>
+                <div className="sidebar-user-plan">
+                  {user?.plan || 'Advocate Plan'}
+                </div>
+              </div>
+              <ChevronRight size={16} className="sidebar-chevron" />
+            </div>
+
+            {/* Verified Legal Database Badge Card */}
+            <div
+              className="sidebar-verified-card"
+              onClick={() => {
+                setActiveTab('converter');
+                if (window.innerWidth <= 868) setIsSidebarOpen(false);
+              }}
+              title="BNS 2023 & BNSS Verified - Updated legal database"
+            >
+              <div className="sidebar-verified-icon-box">
+                <ShieldCheck size={18} strokeWidth={2.4} />
+              </div>
+              <div className="sidebar-verified-meta">
+                <div className="sidebar-verified-title">
+                  BNS 2023 / BNSS Verified
+                </div>
+                <div className="sidebar-verified-sub">
+                  Updated legal database
+                </div>
+              </div>
+              <ChevronRight size={15} className="sidebar-verified-chevron" />
+            </div>
+          </div>
+        </div>
       </nav>
 
       {/* Main Workspace Stage */}
       <main ref={mainScrollRef} className="app-main" style={{
         flex: 1,
         margin: 0,
-        padding: '16px 28px 28px',
-        background: 'var(--card-bg)',
+        padding: '14px 24px 20px',
+        background: 'transparent',
         borderRadius: 0,
         border: 'none',
         boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: isSidebarOpen ? 'calc(100% - 260px)' : 'calc(100% - 74px)',
-        width: isSidebarOpen ? 'calc(100% - 260px)' : 'calc(100% - 74px)',
+        maxWidth: isSidebarOpen ? 'calc(100% - 290px)' : 'calc(100% - 74px)',
+        width: isSidebarOpen ? 'calc(100% - 290px)' : 'calc(100% - 74px)',
         height: '100vh',
-        overflowY: 'auto',
+        overflowY: activeTab === 'chat' ? 'hidden' : 'auto',
         color: 'var(--text-main)',
         transition: 'all 0.25s ease',
         zIndex: 1,
@@ -472,11 +536,16 @@ function App() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingBottom: '14px',
-          marginBottom: '16px',
-          borderBottom: '1px solid var(--card-border)',
-          gap: '14px',
-          flexWrap: 'wrap'
+          padding: '10px 16px',
+          marginBottom: '14px',
+          background: 'var(--card-bg)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--card-border)',
+          boxShadow: 'var(--card-shadow)',
+          gap: '12px',
+          flexWrap: 'wrap',
+          flexShrink: 0,
+          zIndex: 50
         }}>
           {/* Left: Mobile Toggle & Active Workspace Badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '220px' }}>
@@ -498,6 +567,32 @@ function App() {
             >
               <Menu size={18} />
             </button>
+
+            {!isSidebarOpen && (
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'var(--subtle-bg)',
+                  border: '1px solid var(--card-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '5px 10px',
+                  color: 'var(--text-main)',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  boxShadow: 'var(--shadow-xs)',
+                  transition: 'all 0.15s ease'
+                }}
+                title={isHindi ? "साइडबार खोलें (Ctrl + B)" : "Expand Sidebar (Ctrl + B)"}
+                aria-label="Expand Sidebar"
+              >
+                <PanelLeft size={16} />
+                <span>{isHindi ? 'साइडबार' : 'Sidebar'}</span>
+              </button>
+            )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div style={{
@@ -565,22 +660,24 @@ function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
             {/* Theme Toggle */}
             <button
+              id="theme-toggle-btn"
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              title={theme === 'dark' ? (isHindi ? 'लाइट थीम में बदलें' : 'Switch to Light Theme') : (isHindi ? 'डार्क थीम में बदलें' : 'Switch to Dark Theme')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '6px 10px',
-                borderRadius: 'var(--radius-xs)',
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-full)',
                 background: 'var(--subtle-bg)',
                 border: '1px solid var(--card-border)',
                 color: 'var(--text-main)',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                gap: '5px',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                gap: '6px',
                 fontSize: '12px',
-                fontWeight: '600'
+                fontWeight: '600',
+                boxShadow: 'var(--shadow-xs)'
               }}
             >
               {theme === 'dark' ? (
@@ -770,6 +867,7 @@ function App() {
               onQueryConsumed={() => setInjectedQuery(null)}
               language={language}
               onLanguageChange={setLanguage}
+              user={user}
             />
           )}
           {activeTab === 'drafting' && (
@@ -801,7 +899,11 @@ function App() {
             />
           )}
           {activeTab === 'vault' && (
-            <LegalVault language={language} onNavigateTab={setActiveTab} />
+            <LegalVault
+              language={language}
+              onNavigateTab={setActiveTab}
+              onOpenSharedDoc={(id) => setSharedDocId(id)}
+            />
           )}
           {activeTab === 'calculator' && (
             <FeeCalculator language={language} />

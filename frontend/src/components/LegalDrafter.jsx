@@ -43,6 +43,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
   const [selectedEvidences, setSelectedEvidences] = useState([]);
   const [customEvidence, setCustomEvidence] = useState('');
   const [reliefSought, setReliefSought] = useState('');
+  const [extraFields, setExtraFields] = useState({});
 
   // Voice Input State
   const [isListening, setIsListening] = useState(false);
@@ -68,6 +69,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
     setSelectedEvidences(data.selectedEvidences);
     setCustomEvidence(data.customEvidence);
     setReliefSought(data.reliefSought);
+    setExtraFields(data.extraFields || {});
   };
 
   const handleGenerateDraft = async () => {
@@ -96,7 +98,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         incident_location: incidentLocation,
         facts: facts,
         evidence: evidenceList.join(', '),
-        relief_sought: reliefSought
+        relief_sought: reliefSought,
+        extra_fields: extraFields
       });
 
       setGeneratedResult(response.data);
@@ -170,7 +173,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         language={language}
         onLanguageChange={onLanguageChange}
         isHindi={isHindi}
-        onNewDraft={() => { setStep(1); setGeneratedResult(null); setDraftError(null); }}
+        onNewDraft={() => { setStep(1); setGeneratedResult(null); setDraftError(null); setExtraFields({}); }}
       />
 
       {step < 5 && (
@@ -197,6 +200,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {step === 2 && (
         <DrafterStep2
+          documentType={documentType}
           complainant={complainant}
           setComplainant={setComplainant}
           isAccusedUnknown={isAccusedUnknown}
@@ -210,6 +214,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
 
       {step === 3 && (
         <DrafterStep3
+          documentType={documentType}
           incidentDatetime={incidentDatetime}
           setIncidentDatetime={setIncidentDatetime}
           incidentLocation={incidentLocation}
@@ -222,6 +227,8 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           setCustomEvidence={setCustomEvidence}
           reliefSought={reliefSought}
           setReliefSought={setReliefSought}
+          extraFields={extraFields}
+          setExtraFields={setExtraFields}
           isListening={isListening}
           handleToggleVoiceInput={handleToggleVoiceInput}
           setStep={setStep}
@@ -239,6 +246,7 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
           incidentDatetime={incidentDatetime}
           incidentLocation={incidentLocation}
           facts={facts}
+          extraFields={extraFields}
           draftError={draftError}
           isGenerating={isGenerating}
           handleGenerateDraft={handleGenerateDraft}

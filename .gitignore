@@ -51,6 +51,16 @@ pnpm-debug.log*
 backend/chroma_db/
 backend/data/chat_history/
 backend/data/data/
+*.db
+backend/data/*.db
+
+# Large Datasets & Parquet Files (>100MB)
+*.parquet
+*.parquet.*
+backend/data/*.parquet
+backend/data/train.parquet
+backend/data/test.parquet
+backend/data/validation.parquet
 
 # OS & Editor
 .DS_Store

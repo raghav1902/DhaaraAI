@@ -1,0 +1,350 @@
+/* SharedDocumentViewer.css */
+
+.vault-shared-portal {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.vault-shared-card {
+  max-width: 500px;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  padding: 36px 32px;
+  text-align: center;
+  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.18);
+  position: relative;
+}
+
+body.dark-theme .vault-shared-card {
+  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.6);
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.vault-shared-card--destroyed {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08), transparent 70%), var(--card-bg);
+}
+
+.vault-shared-lock-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--royal-600), var(--royal-800));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.4);
+}
+
+.vault-shared-destroyed-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4);
+}
+
+.vault-shared-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--royal-600);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  margin-bottom: 12px;
+}
+
+.vault-shared-badge--destroyed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.vault-shared-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 8px;
+}
+
+.vault-shared-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+
+.vault-shared-meta-box {
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vault-shared-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  gap: 8px;
+}
+
+.vault-shared-meta-label {
+  color: var(--text-muted);
+}
+
+.vault-shared-meta-val {
+  color: var(--text-main);
+  text-align: right;
+  word-break: break-word;
+}
+
+.vault-shared-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.vault-shared-input-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-shared-input-wrap {
+  width: 100%;
+}
+
+.vault-shared-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+}
+
+.vault-shared-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--danger-light);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-xs);
+  color: var(--danger);
+  font-size: 12.5px;
+}
+
+.vault-shared-submit-btn {
+  width: 100%;
+  padding: 12px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-md) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.vault-shared-trust-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.vault-shared-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-shared-security-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  padding: 10px;
+  background: var(--subtle-bg);
+  border-radius: var(--radius-xs);
+}
+
+.vault-shared-back-btn {
+  margin-top: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Decrypted Document View */
+.vault-shared-doc-view {
+  max-width: 900px;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.vault-shared-doc-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--card-border);
+  background: var(--subtle-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.vault-shared-doc-meta {
+  flex: 1;
+  min-width: 250px;
+}
+
+.vault-shared-doc-title {
+  margin: 8px 0 4px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.vault-shared-doc-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.vault-shared-burn-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  margin-left: 8px;
+}
+
+.vault-shared-doc-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.vault-shared-burn-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(239, 68, 68, 0.08);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+body.dark-theme .vault-shared-burn-notice {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
+}
+
+.vault-shared-doc-content {
+  padding: 28px 24px;
+  background: var(--card-bg);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.vault-shared-doc-text {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.vault-shared-doc-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--card-border);
+  background: var(--subtle-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.vault-shared-watermark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vault-shared-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(37, 99, 235, 0.18);
+  border-top-color: var(--royal-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+.vault-shared-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

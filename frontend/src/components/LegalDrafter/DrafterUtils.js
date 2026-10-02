@@ -86,7 +86,7 @@ export const getPresetData = (presetKey, isHindi) => {
 
 export const exportDraftToDoc = (documentType, draft) => {
   if (!draft) return;
-  const docTitle = documentType === 'Legal Demand Notice' ? 'Legal_Demand_Notice' : 'Police_Complaint_FIR';
+  const docTitle = (documentType || 'Legal_Draft').replace(/[^a-zA-Z0-9]/g, '_');
   const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${documentType}</title><style>body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;margin:1in;text-align:justify;}</style></head><body>`;
   const footer = "</body></html>";
   const content = header + `<h3 style="text-align:center;text-transform:uppercase;font-weight:bold;">${documentType}</h3><pre style="font-family:'Times New Roman',serif;font-size:12pt;white-space:pre-wrap;line-height:1.6;">${draft}</pre>` + footer;
@@ -103,7 +103,7 @@ export const exportDraftToDoc = (documentType, draft) => {
 
 export const exportDraftToPdf = async (documentType, draft, isHindi) => {
   if (!draft) return;
-  const docTitle = documentType === 'Legal Demand Notice' ? 'Legal_Demand_Notice' : 'Police_Complaint_FIR';
+  const docTitle = (documentType || 'Legal_Draft').replace(/[^a-zA-Z0-9]/g, '_');
 
   const element = document.createElement('div');
   element.style.padding = '20mm';
@@ -115,15 +115,13 @@ export const exportDraftToPdf = async (documentType, draft, isHindi) => {
   element.style.background = '#ffffff';
 
   const emblem = isHindi ? 'सत्यमेव जयते' : 'FORMAL LEGAL INSTRUMENT • BHARAT (INDIA)';
-  const headerTitle = documentType === 'Legal Demand Notice'
-    ? (isHindi ? 'विधिक मांग नोटिस' : 'STATUTORY LEGAL DEMAND NOTICE')
-    : (isHindi ? 'प्रथम सूचना रिपोर्ट (FIR) हेतु औपचारिक शिकायत' : 'FORMAL POLICE COMPLAINT (UNDER SECTION 173 BNSS, 2023)');
+  const headerTitle = String(documentType || 'FORMAL LEGAL DRAFT').toUpperCase();
 
   element.innerHTML = `
     <div style="text-align:center;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:24px;">
       <div style="font-size:10pt;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">${emblem}</div>
-      <h1 style="font-size:16pt;font-weight:bold;margin:6px 0 2px;text-transform:uppercase;">${headerTitle}</h1>
-      <div style="font-size:9pt;">Formulated under Bharatiya Nagarik Suraksha Sanhita, 2023 & BNS 2023</div>
+      <h1 style="font-size:15pt;font-weight:bold;margin:6px 0 2px;text-transform:uppercase;">${headerTitle}</h1>
+      <div style="font-size:9pt;">Generated via DhaaraAI Legal Drafting Intelligence Studio</div>
     </div>
     <div style="white-space:pre-wrap;">${draft}</div>
   `;
@@ -150,9 +148,22 @@ export const exportDraftToPdf = async (documentType, draft, isHindi) => {
 export const saveDraftToVault = (documentType, complainantName, draft, isHindi) => {
   if (!draft) return;
   const drafts = JSON.parse(localStorage.getItem('dhaara_vault_drafts') || '[]');
+  
+  // Strong folder categorization
+  const docTypeLower = (documentType || '').toLowerCase();
+  let folder = 'Drafted Petitions';
+  if (docTypeLower.includes('notice') || docTypeLower.includes('138')) {
+    folder = 'Client Notices';
+  } else if (docTypeLower.includes('agreement') || docTypeLower.includes('nda') || docTypeLower.includes('lease') || docTypeLower.includes('mou')) {
+    folder = 'Agreements & NDAs';
+  } else if (docTypeLower.includes('affidavit') || docTypeLower.includes('declaration') || docTypeLower.includes('power of attorney')) {
+    folder = 'Affidavits & Declarations';
+  }
+
   const newDraft = {
     id: Date.now().toString(),
     type: documentType,
+    folder: folder,
     title: complainantName ? `${documentType} - ${complainantName}` : documentType,
     content: draft,
     date: new Date().toISOString()

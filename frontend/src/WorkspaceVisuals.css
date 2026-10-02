@@ -57,6 +57,32 @@ body.dark-theme .app-container::after {
   outline-offset: 2px;
 }
 
+/* Premium Glass Surface Polish & Edge Illumination */
+.glass-panel,
+.ask-ai-hero,
+.ask-ai-active-session-bar,
+.module-header-banner,
+.app-top-header,
+.ask-ai-composer-shell {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.ask-ai-hero,
+.module-header-banner,
+.app-top-header {
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+body.dark-theme .glass-panel,
+body.dark-theme .ask-ai-hero,
+body.dark-theme .ask-ai-active-session-bar,
+body.dark-theme .module-header-banner,
+body.dark-theme .app-top-header,
+body.dark-theme .ask-ai-composer-shell {
+  box-shadow: 0 6px 22px -3px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
 /* Contextual Header Textures - Scoped & Opt-in (High Contrast Guaranteed) */
 .texture-legal-court {
   background-image: 

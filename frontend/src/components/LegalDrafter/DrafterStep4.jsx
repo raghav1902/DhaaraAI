@@ -51,14 +51,33 @@ export default function DrafterStep4({
           </div>
         </div>
 
+        {extraFields && Object.keys(extraFields).length > 0 && (
+          <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
+            <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '12px', marginBottom: '6px' }}>
+              {isHindi ? 'विशिष्ट अतिरिक्त विवरण:' : 'Specific Template Fields:'}
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {Object.entries(extraFields).map(([k, v]) => v ? (
+                <span key={k} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '6px', padding: '4px 10px', fontSize: '12px' }}>
+                  <strong>{k.replace(/_/g, ' ')}:</strong> {String(v)}
+                </span>
+              ) : null)}
+            </div>
+          </div>
+        )}
+
         <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--card-border)' }}>
           <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '12px', marginBottom: '4px' }}>
             {isHindi ? 'घटना के तथ्य:' : 'Factual Brief:'}
           </span>
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-main)', background: 'var(--card-bg)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
-            {facts}
+            {facts || (isHindi ? 'कोई तथ्य दर्ज नहीं' : 'No facts specified')}
           </p>
         </div>
+      </div>
+
+      <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+        🛡️ <em>AI-assisted draft — verify facts, applicable law, jurisdiction and procedural requirements before filing.</em>
       </div>
 
       {draftError && (
