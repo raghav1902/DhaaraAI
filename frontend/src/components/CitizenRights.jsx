@@ -68,9 +68,6 @@ export default function CitizenRights({ language = 'English' }) {
               <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
                 {isHindi ? 'नागरिक अधिकार और SOS निर्देशिका' : 'Citizen Statutory Rights & Emergency SOS'}
               </h2>
-              <span style={{ fontSize: '11px', background: 'var(--danger-light)', color: 'var(--danger)', border: '1px solid var(--danger-border)', fontWeight: '700', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                BNSS 2023 & Art. 21
-              </span>
             </div>
             <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
               {isHindi

@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import './LegalVault.css';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = typeof window !== 'undefined' && (window.location.port === '5173' || window.location.port === '3000') ? '' : 'http://localhost:8000';
 
 // Available Folder Taxonomies with legal classification
 const VAULT_FOLDERS = [
@@ -49,7 +49,7 @@ const VAULT_FOLDERS = [
  * Intelligent Rule-Based Legal Document Auto-Classifier.
  * Categorizes documents into specialized legal folders based on statute, clauses, and document semantics.
  */
-export function autoClassifyDraft(draft) {
+function autoClassifyDraft(draft) {
   if (draft.folder && draft.folder !== 'All Documents' && draft.folder !== 'Uncategorized') {
     return draft.folder;
   }
@@ -444,43 +444,28 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
     .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
 
   // =========================================================================
-  // LOCKED VAULT AUTHENTICATION SCREEN
+  // LOCKED VAULT AUTHENTICATION SCREEN (Minimalist Modern Design)
   // =========================================================================
   if (!isAuthenticated) {
     return (
-      <div className="legal-vault legal-vault--locked">
-        <div className="legal-vault__backdrop" aria-hidden="true">
-          <img
-            src="/assets/legal/vault/vault_locked.webp?v=2"
-            alt=""
-            className="legal-vault__backdrop-image"
-            loading="eager"
-          />
-          <div className="legal-vault__backdrop-overlay" />
-        </div>
-
-        <div className="legal-vault__unlock-card animate-fade-in">
+      <div className="legal-vault legal-vault--locked animate-fade-in">
+        <div className="legal-vault__unlock-card">
           <div className="legal-vault__lock-icon-wrap">
-            <Lock size={28} />
-          </div>
-
-          <div className="legal-vault__security-tag">
-            <Shield size={12} />
-            <span>{isHindi ? '256-बिट सुरक्षित डिवाइस आर्काइव' : 'ENCRYPTED LOCAL ARCHIVE'}</span>
+            <Lock size={22} strokeWidth={2.2} />
           </div>
 
           <h2 className="legal-vault__unlock-title">
-            {isHindi ? 'सुरक्षित कानूनी वॉल्ट' : 'Secure Legal Vault'}
+            {isHindi ? 'कानूनी दस्तावेज़ वॉल्ट' : 'Legal Document Vault'}
           </h2>
 
           <p className="legal-vault__unlock-subtitle">
             {hasPin
               ? (isHindi
-                  ? 'सहेजे गए दस्तावेज़ देखने के लिए 4 अंकों का सुरक्षा पिन दर्ज करें।'
-                  : 'Enter your 4-digit security PIN to unlock your private legal vault.')
+                  ? 'सहेजे गए निजी दस्तावेज़ देखने के लिए 4 अंकों का सुरक्षा पिन दर्ज करें।'
+                  : 'Enter your 4-digit security PIN to unlock private drafts and case records.')
               : (isHindi
-                  ? 'दस्तावेज़ों को सुरक्षित रखने के लिए एक नया 4 अंकों का पिन बनाएं।'
-                  : 'Set a 4-digit security PIN to protect your private legal drafts on this device.')}
+                  ? 'दस्तावेज़ों को सुरक्षित रखने के लिए एक नया 4 अंकों का सुरक्षा पिन बनाएं।'
+                  : 'Create a 4-digit security PIN to protect private legal drafts on this device.')}
           </p>
 
           <div className="legal-vault__pin-form">
@@ -513,17 +498,17 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
 
             <button
               type="button"
-              className="btn-primary legal-vault__submit-btn"
+              className="legal-vault__submit-btn"
               onClick={() => verifyPin(pinDigits.join(''))}
             >
               {hasPin ? (
                 <>
-                  <Unlock size={18} />
+                  <Unlock size={16} />
                   <span>{isHindi ? 'वॉल्ट अनलॉक करें' : 'Unlock Vault'}</span>
                 </>
               ) : (
                 <>
-                  <Save size={18} />
+                  <Save size={16} />
                   <span>{isHindi ? 'पिन सेट करें व खोलें' : 'Set PIN & Open Vault'}</span>
                 </>
               )}
@@ -531,14 +516,8 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
           </div>
 
           <div className="legal-vault__trust-row">
-            <span className="legal-vault__trust-item">
-              <Shield size={13} color="var(--emerald-600)" />
-              {isHindi ? 'पिन-संरक्षित स्थानीय संग्रहण' : 'Client-Side PIN Encrypted'}
-            </span>
-            <span className="legal-vault__trust-item">
-              <Lock size={13} color="var(--royal-600)" />
-              {isHindi ? 'शून्य-क्लाउड स्थानीय ड्राफ्ट' : 'Zero-Cloud Device Storage'}
-            </span>
+            <ShieldCheck size={14} color="var(--emerald-600)" />
+            <span>{isHindi ? 'क्लाइंट-साइड एन्क्रिप्टेड • स्थानीय डिवाइस स्टोरेज' : 'Client-side encrypted • Stored locally on this device'}</span>
           </div>
         </div>
       </div>

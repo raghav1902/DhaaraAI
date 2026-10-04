@@ -124,56 +124,31 @@ def analyze_contract_document(
     is_hindi      = "hindi" in str(language).lower()
 
     REQUIRED_FIELDS = {"summary", "risk_score", "risk_percentage", "red_flags", "actionable_advice"}
-
     if client:
         prompt_lang = "HINDI (देवनागरी)" if is_hindi else "ENGLISH"
         system_instruction = CONTRACT_ANALYSIS_SYSTEM_PROMPT.format(prompt_lang=prompt_lang)
         user_msg = f"Document Type: {doc_type}\n\nDocument Text:\n{safe_doc_text[:6000]}"
 
-        try:
-            chat_completion = client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user",   "content": user_msg}
-                ],
-                model=default_model,
-                temperature=0.2,
-                max_tokens=1500,
-                response_format={"type": "json_object"}
-            )
-            raw_content = chat_completion.choices[0].message.content or "{}"
-            parsed = json.loads(raw_content)
+        models_to_try = [default_model]
+        for fb in ["qwen/qwen3.8-27b", "openai/gpt-oss-20b"]:
+            if fb not in models_to_try:
+                models_to_try.append(fb)
 
-            if not parsed.get("is_legal_contract", True):
-                return {
-                    "success": False,
-                    "error": "This document does not appear to be a legal contract, agreement, or notice. Please upload a valid legal document for audit." if not is_hindi else "यह दस्तावेज़ कोई कानूनी अनुबंध, समझौता या नोटिस प्रतीत नहीं होता है। कृपया ऑडिट के लिए एक वैध कानूनी दस्तावेज़ अपलोड करें।"
-                }
-
-            # Validate that the AI response has required schema fields
-            if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
-                raise ValueError(f"AI response missing required fields: {REQUIRED_FIELDS - set(parsed.keys())}")
-
-            parsed["success"] = True
-            parsed["source"]  = "AI Legal Audit"
-            return parsed
-
-        except Exception as e:
-            print(f"[contract_analyzer] Primary model failed: {e}. Trying fallback model qwen/qwen3.8-27b.")
+        for model in models_to_try:
             try:
                 chat_completion = client.chat.completions.create(
                     messages=[
                         {"role": "system", "content": system_instruction},
-                        {"role": "user",   "content": user_msg}
+                        {"role": "user", "content": user_msg}
                     ],
-                    model="qwen/qwen3.8-27b",
+                    model=model,
                     temperature=0.2,
-                    max_tokens=1500,
+                    max_tokens=950,
                     response_format={"type": "json_object"}
                 )
                 raw_content = chat_completion.choices[0].message.content or "{}"
                 parsed = json.loads(raw_content)
-
+                
                 if not parsed.get("is_legal_contract", True):
                     return {
                         "success": False,
@@ -181,13 +156,13 @@ def analyze_contract_document(
                     }
 
                 if not isinstance(parsed, dict) or not REQUIRED_FIELDS.issubset(set(parsed.keys())):
-                    raise ValueError("Fallback AI response also missing required fields")
+                    raise ValueError(f"AI response missing required fields: {REQUIRED_FIELDS - set(parsed.keys())}")
 
                 parsed["success"] = True
-                parsed["source"]  = "AI Legal Audit (Fallback Model)"
+                parsed["source"] = f"AI Legal Audit ({model})"
                 return parsed
-
-            except Exception as e2:
-                print(f"[contract_analyzer] Fallback model failed: {e2}. Falling back to statutory rule-based engine.")
+            except Exception as e:
+                print(f"[contract_analyzer] Model '{model}' contract analysis failed: {e}. Trying fallback...")
+                continue
 
     return heuristic_contract_analysis(safe_doc_text, doc_type, is_hindi)

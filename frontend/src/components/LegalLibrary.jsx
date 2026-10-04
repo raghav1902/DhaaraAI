@@ -154,17 +154,6 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
               <h2 className="legal-library__title">
                 {isHindi ? 'कानूनी पुस्तकालय एवं शब्दावली' : 'Legal Statutory Library & Glossary'}
               </h2>
-              <span className="badge badge-primary">
-                BNS 2023 &amp; IPC 1860
-              </span>
-              <span className="badge badge-success" style={{ fontSize: '11px' }}>
-                150+ Legal Terms
-              </span>
-              {usingFallback && activeTab === 'statutes' && (
-                <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
-                  Statutory Cache
-                </span>
-              )}
             </div>
             <p className="legal-library__subtitle">
               {isHindi

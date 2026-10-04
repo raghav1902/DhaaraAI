@@ -66,8 +66,17 @@
 }
 
 @keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.25); opacity: 0.75; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
+  }
 }
 
 .ask-ai-session-info {
@@ -174,23 +183,19 @@
 .ask-ai-hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    var(--card-bg) 0%,
-    color-mix(in srgb, var(--card-bg) 95%, transparent) 25%,
-    color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
-    rgba(15, 23, 42, 0.2) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--card-bg) 0%,
+      color-mix(in srgb, var(--card-bg) 95%, transparent) 25%,
+      color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
+      rgba(15, 23, 42, 0.2) 100%);
 }
 
 body.dark-theme .ask-ai-hero-gradient-overlay {
-  background: linear-gradient(
-    90deg,
-    var(--card-bg) 0%,
-    color-mix(in srgb, var(--card-bg) 95%, transparent) 30%,
-    color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
-    rgba(15, 23, 42, 0.5) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--card-bg) 0%,
+      color-mix(in srgb, var(--card-bg) 95%, transparent) 30%,
+      color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
+      rgba(15, 23, 42, 0.5) 100%);
 }
 
 .ask-ai-brand {
@@ -278,7 +283,7 @@ body.dark-theme .ask-ai-hero-gradient-overlay {
   background: var(--subtle-bg);
 }
 
-.ask-ai-feature-card > span {
+.ask-ai-feature-card>span {
   display: grid;
   width: 28px;
   height: 28px;
@@ -305,10 +310,25 @@ body.dark-theme .ask-ai-hero-gradient-overlay {
   white-space: normal;
 }
 
-.feature-blue > span { color: var(--primary); background: var(--primary-light); }
-.feature-purple > span { color: var(--ai-purple); background: var(--ai-purple-light); }
-.feature-green > span { color: var(--accent); background: var(--accent-light); }
-.feature-orange > span { color: var(--warning); background: var(--warning-light); }
+.feature-blue>span {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.feature-purple>span {
+  color: var(--ai-purple);
+  background: var(--ai-purple-light);
+}
+
+.feature-green>span {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.feature-orange>span {
+  color: var(--warning);
+  background: var(--warning-light);
+}
 
 .ask-ai-reset {
   display: inline-flex;
@@ -679,7 +699,9 @@ body.dark-theme .ask-ai-hero-gradient-overlay {
 }
 
 @keyframes askAiSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .ask-ai-composer-hint {
@@ -902,21 +924,203 @@ body.dark-theme .ask-ai-hero-gradient-overlay {
 }
 
 /* ==========================================================================
+   DARK THEME LEGAL CHAT STUDIO POLISH
+   ========================================================================== */
+body.dark-theme .ask-ai-hero {
+  background: #0c1222;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .ask-ai-feature-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .ask-ai-feature-card b {
+  color: #f8fafc;
+}
+
+body.dark-theme .ask-ai-feature-card small {
+  color: #94a3b8;
+}
+
+body.dark-theme .ask-ai-active-session-bar {
+  background: #0c1222;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .ask-ai-transcript {
+  background: #080c16;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .chat-msg-bubble.is-assistant,
+body.dark-theme .ask-ai-message.is-assistant {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .chat-msg-bubble.is-user,
+body.dark-theme .ask-ai-message.is-user {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35) !important;
+  color: #ffffff !important;
+}
+
+body.dark-theme .ask-ai-message-toolbar {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+body.dark-theme .ask-ai-action-button {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+body.dark-theme .ask-ai-action-button:hover {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+body.dark-theme .ask-ai-action-button.is-speaking {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+body.dark-theme .ask-ai-prompt-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.09);
+  color: #cbd5e1;
+}
+
+body.dark-theme .ask-ai-prompt-chip:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
+}
+
+body.dark-theme .ask-ai-suggested-heading h3 {
+  color: #94a3b8;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+}
+
+body.dark-theme .ask-ai-suggested-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), #111a2e;
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .ask-ai-suggested-card:hover:not(:disabled) {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.14) 0%, rgba(37, 99, 235, 0.04) 100%), #14213d;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(37, 99, 235, 0.2);
+}
+
+body.dark-theme .ask-ai-suggested-icon {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+body.dark-theme .ask-ai-suggested-label {
+  color: #f1f5f9;
+}
+
+body.dark-theme .ask-ai-suggested-arrow {
+  color: #71829e;
+}
+
+body.dark-theme .ask-ai-suggested-card:hover .ask-ai-suggested-arrow {
+  color: #60a5fa;
+}
+
+body.dark-theme .ask-ai-composer-shell {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .ask-ai-composer-shell:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-theme .ask-ai-composer-input {
+  color: #f8fafc;
+}
+
+body.dark-theme .ask-ai-composer-input::placeholder {
+  color: #71829e;
+}
+
+body.dark-theme .ask-ai-mic-button {
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+}
+
+body.dark-theme .ask-ai-mic-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+body.dark-theme .ask-ai-send-button {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);
+}
+
+body.dark-theme .ask-ai-send-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.65);
+}
+
+body.dark-theme .ask-ai-send-button:disabled {
+  background: rgba(255, 255, 255, 0.06);
+  color: #4b5d78;
+  box-shadow: none;
+}
+
+body.dark-theme .ask-ai-composer-hint,
+body.dark-theme .ask-ai-disclaimer {
+  color: #788ba6;
+}
+
+body.dark-theme .ask-ai-rail-card {
+  background: #0c1222;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .code-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 1040px) {
   .ask-ai {
     grid-template-columns: 1fr;
   }
+
   .ask-ai-context-rail {
     display: none;
   }
+
   .ask-ai-feature-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .ask-ai-hero-copy {
     max-width: 100%;
   }
+
   .ask-ai-hero-visual {
     width: 45%;
     opacity: 0.25;

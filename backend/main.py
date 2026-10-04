@@ -16,6 +16,14 @@ import urllib.error
 import urllib.parse
 import os
 from pathlib import Path
+
+try:
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
 

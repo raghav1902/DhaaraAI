@@ -103,9 +103,6 @@ export default function Settings({ language, onLanguageChange, theme, onThemeCha
               <h2 className="settings-hub__title">
                 {isHindi ? 'कार्यक्षेत्र सेटिंग्स' : 'Workspace Settings'}
               </h2>
-              <span className="badge badge-neutral">
-                Preferences
-              </span>
             </div>
             <p className="settings-hub__subtitle">
               {isHindi

@@ -551,9 +551,6 @@ export default function FeeCalculator({ language = 'English' }) {
               <h2 className="fee-calculator__title">
                 {isHindi ? 'न्यायालय शुल्क और स्टाम्प ड्यूटी कैलकुलेटर' : 'Legal Fee & Stamp Duty Studio'}
               </h2>
-              <span className="badge badge-warning">
-                Official Schedules
-              </span>
             </div>
             <p className="fee-calculator__subtitle">
               {isHindi
