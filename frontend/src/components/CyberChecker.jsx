@@ -104,9 +104,6 @@ export default function CyberChecker({ language = 'English' }) {
               <h2 className="cyber-scanner__title">
                 {isHindi ? 'साइबर फ्रॉड व लीक चेकर' : 'Cyber Exposure & Breach Scanner'}
               </h2>
-              <span className="badge badge-purple">
-                XposedOrNot API
-              </span>
             </div>
             <p className="cyber-scanner__subtitle">
               {isHindi

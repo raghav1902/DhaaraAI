@@ -405,10 +405,6 @@ export default function LegalChat({
                 <span className="ask-ai-session-title">
                   {conversations.find(c => c.id === activeConversationId)?.title || (isHindi ? 'सक्रिय विधिक परामर्श सत्र' : 'Active Legal Intelligence Consultation')}
                 </span>
-                <span className="ask-ai-session-meta">
-                  <ShieldCheck size={12} color="var(--emerald-600)" />
-                  {isHindi ? 'BNS / BNSS 2023 प्रमाणित' : 'BNS 2023 • BNSS 2023 • BSA 2023 Verified'}
-                </span>
               </div>
             </div>
             <div className="ask-ai-session-actions">
@@ -429,7 +425,6 @@ export default function LegalChat({
               <div className="ask-ai-brand">
                 <span className="ask-ai-brand-mark"><Scale size={16} /></span>
                 <span>DhaaraAI LegalGPT Workspace</span>
-                <span className="ask-ai-bns-badge">BNS 2023 • BNSS 2023 • BSA 2023 Verified</span>
               </div>
 
               <div className="ask-ai-heading-row">
@@ -453,8 +448,8 @@ export default function LegalChat({
                 <div className="ask-ai-feature-card feature-blue">
                   <span><BookOpen size={15} /></span>
                   <div>
-                    <b>BNS / BNSS 2023</b>
-                    <small>{isHindi ? 'नई विधिक संहिता' : 'New Penal Codes'}</small>
+                    <b>{isHindi ? 'विधिक संहिता' : 'Statutory Codes'}</b>
+                    <small>{isHindi ? 'अपराधिक व दीवानी कानून' : 'Penal & Civil Laws'}</small>
                   </div>
                 </div>
                 <div className="ask-ai-feature-card feature-purple">

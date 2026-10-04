@@ -37,7 +37,7 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
             {isHindi ? 'लागू नया कानून (1 जुलाई 2024 से)' : 'Current Active Law (Post July 1, 2024)'}
           </div>
           <div style={{ fontSize: '19px', fontWeight: '800', color: 'var(--accent)', margin: '4px 0 2px' }}>
-            BNS Section {selectedItem.bns_section}
+            {/^(BNS|BNSS|BSA|IPC|CRPC|IEA)/i.test(selectedItem.bns_section) ? selectedItem.bns_section : `BNS Section ${selectedItem.bns_section}`}
           </div>
           <div style={{ fontSize: '12.5px', color: 'var(--text-main)', fontWeight: '700', lineHeight: '1.4' }}>
             {selectedItem.bns_title}
@@ -58,7 +58,7 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
             {isHindi ? 'पुराना निरस्त कानून (30 जून 2024 तक)' : 'Legacy Law (Pre July 1, 2024)'}
           </div>
           <div style={{ fontSize: '19px', fontWeight: '800', color: 'var(--text-main)', margin: '4px 0 2px' }}>
-            IPC Section {selectedItem.ipc_section}
+            {/^(BNS|BNSS|BSA|IPC|CRPC|IEA)/i.test(selectedItem.ipc_section) ? selectedItem.ipc_section : `IPC Section ${selectedItem.ipc_section}`}
           </div>
           <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', fontWeight: '700', lineHeight: '1.4' }}>
             {selectedItem.ipc_title}
@@ -70,28 +70,58 @@ export default function BnsComparisonCard({ selectedItem, isHindi, onAskAi }) {
       </div>
 
       {/* Statutory Parameters Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+        {/* Classification / Offense Nature */}
         <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
-            {isHindi ? 'अपराध की प्रकृति' : 'Offense Nature'}
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+            {selectedItem.nature === 'Cognizable' || selectedItem.nature === 'Non-Cognizable'
+              ? (isHindi ? 'अपराध की प्रकृति' : 'Offense Nature')
+              : (isHindi ? 'प्रावधान वर्गीकरण' : 'Classification')}
           </span>
-          <span className={`badge ${selectedItem.nature === 'Cognizable' ? 'badge-danger' : 'badge-success'}`} style={{ marginTop: '5px' }}>
+          <span
+            className={`badge ${
+              selectedItem.nature === 'Cognizable'
+                ? 'badge-danger'
+                : selectedItem.nature === 'Non-Cognizable'
+                ? 'badge-success'
+                : 'badge-info'
+            }`}
+            style={{ whiteSpace: 'normal', lineHeight: '1.3', textAlign: 'left', display: 'inline-block', maxWidth: '100%', wordBreak: 'break-word' }}
+          >
             {selectedItem.nature}
           </span>
         </div>
+
+        {/* Bail Status / Statutory Schedule */}
         <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
-            {isHindi ? 'जमानत की स्थिति' : 'Bail Status'}
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+            {selectedItem.bailable === 'Bailable' || selectedItem.bailable === 'Non-Bailable'
+              ? (isHindi ? 'जमानत की स्थिति' : 'Bail Status')
+              : (isHindi ? 'प्रक्रिया / अनुसूची' : 'Statutory Schedule')}
           </span>
-          <span className={`badge ${selectedItem.bailable === 'Bailable' ? 'badge-success' : 'badge-danger'}`} style={{ marginTop: '5px' }}>
+          <span
+            className={`badge ${
+              selectedItem.bailable === 'Bailable'
+                ? 'badge-success'
+                : selectedItem.bailable === 'Non-Bailable'
+                ? 'badge-danger'
+                : 'badge-neutral'
+            }`}
+            style={{ whiteSpace: 'normal', lineHeight: '1.3', textAlign: 'left', display: 'inline-block', maxWidth: '100%', wordBreak: 'break-word' }}
+          >
             {selectedItem.bailable}
           </span>
         </div>
+
+        {/* Court / Jurisdiction */}
         <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>
-            {isHindi ? 'सुनवाई अदालत' : 'Triable By'}
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+            {isHindi ? 'अधिकार क्षेत्र / अदालत' : 'Triable By / Court'}
           </span>
-          <span className="badge badge-info" style={{ marginTop: '5px' }}>
+          <span
+            className="badge badge-info"
+            style={{ whiteSpace: 'normal', lineHeight: '1.3', textAlign: 'left', display: 'inline-block', maxWidth: '100%', wordBreak: 'break-word' }}
+          >
             {selectedItem.triable_by}
           </span>
         </div>

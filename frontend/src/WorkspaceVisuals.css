@@ -8,6 +8,20 @@
   isolation: isolate;
   position: relative;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+}
+
+.app-main {
+  scrollbar-gutter: stable;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+.workspace-content {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Subtle ambient backdrop gradients */
@@ -21,7 +35,6 @@
     radial-gradient(circle at 85% 8%, rgba(37, 99, 235, 0.04), transparent 28%),
     radial-gradient(circle at 10% 92%, rgba(124, 58, 237, 0.03), transparent 28%),
     var(--bg-color);
-  transition: background 0.25s ease;
 }
 
 /* Very faint legal architectural watermark texture */
@@ -36,18 +49,18 @@
   background-size: cover;
   background-position: right bottom;
   mix-blend-mode: multiply;
-  transition: opacity 0.25s ease;
 }
 
 body.dark-theme .app-container::before {
   background: 
-    radial-gradient(circle at 85% 8%, rgba(59, 130, 246, 0.06), transparent 30%),
-    radial-gradient(circle at 10% 92%, rgba(139, 92, 246, 0.05), transparent 30%),
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.09), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.06), transparent 35%),
+    radial-gradient(circle at 10% 85%, rgba(168, 85, 247, 0.05), transparent 35%),
     var(--bg-color);
 }
 
 body.dark-theme .app-container::after {
-  opacity: 0.012;
+  opacity: 0.015;
   mix-blend-mode: screen;
 }
 
@@ -80,7 +93,8 @@ body.dark-theme .ask-ai-active-session-bar,
 body.dark-theme .module-header-banner,
 body.dark-theme .app-top-header,
 body.dark-theme .ask-ai-composer-shell {
-  box-shadow: 0 6px 22px -3px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  box-shadow: 0 6px 24px -3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Contextual Header Textures - Scoped & Opt-in (High Contrast Guaranteed) */

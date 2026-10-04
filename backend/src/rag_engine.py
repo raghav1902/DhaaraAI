@@ -26,8 +26,8 @@ from legal_validator import LegalAccuracyValidator
 # Singleton validator instance — shared across all requests (thread-safe, stateless)
 _validator = LegalAccuracyValidator()
 
-DEFAULT_MODEL = "qwen/qwen3.8-27b"
-FALLBACK_MODEL = "openai/gpt-oss-120b"
+DEFAULT_MODEL = "openai/gpt-oss-120b"
+FALLBACK_MODEL = "qwen/qwen3.8-27b"
 SIMILARITY_THRESHOLD = 0.30
 
 from prompts import (
@@ -461,7 +461,7 @@ class DhaaraRAGEngine:
                 "(3) ### व्यावहारिक अगले कदम — यदि प्रासंगिक हो।"
             )
         else:
-            token_budget = 2200
+            token_budget = 1400
             depth_instruction = (
                 "MANDATORY — Produce a COMPLETE structured legal research response using ALL applicable sections below. "
                 "Do NOT truncate mid-section. Do NOT write a key-points-only card.\n\n"
@@ -570,18 +570,21 @@ class DhaaraRAGEngine:
         models_to_try = [self.model_name]
         if FALLBACK_MODEL not in models_to_try:
             models_to_try.append(FALLBACK_MODEL)
-        if "openai/gpt-oss-120b" not in models_to_try:
-            models_to_try.append("openai/gpt-oss-120b")
+        if "openai/gpt-oss-20b" not in models_to_try:
+            models_to_try.append("openai/gpt-oss-20b")
 
         last_err = None
         for model in models_to_try:
             try:
+                # Clamp max_tokens to 950 for models with strict 1,000 OTPM rate limits (e.g. qwen)
+                eff_max_tokens = min(token_budget, 950) if "qwen" in model.lower() else token_budget
+
                 if stream:
                     response_stream = self.client.chat.completions.create(
                         model=model,
                         messages=messages,
                         temperature=0.1,
-                        max_tokens=token_budget,
+                        max_tokens=eff_max_tokens,
                         stream=True
                     )
 
@@ -628,10 +631,13 @@ class DhaaraRAGEngine:
                         model=model,
                         messages=messages,
                         temperature=0.1,
-                        max_tokens=token_budget,
+                        max_tokens=eff_max_tokens,
                         stream=False
                     )
-                    answer_text = response.choices[0].message.content.strip()
+                    raw_content = response.choices[0].message.content or ""
+                    answer_text = raw_content.strip()
+                    if not answer_text and hasattr(response.choices[0].message, "reasoning"):
+                        answer_text = (response.choices[0].message.reasoning or "").strip()
 
                     if answer_text:
                         if active_disclaimer not in answer_text:
@@ -751,47 +757,64 @@ Please produce a comprehensive, formal, print-ready legal draft adhering to Indi
         if not self.client:
             self._init_groq_client(self.api_key)
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.15,
-                max_tokens=950,
-                stream=False
-            )
-            draft_text = response.choices[0].message.content.strip()
-            return {
-                "success": True,
-                "document_type": document_type,
-                "language": language,
-                "sections_referenced": sections_summary,
-                "draft": draft_text
-            }
-        except Exception as e:
-            print(f"[rag_engine] Drafting failed via primary model: {e}")
-            fallback_draft = self._generate_fallback_draft(
-                document_type=document_type,
-                is_hindi=is_hindi,
-                complainant=complainant,
-                accused=accused,
-                incident_datetime=incident_datetime,
-                incident_location=incident_location,
-                facts=facts,
-                evidence=evidence,
-                relief=relief_sought,
-                sections=sections_str,
-                extra_fields=extras
-            )
-            return {
-                "success": True,
-                "document_type": document_type,
-                "language": language,
-                "sections_referenced": sections_summary,
-                "draft": fallback_draft
-            }
+        models_to_try = [self.model_name]
+        for fb in [FALLBACK_MODEL, "openai/gpt-oss-20b"]:
+            if fb and fb not in models_to_try:
+                models_to_try.append(fb)
+
+        for model in models_to_try:
+            try:
+                eff_max_tokens = min(1400, 950) if "qwen" in model.lower() else 1400
+                response = self.client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=0.15,
+                    max_tokens=eff_max_tokens,
+                    stream=False
+                )
+                raw_text = response.choices[0].message.content or ""
+                draft_text = raw_text.strip()
+                if not draft_text and hasattr(response.choices[0].message, "reasoning"):
+                    draft_text = (response.choices[0].message.reasoning or "").strip()
+
+                if not draft_text:
+                    raise ValueError(f"Model {model} returned empty draft output.")
+
+                return {
+                    "success": True,
+                    "document_type": document_type,
+                    "language": language,
+                    "sections_referenced": sections_summary,
+                    "draft": draft_text
+                }
+            except Exception as e:
+                print(f"[rag_engine] Drafting attempt failed on '{model}': {e}. Trying next fallback...")
+                continue
+
+        print("[rag_engine] All drafting models failed. Activating deterministic fallback template.")
+        fallback_draft = self._generate_fallback_draft(
+            document_type=document_type,
+            is_hindi=is_hindi,
+            complainant=complainant,
+            accused=accused,
+            incident_datetime=incident_datetime,
+            incident_location=incident_location,
+            facts=facts,
+            evidence=evidence,
+            relief=relief_sought,
+            sections=sections_str,
+            extra_fields=extras
+        )
+        return {
+            "success": True,
+            "document_type": document_type,
+            "language": language,
+            "sections_referenced": sections_summary,
+            "draft": fallback_draft
+        }
 
     def _generate_fallback_draft(
         self,

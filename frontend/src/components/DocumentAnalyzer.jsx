@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import {
   FileSearch,
@@ -132,9 +132,6 @@ export default function DocumentAnalyzer({ language = 'English' }) {
                 <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
                   {isHindi ? 'अनुबंध जोखिम ऑडिट' : 'Contract Risk & Unfair Clause Audit'}
                 </h2>
-                <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                  Indian Contract Act 1872
-                </span>
               </div>
               <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
                 {isHindi

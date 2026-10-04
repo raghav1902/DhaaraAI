@@ -62,6 +62,89 @@ def _infer_category(from_act: str, to_act: str, heading: str) -> str:
     return "Statutory Codes & Rights"
 
 
+def _infer_statutory_parameters(from_act: str, to_act: str, heading: str, relation: str) -> Dict[str, str]:
+    h = (heading or "").lower()
+    fa = from_act.upper()
+    ta = to_act.upper()
+
+    # 1. Procedural Criminal Law (CrPC <-> BNSS)
+    if fa == "CRPC" or ta == "BNSS":
+        return {
+            "nature": "Procedural Rule",
+            "bailable": "Criminal Procedure",
+            "compoundable": "Subject to judicial discretion under BNSS",
+            "punishment": "Procedural law governing criminal jurisdiction, inquiry & trial",
+            "triable_by": "Criminal Courts (Magistrate & Sessions)"
+        }
+
+    # 2. Evidence Law (IEA <-> BSA)
+    if fa == "IEA" or ta == "BSA":
+        return {
+            "nature": "Evidentiary Law",
+            "bailable": "Statutory Evidence Rule",
+            "compoundable": "Not Applicable (Evidence Code)",
+            "punishment": "Statutory rules governing admissibility, relevancy & proof",
+            "triable_by": "All Civil & Criminal Courts"
+        }
+
+    # 3. Direct Tax (Income Tax Act)
+    if "TAX" in fa or "TAX" in ta:
+        return {
+            "nature": "Revenue Law",
+            "bailable": "Civil / Revenue Jurisdiction",
+            "compoundable": "Compounding per CBDT guidelines",
+            "punishment": "Statutory tax assessments & revenue procedures",
+            "triable_by": "Assessing Officer / ITAT / High Court"
+        }
+
+    # 4. Substantive Penal Code (IPC <-> BNS)
+    # Violent / Heinous Offenses
+    if any(w in h for w in [
+        "murder", "homicide", "rape", "gang rape", "kidnap", "abduct", "dacoity", "robbery",
+        "extortion", "dowry death", "grievous hurt", "waging war", "treason", "terrorist",
+        "counterfeit", "unnatural", "lynching", "organized crime", "snatching", "culpable homicide"
+    ]):
+        return {
+            "nature": "Cognizable",
+            "bailable": "Non-Bailable",
+            "compoundable": "Non-Compoundable",
+            "punishment": "Rigorous imprisonment (3 years up to Life / Capital punishment) and fine",
+            "triable_by": "Court of Session"
+        }
+
+    # Property / White Collar / Fraud
+    if any(w in h for w in ["theft", "cheating", "fraud", "criminal breach of trust", "forgery", "stolen property", "house-breaking"]):
+        is_serious = any(w in h for w in ["cheating", "trust", "dwelling"])
+        return {
+            "nature": "Cognizable",
+            "bailable": "Non-Bailable" if is_serious else "Bailable",
+            "compoundable": "Compoundable with court permission",
+            "punishment": "Imprisonment up to 3 to 7 years, or fine, or both",
+            "triable_by": "Magistrate of the First Class"
+        }
+
+    # Minor / Bailable / Non-Cognizable
+    if any(w in h for w in ["simple hurt", "affray", "nuisance", "defamation", "rash driving", "negligent driving", "insult", "intimidation", "mischief", "trespass"]):
+        is_nc = any(w in h for w in ["defamation", "insult", "nuisance"])
+        return {
+            "nature": "Non-Cognizable" if is_nc else "Cognizable",
+            "bailable": "Bailable",
+            "compoundable": "Compoundable",
+            "punishment": "Imprisonment up to 1 to 2 years, or fine, or both",
+            "triable_by": "Any Magistrate"
+        }
+
+    # General Substantive Provision
+    rel_cap = relation.capitalize() if relation else "Transition"
+    return {
+        "nature": f"Statutory Provision ({rel_cap})",
+        "bailable": "Refer First Schedule (BNSS)",
+        "compoundable": "As prescribed under statute",
+        "punishment": "As defined under active statutory section",
+        "triable_by": "Competent Judicial Magistrate / Sessions Court"
+    }
+
+
 def get_full_concordance_db() -> List[Dict[str, Any]]:
     """
     Returns the comprehensive, deduplicated concordance database merging the 19 high-detail
@@ -119,6 +202,7 @@ def get_full_concordance_db() -> List[Dict[str, Any]]:
 
                     category = _infer_category(from_act, to_act, to_heading or from_heading)
                     title = to_heading or from_heading or f"{to_act} Section {to_num}"
+                    stat_params = _infer_statutory_parameters(from_act, to_act, to_heading or from_heading or "", relation)
 
                     combined.append({
                         "id": f"map_{from_act.lower()}_{from_num}_{to_act.lower()}_{to_num}_{idx}",
@@ -131,11 +215,11 @@ def get_full_concordance_db() -> List[Dict[str, Any]]:
                         "ipc_section": f"{from_act} Section {from_num}",
                         "ipc_title": from_heading or title,
                         "ipc_act": act_name_map.get(from_act, from_act),
-                        "nature": f"Statutory Provision ({relation.capitalize()})",
-                        "bailable": "Refer First Schedule of BNSS 2023",
-                        "compoundable": "As prescribed under statute",
-                        "punishment": "As defined under the active section",
-                        "triable_by": "Competent Judicial Magistrate / Sessions Court",
+                        "nature": stat_params["nature"],
+                        "bailable": stat_params["bailable"],
+                        "compoundable": stat_params["compoundable"],
+                        "punishment": stat_params["punishment"],
+                        "triable_by": stat_params["triable_by"],
                         "bnss_procedure": f"Governed under {act_name_map.get(to_act, to_act)} Section {to_num}. Replaces legacy {act_name_map.get(from_act, from_act)} Section {from_num}.",
                         "victim_guidance": f"File complaint or invocation quoting {to_act} Section {to_num} (formerly {from_act} Section {from_num}).",
                         "accused_guidance": f"Verify procedural safeguards and jurisdiction under {to_act} Section {to_num}.",

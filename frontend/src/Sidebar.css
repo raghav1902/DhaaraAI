@@ -1,15 +1,347 @@
 /* ==========================================================================
-   DHAARAAI — ULTRA-PREMIUM MODERN SIDEBAR DESIGN
-   Exact matching implementation from Figma reference
+   DHAARAAI — YOUTUBE-STYLE TOP NAVBAR & PERSISTENT BRAND HEADER
    Light & Dark Theme Optimized (WCAG Compliant)
    ========================================================================== */
 
-.app-sidebar {
-  width: 290px;
-  min-width: 290px;
-  height: 100vh;
+.yt-top-navbar {
+  height: 56px;
+  min-height: 56px;
+  max-height: 56px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+  z-index: 100;
+  box-sizing: border-box;
+  gap: 16px;
   position: sticky;
   top: 0;
+}
+
+body.dark-theme .yt-top-navbar {
+  background: rgba(12, 18, 34, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6), inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+.yt-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: fit-content;
+}
+
+/* Hamburger button: LEFT of logo (Just like YouTube) */
+.yt-hamburger-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.yt-hamburger-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.yt-hamburger-btn:active {
+  transform: scale(0.92);
+}
+
+body.dark-theme .yt-hamburger-btn {
+  color: #cbd5e1;
+}
+
+body.dark-theme .yt-hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Brand Button & Logo */
+.yt-brand-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0 4px;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  user-select: none;
+}
+
+.yt-logo-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.4);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.yt-brand-btn:hover .yt-logo-box {
+  transform: scale(1.05);
+}
+
+.yt-brand-info {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.yt-brand-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+body.dark-theme .yt-brand-title {
+  color: #f8fafc;
+}
+
+.yt-country-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  margin-left: 3px;
+  align-self: flex-start;
+  letter-spacing: -0.01em;
+}
+
+body.dark-theme .yt-country-badge {
+  color: #94a3b8;
+}
+
+/* Active Module Indicator Badge */
+.yt-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-left: 8px;
+}
+
+body.dark-theme .yt-active-badge {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.09);
+  color: #f8fafc;
+}
+
+.yt-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+/* Center Search */
+.yt-search-form {
+  flex: 1 1 260px;
+  max-width: 460px;
+  min-width: 160px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.yt-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.yt-search-input {
+  width: 100%;
+  padding: 7px 55px 7px 34px;
+  font-size: 13px;
+  height: 36px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+body.dark-theme .yt-search-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #f8fafc;
+}
+
+body.dark-theme .yt-search-input::placeholder {
+  color: #788ba6;
+}
+
+body.dark-theme .yt-search-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 0 16px rgba(59, 130, 246, 0.15);
+}
+
+.yt-search-badge {
+  position: absolute;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 2px 5px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+body.dark-theme .yt-search-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+/* Right Section */
+.yt-verified-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 4px 9px;
+  border-radius: 16px;
+}
+
+body.dark-theme .yt-verified-pill {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(52, 211, 153, 0.32);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.12);
+}
+
+.yt-lang-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+body.dark-theme .yt-lang-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .yt-lang-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.yt-lang-select {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  outline: none;
+}
+
+body.dark-theme .yt-lang-select {
+  color: #cbd5e1;
+}
+
+.yt-theme-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+body.dark-theme .yt-theme-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+.yt-theme-btn:hover {
+  background: #f1f5f9;
+}
+
+body.dark-theme .yt-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.yt-profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.yt-profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   PRIMARY SIDEBAR DESIGN
+   ========================================================================== */
+
+.app-sidebar {
+  width: 272px;
+  min-width: 272px;
+  max-width: 272px;
+  flex-shrink: 0;
+  height: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
   background: #ffffff;
@@ -30,9 +362,9 @@
 }
 
 body.dark-theme .app-sidebar {
-  background: #0b1120;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 4px 0 25px -2px rgba(0, 0, 0, 0.5);
+  background: #0c1222;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 28px -2px rgba(0, 0, 0, 0.65);
 }
 
 /* Inner Scrollable Container */
@@ -178,8 +510,8 @@ body.dark-theme .sidebar-toggle-btn:hover {
 }
 
 body.dark-theme .sidebar-search-box {
-  background: #111827;
-  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-search-box:focus-within {
@@ -189,7 +521,7 @@ body.dark-theme .sidebar-search-box {
 }
 
 body.dark-theme .sidebar-search-box:focus-within {
-  background: #0f172a;
+  background: rgba(255, 255, 255, 0.07);
   border-color: #60a5fa;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
@@ -213,8 +545,8 @@ body.dark-theme .sidebar-search-input {
   color: #f8fafc;
 }
 
-.sidebar-search-input::placeholder {
-  color: #94a3b8;
+body.dark-theme .sidebar-search-input::placeholder {
+  color: #71829e;
 }
 
 .sidebar-search-badge {
@@ -262,7 +594,8 @@ body.dark-theme .sidebar-nav-section:not(:first-child) {
 }
 
 body.dark-theme .sidebar-section-header {
-  color: #64748b;
+  color: #788ba6;
+  font-weight: 750;
 }
 
 /* --------------------------------------------------------------------------
@@ -279,7 +612,7 @@ body.dark-theme .sidebar-section-header {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 6.5px 10px;
+  padding: 7px 10px;
   border-radius: 10px;
   background: transparent;
   border: 1px solid transparent;
@@ -297,9 +630,13 @@ body.dark-theme .sidebar-section-header {
   border-color: #f1f5f9;
 }
 
+body.dark-theme .sidebar-nav-item {
+  color: #94a3b8;
+}
+
 body.dark-theme .sidebar-nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Active Nav Item */
@@ -310,9 +647,9 @@ body.dark-theme .sidebar-nav-item:hover {
 }
 
 body.dark-theme .sidebar-nav-item--active {
-  background: rgba(37, 99, 235, 0.16) !important;
-  border-color: rgba(59, 130, 246, 0.28) !important;
-  box-shadow: 0 2px 14px rgba(37, 99, 235, 0.2);
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.22) 0%, rgba(37, 99, 235, 0.06) 100%) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 2px 14px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Active Left Indicator Pill - Perfectly anchored on the item's left boundary */
@@ -366,8 +703,9 @@ body.dark-theme .sidebar-nav-item:hover .sidebar-nav-icon-box {
 }
 
 body.dark-theme .sidebar-nav-item--active .sidebar-nav-icon-box {
-  background: rgba(37, 99, 235, 0.3) !important;
-  color: #60a5fa !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45);
 }
 
 /* Nav Item Label */
@@ -403,6 +741,7 @@ body.dark-theme .sidebar-nav-item:hover .sidebar-nav-label {
 
 body.dark-theme .sidebar-nav-item--active .sidebar-nav-label {
   color: #93c5fd !important;
+  font-weight: 700;
 }
 
 /* Nav Item Badges */
@@ -434,9 +773,9 @@ body.dark-theme .sidebar-nav-item--active .sidebar-nav-label {
 }
 
 body.dark-theme .sidebar-badge--blue {
-  background: rgba(37, 99, 235, 0.22);
+  background: rgba(59, 130, 246, 0.18);
   color: #93c5fd;
-  border: 1px solid rgba(37, 99, 235, 0.35);
+  border: 1px solid rgba(59, 130, 246, 0.35);
 }
 
 .sidebar-badge--amber {
@@ -445,9 +784,9 @@ body.dark-theme .sidebar-badge--blue {
 }
 
 body.dark-theme .sidebar-badge--amber {
-  background: rgba(234, 88, 12, 0.2);
-  color: #fdba74;
-  border: 1px solid rgba(234, 88, 12, 0.35);
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .sidebar-badge--danger {
@@ -456,9 +795,9 @@ body.dark-theme .sidebar-badge--amber {
 }
 
 body.dark-theme .sidebar-badge--danger {
-  background: rgba(220, 38, 38, 0.2);
+  background: rgba(239, 68, 68, 0.18);
   color: #fca5a5;
-  border: 1px solid rgba(220, 38, 38, 0.35);
+  border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
 .sidebar-chevron {
@@ -502,7 +841,7 @@ body.dark-theme .sidebar-nav-item--active .sidebar-chevron {
 }
 
 body.dark-theme .sidebar-footer {
-  border-top-color: rgba(255, 255, 255, 0.06);
+  border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 /* User Profile Card */
@@ -522,8 +861,8 @@ body.dark-theme .sidebar-footer {
 }
 
 body.dark-theme .sidebar-user-card {
-  background: #111827;
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-user-card:hover {
@@ -532,7 +871,7 @@ body.dark-theme .sidebar-user-card {
 }
 
 body.dark-theme .sidebar-user-card:hover {
-  background: #1e293b;
+  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
@@ -674,97 +1013,127 @@ body.dark-theme .sidebar-verified-chevron {
 }
 
 /* --------------------------------------------------------------------------
-   COLLAPSED SIDEBAR (74px)
+   COLLAPSED SIDEBAR (72px — YOUTUBE MINI RAIL STYLE)
    -------------------------------------------------------------------------- */
 .app-sidebar.sidebar-closed {
-  width: 74px;
-  min-width: 74px;
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  flex-shrink: 0;
 }
 
 .app-sidebar.sidebar-closed .sidebar-scroll-body {
-  padding: 16px 8px 12px;
-  align-items: center;
+  padding: 8px 4px 12px;
+  align-items: stretch;
 }
 
-.app-sidebar.sidebar-closed .sidebar-brand-info,
+/* Hide clutter in mini rail */
+.app-sidebar.sidebar-closed .sidebar-brand-row,
 .app-sidebar.sidebar-closed .sidebar-search-wrap,
 .app-sidebar.sidebar-closed .sidebar-section-header,
-.app-sidebar.sidebar-closed .sidebar-nav-label,
 .app-sidebar.sidebar-closed .sidebar-badge-wrap,
+.app-sidebar.sidebar-closed .sidebar-chevron,
+.app-sidebar.sidebar-closed .sidebar-active-pill,
 .app-sidebar.sidebar-closed .sidebar-user-meta,
-.app-sidebar.sidebar-closed .sidebar-user-card .sidebar-chevron,
-.app-sidebar.sidebar-closed .sidebar-verified-meta,
-.app-sidebar.sidebar-closed .sidebar-verified-chevron {
+.app-sidebar.sidebar-closed .sidebar-verified-meta {
   display: none !important;
 }
 
-.app-sidebar.sidebar-closed .sidebar-brand-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  width: 100%;
+.app-sidebar.sidebar-closed .sidebar-nav-section:not(:first-child) {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.app-sidebar.sidebar-closed .sidebar-toggle-btn {
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-section:not(:first-child) {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Stacked Icon + Compact Label below (Identical to YouTube!) */
+.app-sidebar.sidebar-closed .sidebar-nav-item {
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 9px 2px 7px !important;
+  min-height: 58px !important;
+  height: auto !important;
+  gap: 5px !important;
+  border-radius: 10px !important;
+  margin-bottom: 3px !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.app-sidebar.sidebar-closed .sidebar-nav-icon-box {
+  width: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
   display: flex !important;
-  width: 32px;
-  height: 32px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #475569;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  margin: 0 auto;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-body.dark-theme .app-sidebar.sidebar-closed .sidebar-toggle-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+.app-sidebar.sidebar-closed .sidebar-nav-label {
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  line-height: 1.15 !important;
+  max-width: 64px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.01em !important;
+}
+
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item {
   color: #94a3b8;
 }
 
-.app-sidebar.sidebar-closed .sidebar-toggle-btn:hover {
-  background: #e2e8f0;
-  color: #1d4ed8;
-  border-color: #cbd5e1;
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
 }
 
-body.dark-theme .app-sidebar.sidebar-closed .sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #60a5fa;
-  border-color: rgba(255, 255, 255, 0.22);
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item:hover .sidebar-nav-icon-box {
+  color: #60a5fa !important;
 }
 
-.app-sidebar.sidebar-closed .sidebar-nav-item {
-  justify-content: center;
-  padding: 7px 0;
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item--active {
+  background: rgba(37, 99, 235, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.3) !important;
 }
 
-.app-sidebar.sidebar-closed .sidebar-active-pill {
-  left: 0;
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item--active .sidebar-nav-icon-box {
+  color: #60a5fa !important;
+}
+
+body.dark-theme .app-sidebar.sidebar-closed .sidebar-nav-item--active .sidebar-nav-label {
+  color: #93c5fd !important;
+  font-weight: 700 !important;
 }
 
 .app-sidebar.sidebar-closed .sidebar-user-card,
 .app-sidebar.sidebar-closed .sidebar-verified-card {
-  justify-content: center;
-  padding: 7px 0;
+  justify-content: center !important;
+  padding: 8px 0 !important;
+  width: 100% !important;
+  border-radius: 10px !important;
 }
 
 @media (max-width: 868px) {
   .app-sidebar {
     position: fixed !important;
-    top: 0 !important;
+    top: 56px !important;
     left: 0 !important;
     bottom: 0 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    width: 290px !important;
-    min-width: 290px !important;
+    height: calc(100vh - 56px) !important;
+    max-height: calc(100vh - 56px) !important;
+    width: 280px !important;
+    min-width: 280px !important;
     z-index: 1050 !important;
     box-shadow: 6px 0 28px rgba(0, 0, 0, 0.3) !important;
     transform: translateX(0) !important;
@@ -776,4 +1145,4 @@ body.dark-theme .app-sidebar.sidebar-closed .sidebar-toggle-btn:hover {
     pointer-events: none !important;
     display: none !important;
   }
-}
+}

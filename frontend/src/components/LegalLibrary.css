@@ -57,23 +57,19 @@
 .legal-library__banner-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    var(--card-bg) 0%,
-    color-mix(in srgb, var(--card-bg) 96%, transparent) 22%,
-    color-mix(in srgb, var(--card-bg) 40%, transparent) 65%,
-    rgba(15, 23, 42, 0.25) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--card-bg) 0%,
+      color-mix(in srgb, var(--card-bg) 96%, transparent) 22%,
+      color-mix(in srgb, var(--card-bg) 40%, transparent) 65%,
+      rgba(15, 23, 42, 0.25) 100%);
 }
 
 body.dark-theme .legal-library__banner-gradient {
-  background: linear-gradient(
-    90deg,
-    var(--card-bg) 0%,
-    color-mix(in srgb, var(--card-bg) 95%, transparent) 26%,
-    color-mix(in srgb, var(--card-bg) 48%, transparent) 65%,
-    rgba(15, 23, 42, 0.55) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--card-bg) 0%,
+      color-mix(in srgb, var(--card-bg) 95%, transparent) 26%,
+      color-mix(in srgb, var(--card-bg) 48%, transparent) 65%,
+      rgba(15, 23, 42, 0.55) 100%);
 }
 
 @media (max-width: 960px) {
@@ -479,6 +475,7 @@ body.dark-theme .legal-library__banner-gradient {
   .legal-library__header {
     padding: 14px !important;
   }
+
   .legal-library__title {
     font-size: 16px !important;
   }

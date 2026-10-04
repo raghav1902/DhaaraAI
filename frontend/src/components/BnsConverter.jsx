@@ -88,9 +88,6 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
               <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
                 {isHindi ? 'BNS 2023 ↔ IPC 1860 विधिक संदर्भ तालिका' : 'BNS 2023 ↔ IPC 1860 Statutory Concordance Explorer'}
               </h2>
-              <span style={{ fontSize: '11px', background: 'var(--accent-light)', color: 'var(--accent)', border: '1px solid var(--accent-border)', fontWeight: '700', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                Concordance Engine
-              </span>
             </div>
             <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
               {isHindi
@@ -174,20 +171,34 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
                       <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)' }}>
-                        BNS Sec {item.bns_section}
+                        {/^(BNS|BNSS|BSA|IPC|CRPC|IEA)/i.test(item.bns_section) ? item.bns_section : `BNS Sec ${item.bns_section}`}
                       </span>
                       <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', background: 'var(--subtle-bg)', padding: '1px 6px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--card-border)' }}>
-                        IPC {item.ipc_section}
+                        {/^(BNS|BNSS|BSA|IPC|CRPC|IEA)/i.test(item.ipc_section) ? item.ipc_section : `IPC ${item.ipc_section}`}
                       </span>
                     </div>
                     <div style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.4' }}>
                       {isHindi ? item.offense_hi : item.offense_en}
                     </div>
-                    <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                      <span style={{ fontSize: '9.5px', padding: '1px 5px', borderRadius: '4px', background: item.nature === 'Cognizable' ? 'var(--danger-light)' : 'var(--accent-light)', color: item.nature === 'Cognizable' ? 'var(--danger)' : 'var(--accent)' }}>
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                      <span style={{
+                        fontSize: '9.5px',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        background: item.nature === 'Cognizable' ? 'var(--danger-light)' : item.nature === 'Non-Cognizable' ? 'var(--accent-light)' : 'var(--subtle-bg)',
+                        color: item.nature === 'Cognizable' ? 'var(--danger)' : item.nature === 'Non-Cognizable' ? 'var(--accent)' : 'var(--text-muted)',
+                        border: '1px solid var(--card-border)'
+                      }}>
                         {item.nature}
                       </span>
-                      <span style={{ fontSize: '9.5px', padding: '1px 5px', borderRadius: '4px', background: item.bailable === 'Bailable' ? 'var(--accent-light)' : 'var(--danger-light)', color: item.bailable === 'Bailable' ? 'var(--accent)' : 'var(--danger)' }}>
+                      <span style={{
+                        fontSize: '9.5px',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        background: item.bailable === 'Bailable' ? 'var(--accent-light)' : item.bailable === 'Non-Bailable' ? 'var(--danger-light)' : 'var(--subtle-bg)',
+                        color: item.bailable === 'Bailable' ? 'var(--accent)' : item.bailable === 'Non-Bailable' ? 'var(--danger)' : 'var(--text-muted)',
+                        border: '1px solid var(--card-border)'
+                      }}>
                         {item.bailable}
                       </span>
                     </div>

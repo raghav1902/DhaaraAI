@@ -11,17 +11,47 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>DhaaraAI — India’s Legal Intelligence, Built for Indian Law</title>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('dhaara_theme');
+          if (t === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+            if (document.body) {
+              document.body.classList.add('dark-theme');
+            } else {
+              document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('dark-theme');
+              });
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js').catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (const registration of registrations) {
+              registration.unregister();
+            }
           });
-        });
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              for (const name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js').catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+          });
+        }
       }
     </script>
   </body>

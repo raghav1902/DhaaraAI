@@ -35,16 +35,12 @@ export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft 
             <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
               {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस ड्राफ्टर' : 'Automated FIR & Legal Notice Drafter'}
             </h2>
-            <span style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', fontWeight: '700', padding: '2px 8px', borderRadius: '12px' }}>
-              Sec 173 BNSS
-            </span>
           </div>
           <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '2px 0 0' }}>
             {isHindi ? 'धारा 173 BNSS एवं भारतीय न्याय संहिता (BNS 2023) के प्रमाणित प्रारूप' : 'Statutory procedural formats under Section 173 BNSS & BNS 2023'}
           </p>
         </div>
       </div>
-      <button type="button" className="drafter-new-button" onClick={onNewDraft} style={{ position: 'relative', zIndex: 2 }}><FileText size={15} /> {isHindi ? 'नया ड्राफ्ट' : 'New Draft'}</button>
       <div className="drafter-header-visual" aria-hidden="true">
         <img
           src="/assets/legal/drafting/drafting_desk.webp"
