@@ -272,11 +272,11 @@ export default function AuthPage({ onLogin, onBack, initialMode = 'login' }) {
           width: 100%;
           max-width: 1140px;
           margin: 0 auto;
-          padding: 1.5rem 1.5rem 4rem;
+          padding: 1.5rem 1.5rem 3.5rem;
           display: grid;
           grid-template-columns: 4fr 5fr;
           gap: 3.5rem;
-          align-items: flex-start;
+          align-items: stretch;
           flex: 1;
           box-sizing: border-box;
           animation: pageFadeIn 0.35s ease-out forwards;
@@ -285,25 +285,25 @@ export default function AuthPage({ onLogin, onBack, initialMode = 'login' }) {
         .auth-brand-col {
           display: flex;
           flex-direction: column;
-          justifyContent: flex-start;
-          min-height: auto;
+          justifyContent: space-between;
+          min-height: 560px;
           position: relative;
-          padding-top: 0.75rem;
+          padding: 0.5rem 0 1rem;
         }
 
         .auth-bg-art {
           position: absolute;
-          bottom: -15px;
-          left: -15px;
-          width: 95%;
-          max-width: 420px;
-          height: 220px;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          max-width: 440px;
+          height: 180px;
           background-image: url(/assets/legal/how/court_dome_sketch.jpg);
           background-size: cover;
           background-position: center bottom;
-          opacity: 0.22;
-          mask-image: radial-gradient(ellipse at 40% 70%, black 30%, transparent 75%);
-          -webkit-mask-image: radial-gradient(ellipse at 40% 70%, black 30%, transparent 75%);
+          opacity: 0.16;
+          mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 55%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 55%, transparent 100%);
           pointer-events: none;
           z-index: 1;
           animation: artReveal 0.6s ease-out forwards;
@@ -521,7 +521,8 @@ export default function AuthPage({ onLogin, onBack, initialMode = 'login' }) {
             margin-bottom: 0.5rem !important;
             line-height: 1.25 !important;
           }
-          .auth-brand-benefits {
+          .auth-brand-benefits,
+          .auth-brand-trust-box {
             display: none !important;
           }
           .auth-form-card {
@@ -747,9 +748,31 @@ export default function AuthPage({ onLogin, onBack, initialMode = 'login' }) {
                 </span>
               </div>
             </div>
+
+            {/* Chamber Trust Assurance Box */}
+            <div className="auth-brand-trust-box" style={{
+              marginTop: '1.75rem',
+              padding: '0.85rem 1rem',
+              background: 'rgba(255, 255, 255, 0.75)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '12px',
+              border: '1px solid #e7e3da',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
+              maxWidth: '380px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.25rem' }}>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981' }} />
+                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#1e293b', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  Judicial Research Grade
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.79rem', color: '#64748b', lineHeight: '1.45' }}>
+                Conforms with DPDP Act 2023 data residency. Client briefs & vault uploads are private with zero LLM model retention.
+              </p>
+            </div>
           </div>
 
-          {/* Background Illustration blended softly */}
+          {/* Background Illustration blended softly at column base */}
           <div className="auth-bg-art" aria-hidden="true" />
         </section>
 
