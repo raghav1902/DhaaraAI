@@ -18,7 +18,7 @@ import CtaBanner from './landing/CtaBanner';
 import LandingFooter from './landing/LandingFooter';
 import UniversalModal from './landing/UniversalModal';
 
-export default function LandingPage({ onExplore, user }) {
+export default function LandingPage({ onExplore, onLogin, user }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
 
@@ -43,7 +43,7 @@ export default function LandingPage({ onExplore, user }) {
       <LandingStyles />
 
       {/* 1. Sticky Frosted Navbar */}
-      <LandingNavbar isScrolled={isScrolled} onExplore={onExplore} user={user} />
+      <LandingNavbar isScrolled={isScrolled} onExplore={onExplore} onLogin={onLogin} user={user} />
 
       {/* 2. Hero Section with Authentic Indian Legal Imagery + Laptop Studio */}
       <HeroSection onExplore={onExplore} user={user} />

@@ -85,6 +85,38 @@ export default function UniversalModal({ activeModal, onClose }) {
             <div>
               <h4 style={{ color: '#0f172a', margin: '0 0 0.5rem 0' }}>1. Informational & Research Companion</h4>
               <p>DhaaraAI provides legal research assistance and document synthesis. Outputs do not constitute formal attorney legal advice. Users must exercise independent professional legal judgment before filing in court.</p>
+              <h4 style={{ color: '#0f172a', margin: '1.25rem 0 0.5rem 0' }}>2. Client Privilege & Fair Usage</h4>
+              <p>Advocates maintain complete ownership of all generated drafts and case analyses. Fair use quotas protect network availability for all litigators.</p>
+            </div>
+          )}
+
+          {activeModal === 'Security & Compliance' && (
+            <div>
+              <h4 style={{ color: '#0f172a', margin: '0 0 0.5rem 0' }}>1. India DPDP Act 2023 Alignment</h4>
+              <p>DhaaraAI operates in strict adherence with India’s Digital Personal Data Protection Act 2023. Client confidential matters are strictly session-isolated and never indexed or shared.</p>
+              <h4 style={{ color: '#0f172a', margin: '1.25rem 0 0.5rem 0' }}>2. Cryptographic Zero-Knowledge Vault</h4>
+              <p>Client documents in your Legal Vault are encrypted with client-side PIN hashes and AES-256 encryption. Even our engineering team cannot view unencrypted files.</p>
+              <h4 style={{ color: '#0f172a', margin: '1.25rem 0 0.5rem 0' }}>3. Enterprise SLA & Auditing</h4>
+              <p>Chamber deployments feature dedicated audit logs, ISO 27001-certified Indian data residency, and real-time security alerts.</p>
+            </div>
+          )}
+
+          {activeModal === 'Chambers & Partnerships' && (
+            <div>
+              <h4 style={{ color: '#0f172a', margin: '0 0 0.5rem 0' }}>Law Chambers & Senior Counsel Engagements</h4>
+              <p>We work directly with prominent law chambers, dispute resolution teams, and corporate in-house counsels across India to deliver customized legal AI setups.</p>
+              <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '1rem', marginBottom: '1.25rem' }}>
+                <h5 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '0.95rem' }}>Chambers Package Includes:</h5>
+                <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.86rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <li>Multi-seat advocate licenses with centralized billing</li>
+                  <li>Custom pleading templates, firm letterheads, & Vakalatnama formats</li>
+                  <li>Fine-tuned semantic search over private chamber precedents</li>
+                  <li>Priority on-premise or private cloud deployment options</li>
+                </ul>
+              </div>
+              <p style={{ fontSize: '0.88rem', margin: 0 }}>
+                Inquire directly with our team at <a href="mailto:chambers@dhaara.ai" style={{ color: '#1d4ed8', fontWeight: 600 }}>chambers@dhaara.ai</a> or <a href="mailto:support@dhaara.ai" style={{ color: '#1d4ed8', fontWeight: 600 }}>support@dhaara.ai</a>.
+              </p>
             </div>
           )}
         </div>

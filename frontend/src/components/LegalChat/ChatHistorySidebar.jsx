@@ -251,7 +251,7 @@ export default function ChatHistorySidebar({
           onClick={onNewChat}
         >
           <Plus size={16} />
-          <span>{isHindi ? '+ नया परामर्श' : '+ New Chat'}</span>
+          <span>{isHindi ? 'नया परामर्श' : 'New Chat'}</span>
         </button>
       </div>
 
@@ -286,7 +286,7 @@ export default function ChatHistorySidebar({
         ) : conversations.length === 0 ? (
           <div className="history-empty">
             <p>{isHindi ? 'कोई बातचीत नहीं मिली।' : 'No conversations found.'}</p>
-            <small>{isHindi ? 'नया परामर्श शुरू करने के लिए "+ नया परामर्श" पर क्लिक करें।' : 'Click "+ New Chat" to begin.'}</small>
+            <small>{isHindi ? 'नया परामर्श शुरू करने के लिए "नया परामर्श" पर क्लिक करें।' : 'Click "New Chat" to begin.'}</small>
           </div>
         ) : (
           <>

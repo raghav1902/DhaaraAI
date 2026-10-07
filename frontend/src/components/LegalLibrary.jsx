@@ -230,27 +230,24 @@ export default function LegalLibrary({
                   type="button"
                   onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Legal Statutory Library') : onNavigateTab('settings')}
                   style={{
-                    background: 'rgba(37, 99, 235, 0.1)',
-                    color: '#2563eb',
-                    border: '1px solid rgba(37, 99, 235, 0.3)',
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    color: '#ffffff',
+                    border: 'none',
                     borderRadius: '999px',
-                    padding: '3px 9px',
-                    fontSize: '11px',
+                    padding: '3px 10px',
+                    fontSize: '10.5px',
                     fontWeight: 800,
+                    letterSpacing: '0.03em',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '5px',
-                    cursor: 'pointer'
+                    gap: '4px',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
                   }}
+                  title={isHindi ? 'DhaaraAI Plus में अपग्रेड करें' : 'Upgrade to DhaaraAI Plus'}
                 >
-                  <span>
-                    {activeTab === 'statutes'
-                      ? (isHindi ? 'निःशुल्क पूर्वावलोकन मोड (शीर्ष 15 धाराएं)' : 'Free 15-Section Preview')
-                      : (isHindi ? 'निःशुल्क पूर्वावलोकन मोड (15 विधिक शब्द)' : 'Free 15-Term Preview')}
-                  </span>
-                  <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-                    ★ UPGRADE
-                  </span>
+                  <span>★</span>
+                  <span>{isHindi ? 'अपग्रेड करें' : 'UPGRADE'}</span>
                 </button>
               )}
             </div>

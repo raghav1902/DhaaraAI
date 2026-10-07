@@ -163,11 +163,12 @@ export default function LandingFooter({ onOpenModal }) {
           </h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {[
-              { label: 'Ask AI', href: '#features' },
+              { label: 'Ask AI (LegalGPT)', href: '#demo' },
               { label: 'BNS ↔ IPC Converter', href: '#toolkit' },
-              { label: 'Case Law Explorer', href: '#features' },
-              { label: 'Contract Audit', href: '#features' },
-              { label: 'Pricing Plans', href: '#pricing' }
+              { label: 'Legal Drafting Studio', href: '#toolkit' },
+              { label: 'Contract Risk Audit', href: '#features' },
+              { label: 'Court Fee & Stamp Calculator', href: '#toolkit' },
+              { label: 'Transparent Pricing', href: '#pricing' }
             ].map((link, i) => (
               <li key={i}>
                 <a
@@ -205,8 +206,8 @@ export default function LandingFooter({ onOpenModal }) {
             {[
               { label: 'About Us', modal: 'About Us' },
               { label: 'Knowledge Base', modal: 'Blog' },
-              { label: 'Security & Privacy', modal: 'Privacy Policy' },
-              { label: 'Terms of Service', modal: 'Terms of Service' }
+              { label: 'Security & Privacy', modal: 'Security & Compliance' },
+              { label: 'Chambers & Partnerships', modal: 'Chambers & Partnerships' }
             ].map((link, i) => (
               <li key={i}>
                 <button
@@ -247,28 +248,45 @@ export default function LandingFooter({ onOpenModal }) {
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {[
               { label: 'Terms of Service', modal: 'Terms of Service' },
-              { label: 'Privacy Policy', modal: 'Privacy Policy' },
-              { label: 'Security & Compliance', modal: 'Privacy Policy' },
-              { label: 'BNS Concordance Guide', modal: 'Blog' }
+              { label: 'Privacy Policy (DPDP Act)', modal: 'Privacy Policy' },
+              { label: 'Security & Compliance', modal: 'Security & Compliance' },
+              { label: 'BNS 2023 Concordance Guide', modal: 'Blog' },
+              { label: 'Frequently Asked Questions', href: '#faq' }
             ].map((link, i) => (
               <li key={i}>
-                <button
-                  onClick={() => onOpenModal(link.modal)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    color: '#64748b',
-                    fontSize: '0.86rem',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
-                >
-                  {link.label}
-                </button>
+                {link.modal ? (
+                  <button
+                    onClick={() => onOpenModal(link.modal)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      color: '#64748b',
+                      fontSize: '0.86rem',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <a
+                    href={link.href}
+                    style={{
+                      color: '#64748b',
+                      textDecoration: 'none',
+                      fontSize: '0.86rem',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#1d4ed8'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                  >
+                    {link.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

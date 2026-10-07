@@ -25,8 +25,8 @@ export default function PricingSection({ onExplore }) {
     {
       name: 'DhaaraAI Plus',
       tagline: 'Built for active litigators, advocates & legal teams',
-      monthlyPrice: '₹499',
-      annualPrice: '₹399',
+      monthlyPrice: '₹999',
+      annualPrice: '₹799',
       period: '/mo',
       popular: true,
       badge: 'Recommended • Active Tier',
@@ -45,9 +45,10 @@ export default function PricingSection({ onExplore }) {
     {
       name: 'Chambers & Corporate',
       tagline: 'For law chambers, senior counsels & corporate counsel',
-      monthlyPrice: '₹1,499',
-      annualPrice: '₹1,199',
-      period: '/mo',
+      isCustom: true,
+      monthlyPrice: 'Custom',
+      annualPrice: 'Custom',
+      period: 'tailored plan',
       popular: false,
       btnLabel: 'Contact Chambers Team',
       features: [
@@ -235,14 +236,14 @@ export default function PricingSection({ onExplore }) {
                 }}>
                   <span style={{
                     fontFamily: "'Outfit', sans-serif",
-                    fontSize: '2.5rem',
+                    fontSize: plan.isCustom ? '2.2rem' : '2.5rem',
                     fontWeight: '800',
                     color: isPop ? '#1d4ed8' : '#0b1329'
                   }}>
-                    {billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice}
+                    {plan.isCustom ? 'Custom' : (billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice)}
                   </span>
                   <span style={{ color: '#64748b', fontSize: '0.88rem' }}>
-                    {plan.period}
+                    {plan.isCustom ? 'tailored pricing' : plan.period}
                   </span>
                 </div>
 
@@ -253,7 +254,7 @@ export default function PricingSection({ onExplore }) {
 
               {/* Action Button */}
               <button
-                onClick={onExplore}
+                onClick={plan.isCustom ? () => { window.location.href = 'mailto:chambers@dhaara.ai?subject=Chambers%20%26%20Corporate%20Inquiry'; } : onExplore}
                 className={isPop ? "btn-primary-pill" : "btn-secondary-pill"}
                 style={{
                   width: '100%',
