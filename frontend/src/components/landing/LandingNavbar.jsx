@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, ArrowRight, Menu, X } from 'lucide-react';
 
-export default function LandingNavbar({ isScrolled, onExplore }) {
+export default function LandingNavbar({ isScrolled, onExplore, user }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
 
@@ -60,7 +60,8 @@ export default function LandingNavbar({ isScrolled, onExplore }) {
             alignItems: 'center',
             gap: '0.65rem',
             textDecoration: 'none',
-            color: 'inherit'
+            color: 'inherit',
+            flexShrink: 0
           }}
         >
           <div style={{
@@ -126,25 +127,27 @@ export default function LandingNavbar({ isScrolled, onExplore }) {
 
         {/* Right CTA / Auth actions */}
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <button
-            onClick={onExplore}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#0b1329',
-              fontWeight: '600',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              padding: '0.5rem 0.85rem',
-              borderRadius: '8px',
-              transition: 'background 0.2s'
-            }}
-          >
-            Login
-          </button>
-          <button className="btn-primary-pill" onClick={onExplore}>
-            Start for Free <ArrowRight size={16} />
-          </button>
+          <div className="nav-auth-desktop" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button
+              onClick={onExplore}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#0b1329',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                padding: '0.5rem 0.85rem',
+                borderRadius: '8px',
+                transition: 'background 0.2s'
+              }}
+            >
+              {user ? 'Dashboard' : 'Login'}
+            </button>
+            <button className="btn-primary-pill" onClick={onExplore}>
+              {user ? 'Open Studio' : 'Start for Free'} <ArrowRight size={16} />
+            </button>
+          </div>
 
           {/* Mobile hamburger button */}
           <button
@@ -186,8 +189,21 @@ export default function LandingNavbar({ isScrolled, onExplore }) {
             </a>
           ))}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
-            <button className="btn-primary-pill" onClick={onExplore} style={{ width: '100%', justifyContent: 'center' }}>
-              Start for Free <ArrowRight size={16} />
+            {!user && (
+              <button
+                onClick={() => { setMobileMenuOpen(false); onExplore(); }}
+                className="btn-secondary-pill"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                Login
+              </button>
+            )}
+            <button
+              className="btn-primary-pill"
+              onClick={() => { setMobileMenuOpen(false); onExplore(); }}
+              style={{ width: '100%', justifyContent: 'center' }}
+            >
+              {user ? 'Open Studio' : 'Start for Free'} <ArrowRight size={16} />
             </button>
           </div>
         </div>
@@ -197,6 +213,11 @@ export default function LandingNavbar({ isScrolled, onExplore }) {
         @media (max-width: 868px) {
           .mobile-toggle-btn {
             display: flex !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .nav-auth-desktop {
+            display: none !important;
           }
         }
       `}</style>

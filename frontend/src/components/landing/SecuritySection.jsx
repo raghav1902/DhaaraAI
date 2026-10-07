@@ -28,7 +28,7 @@ export default function SecuritySection() {
 
   return (
     <section id="security" className="landing-section">
-      <div style={{
+      <div className="security-container-box" style={{
         background: 'linear-gradient(135deg, #070e20 0%, #0a1532 50%, #0c1a40 100%)',
         borderRadius: '28px',
         padding: '4rem 2.5rem',
@@ -113,23 +113,23 @@ export default function SecuritySection() {
             </div>
             <h2 style={{
               fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: 'clamp(1.9rem, 3.2vw, 2.5rem)',
+              fontSize: 'clamp(1.65rem, 2.6vw, 2.2rem)',
               fontWeight: '600',
-              lineHeight: '1.2',
+              lineHeight: '1.25',
               color: '#ffffff',
               marginBottom: '0.75rem',
               letterSpacing: '-0.02em'
             }}>
-              Your Client Documents Are Strictly Confidential
+              Client Confidentiality by Architectural Design
             </h2>
             <p style={{
               color: '#94a3b8',
-              fontSize: '0.96rem',
-              lineHeight: '1.6',
-              maxWidth: '720px',
+              fontSize: '0.94rem',
+              lineHeight: '1.65',
+              maxWidth: '680px',
               margin: '0 0 2rem 0'
             }}>
-              DhaaraAI is engineered with military-grade encryption and zero public training retention. Your legal data stays yours, always.
+              Zero public model training retention, local session isolation, and AES-256 encryption aligned with attorney-client privilege.
             </p>
 
             {/* 3 Dark Glass Cards */}
@@ -199,6 +199,12 @@ export default function SecuritySection() {
           }
           .security-cards-row {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .security-container-box {
+            padding: 2.25rem 1.25rem !important;
+            border-radius: 20px !important;
           }
         }
       `}</style>

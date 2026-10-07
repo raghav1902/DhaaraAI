@@ -91,7 +91,7 @@ export default function TestimonialsSection() {
               {/* Quote text */}
               <p style={{
                 fontFamily: "'Newsreader', Georgia, serif",
-                fontSize: '1.02rem',
+                fontSize: '0.94rem',
                 color: '#1e293b',
                 lineHeight: '1.65',
                 fontStyle: 'italic',

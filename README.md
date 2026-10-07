@@ -172,6 +172,57 @@ npm run dev
 ```
 Open `http://localhost:5173` in your browser.
 
+
+---
+
+## 🚀 100% Free Production Deployment Architecture
+
+DhaaraAI is engineered with a **Zero-Cost Production Blueprint (₹0 Total Spend)** allowing 24/7 cloud availability without depending on a local machine or paid servers:
+
+```
+[Global Litigants & Advocates (Web/Mobile)]
+                     │
+                     ▼ HTTPS
+       ┌──────────────────────────────┐
+       │   Vercel Global Edge CDN     │  (100% Free, SSL, Continuous CI/CD)
+       │    Frontend (React 19+Vite)   │  URL: https://dhaara-ai.vercel.app
+       └──────────────┬───────────────┘
+                      │
+                      ▼ REST API via VITE_API_BASE
+       ┌──────────────────────────────┐
+       │      Render.com Cloud VM     │  (100% Free Web Service, 750 hrs/mo)
+       │    FastAPI Python Backend    │  URL: https://dhaara-ai-backend.onrender.com
+       ├──────────────────────────────┤
+       │ • In-Memory BNS Concordance  │  (2,016+ section cross-mappings)
+       │ • 150+ Legal Glossary DB     │  (Native multi-domain dictionary)
+       │ • 1,495+ Statutory Acts CSV  │  (Loaded from git disk on boot)
+       │ • ChromaDB Self-Seeding      │  (Auto-vectorizes from JSON without 1.9GB manual upload)
+       │ • User Accounts & Chats      │  (Isolated SQLite WAL / Cloud Persistent)
+       └──────────────────────────────┘
+```
+
+### 🧠 Why You Don't Need to Upload 1.9 GB ChromaDB Manually
+A common bottleneck in legal RAG systems is the massive size of precomputed vector embeddings (`chroma_db` directory exceeds ~1.9 GB locally). 
+
+DhaaraAI solves this elegantly via **Zero-Upload Cloud Seeding**:
+1. **Raw Statutory Dataset In Git**: Statutory files (`sections.csv`, `mapping.csv`, `comprehensive_statutes.json`) are only **~13 MB** in total and are tracked safely within Git under the 100 MB file limit.
+2. **Self-Healing Vector Seeder (`embed_store.seed_defaults_if_empty()`)**: When the backend boots on Render with a clean state, it automatically detects an empty Chroma collection and constructs dense embeddings on the fly within seconds using local CPU transformers.
+3. **Zero Git Bloat**: Heavy `.sqlite3` and `.bin` vector caches are kept in `.gitignore`, preventing GitHub push rejection errors while keeping cloud startup instantaneous.
+
+### 🌐 Cloud Environment Variables
+
+#### Backend (Render.com)
+| Variable | Value | Purpose |
+| :--- | :--- | :--- |
+| `GROQ_API_KEY` | `gsk_...` | High-speed LLM inference (Llama 3.3 70B) |
+| `DHAARA_CORS_ORIGINS` | `*` (or Vercel URL) | Allows cross-origin requests from the live frontend |
+| `PYTHON_VERSION` | `3.11.0` | Pin Python runtime environment |
+
+#### Frontend (Vercel)
+| Variable | Value | Purpose |
+| :--- | :--- | :--- |
+| `VITE_API_BASE` | `https://dhaara-ai-backend.onrender.com` | Connects the live React UI to the Render cloud backend |
+
 ---
 
 ## 📁 Repository Structure

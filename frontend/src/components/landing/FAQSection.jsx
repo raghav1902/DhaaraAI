@@ -23,8 +23,8 @@ function FAQItem({ question, answer, isOpen, onToggle }) {
           color: '#0b1329',
           fontFamily: "'Outfit', sans-serif",
           fontWeight: '600',
-          fontSize: '1.05rem',
-          lineHeight: '1.4'
+          fontSize: '0.98rem',
+          lineHeight: '1.45'
         }}
       >
         <span>{question}</span>
@@ -52,10 +52,10 @@ function FAQItem({ question, answer, isOpen, onToggle }) {
       }}>
         <div style={{ overflow: 'hidden' }}>
           <p style={{
-            paddingTop: '0.85rem',
+            paddingTop: '0.75rem',
             color: '#475569',
             lineHeight: '1.65',
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             margin: 0,
             maxWidth: '92%'
           }}>
@@ -113,7 +113,7 @@ export default function FAQSection() {
       </div>
 
       {/* Accordion List */}
-      <div style={{
+      <div className="faq-container-box" style={{
         background: '#ffffff',
         borderRadius: '22px',
         padding: '1rem 2.25rem',
@@ -130,6 +130,14 @@ export default function FAQSection() {
           />
         ))}
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .faq-container-box {
+            padding: 0.75rem 1.15rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

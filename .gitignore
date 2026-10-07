@@ -53,6 +53,9 @@ backend/data/chat_history/
 backend/data/data/
 *.db
 backend/data/*.db
+*.zip
+*.tar
+*.gz
 
 # Large Datasets & Parquet / JSONL Files (>100MB)
 *.parquet

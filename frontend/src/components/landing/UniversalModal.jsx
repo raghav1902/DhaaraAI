@@ -16,7 +16,7 @@ export default function UniversalModal({ activeModal, onClose }) {
       justifyContent: 'center',
       padding: '1rem'
     }} onClick={onClose}>
-      <div style={{
+      <div className="universal-modal-dialog" style={{
         background: 'white',
         padding: '2.25rem',
         borderRadius: '22px',
@@ -26,8 +26,16 @@ export default function UniversalModal({ activeModal, onClose }) {
         overflowY: 'auto',
         boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)'
       }} onClick={e => e.stopPropagation()}>
+        <style>{`
+          @media (max-width: 640px) {
+            .universal-modal-dialog {
+              padding: 1.5rem 1.15rem !important;
+              border-radius: 18px !important;
+            }
+          }
+        `}</style>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.6rem', color: '#0f172a', margin: 0 }}>{activeModal}</h2>
+          <h2 style={{ fontSize: '1.35rem', color: '#0f172a', margin: 0, fontWeight: '700' }}>{activeModal}</h2>
           <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <X size={18} color="#475569" />
           </button>

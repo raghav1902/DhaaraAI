@@ -55,10 +55,10 @@ export default function IntegrationsSection() {
           <Workflow size={14} /> INTEGRATES WITH YOUR LEGAL WORKFLOW
         </div>
         <h2 className="landing-section-title">
-          Connect DhaaraAI to the tools you already use.
+          Seamless Integration with Your Existing Workflow
         </h2>
         <p className="landing-section-desc">
-          Seamlessly integrate intelligent legal research, redlining, and citations directly into your existing software stack.
+          Embed statutory research, contract redlining, and verified citations directly into your drafting tools.
         </p>
       </div>
 

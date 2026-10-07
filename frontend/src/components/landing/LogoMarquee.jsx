@@ -35,42 +35,42 @@ export default function LogoMarquee() {
           flexWrap: 'wrap'
         }} className="trust-metrics-container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Users size={20} color="#1d4ed8" />
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Scale size={18} color="#1d4ed8" />
             </div>
             <div>
-              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.75rem', fontWeight: '800', color: '#0b1329', lineHeight: 1 }}>
-                10,000+
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.45rem', fontWeight: '700', color: '#0b1329', lineHeight: 1 }}>
+                2,016+
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
-                Legal Professionals
+              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
+                BNS Concordance Provisions
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BookOpen size={20} color="#059669" />
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <BookOpen size={18} color="#059669" />
             </div>
             <div>
-              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.75rem', fontWeight: '800', color: '#0b1329', lineHeight: 1 }}>
-                2.4M+
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.45rem', fontWeight: '700', color: '#0b1329', lineHeight: 1 }}>
+                28 States
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
-                Statutes & Precedents
+              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
+                Court Fee &amp; Stamp Rules
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Star size={20} fill="#f59e0b" color="#f59e0b" />
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Star size={18} fill="#f59e0b" color="#f59e0b" />
             </div>
             <div>
-              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.75rem', fontWeight: '800', color: '#0b1329', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                4.9<span style={{ fontSize: '1.1rem', color: '#94a3b8', fontWeight: '600' }}>/5</span>
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.45rem', fontWeight: '700', color: '#0b1329', lineHeight: 1, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                4.9<span style={{ fontSize: '0.95rem', color: '#94a3b8', fontWeight: '600' }}>/5</span>
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
+              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
                 Advocate Rating
               </div>
             </div>
@@ -183,7 +183,14 @@ export default function LogoMarquee() {
         @media (max-width: 640px) {
           .trust-metrics-container {
             gap: 1.5rem !important;
-            justifyContent: space-between;
+            justify-content: space-between;
+          }
+        }
+        @media (max-width: 480px) {
+          .trust-metrics-container {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1.15rem !important;
           }
         }
       `}</style>

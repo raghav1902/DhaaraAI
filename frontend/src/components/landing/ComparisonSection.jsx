@@ -3,19 +3,19 @@ import { Scale, X, Check } from 'lucide-react';
 
 export default function ComparisonSection() {
   const traditionalPoints = [
-    'Manual law library searches (hours)',
-    'High retainer & hourly costs',
-    'Slow turnaround (days)',
-    'BNS confusion across sections',
-    'Limited access to precedents'
+    'Hours spent thumbing through physical digests & law journals',
+    'Risk of citing repealed IPC provisions post-July 2024 reform',
+    'Disjointed state-by-state court fee circulars & probate charts',
+    'Manual first-drafting of routine Section 138 notices and petitions',
+    'Fragmented precedent retrieval across multiple court databases'
   ];
 
   const dhaaraPoints = [
-    'AI-powered semantic retrieval (seconds)',
-    'Cost-efficient and transparent pricing',
-    'Instant results with citations',
-    'Automated BNS ↔ IPC conversion',
-    'Access to latest laws and judgments'
+    'Semantic precedent retrieval with verified SC & HC citations in seconds',
+    'Automated BNS ↔ IPC concordance across 2,016+ statutory provisions',
+    'Unified 28-State & UT court fee and stamp duty valuation engine',
+    'Court-ready bilingual draft generation (FIRs, NDAs, statutory notices)',
+    'Zero-retention client confidentiality aligned with attorney-client privilege'
   ];
 
   return (
@@ -54,7 +54,7 @@ export default function ComparisonSection() {
         }} className="comparison-split-box">
 
           {/* VS Center Badge */}
-          <div style={{
+          <div className="comparison-vs-badge" style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
@@ -235,12 +235,12 @@ export default function ComparisonSection() {
           }}>
             <h3 style={{
               fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: '2rem',
+              fontSize: '1.45rem',
               color: '#fef08a',
               fontWeight: '600',
               fontStyle: 'italic',
-              margin: '0 0 0.5rem 0',
-              lineHeight: 1.2,
+              margin: '0 0 0.4rem 0',
+              lineHeight: 1.25,
               textShadow: '0 2px 10px rgba(0,0,0,0.5)'
             }}>
               “Same Law. Smarter Research.”
@@ -271,6 +271,23 @@ export default function ComparisonSection() {
           .comparison-split-box > div:first-child {
             border-right: none !important;
             border-bottom: 1px solid #fee2e2;
+          }
+          .comparison-split-box > div {
+            padding: 1.5rem 1.25rem !important;
+          }
+          .comparison-vs-badge {
+            display: none !important;
+          }
+          .scales-photo-card img {
+            min-height: 250px !important;
+          }
+          .scales-photo-card h3 {
+            font-size: 1.45rem !important;
+          }
+          .scales-photo-card > div:last-child {
+            bottom: 1.25rem !important;
+            left: 1rem !important;
+            right: 1rem !important;
           }
         }
       `}</style>

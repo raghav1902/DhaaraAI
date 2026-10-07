@@ -1,62 +1,72 @@
 import React, { useState } from 'react';
-import { Tag, CheckCircle2 } from 'lucide-react';
+import { Tag, CheckCircle2, Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function PricingSection({ onExplore }) {
   const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' | 'annual'
 
   const plans = [
     {
-      name: 'Basic Plan',
-      tagline: 'Ideal for solo advocates',
-      monthlyPrice: '₹130.99',
-      annualPrice: '₹1250.50',
-      period: '/mo',
+      name: 'Free Tier',
+      tagline: 'Ideal for legal students and introductory research',
+      monthlyPrice: '₹0',
+      annualPrice: '₹0',
+      period: 'forever',
       popular: false,
-      btnLabel: 'Get Started',
+      btnLabel: 'Get Started Free',
       features: [
-        'Advanced AI model access',
-        'Unlimited statutory queries',
-        'Up-to-date BNS 2023 data',
-        'Standard email support'
+        '15 preview statutory concordance provisions',
+        '7 AI legal consultations per day',
+        '2 BNS ↔ IPC section lookups per day',
+        'Citizen legal rights & SOS guide',
+        'Standard response speed',
+        'Zero credit card required'
       ]
     },
     {
-      name: 'Plus Plan',
-      tagline: 'For active law firms',
-      monthlyPrice: '₹340.99',
-      annualPrice: '₹3273.50',
+      name: 'DhaaraAI Plus',
+      tagline: 'Built for active litigators, advocates & legal teams',
+      monthlyPrice: '₹499',
+      annualPrice: '₹399',
       period: '/mo',
       popular: true,
-      badge: 'Most Popular',
-      btnLabel: 'Start 3-Day Free Trial',
+      badge: 'Recommended • Active Tier',
+      btnLabel: 'Upgrade to Plus',
       features: [
-        'Everything in Basic',
-        'Document uploads (PDF & Word)',
-        'Contract risk audits (100/mo)',
-        'Court-ready notice drafting',
-        'Priority AI inference queue'
+        'All 1,495+ statutory concordance provisions unlocked',
+        'Truly unlimited AI statutory & case law consultations',
+        'Unlimited BNS ↔ IPC concordance explorer lookups',
+        'State-wise Court Fee & Stamp Duty Calculator (28 States & UTs)',
+        'Cyber Exposure & Data Leak Threat Scanner',
+        'Court-ready bilingual legal drafter (FIRs, Notices, NDAs)',
+        'Zero-knowledge encrypted client vault with PIN protection',
+        'Priority GPU inference queue with instant citations'
       ]
     },
     {
-      name: 'Enterprise',
-      tagline: 'For corporate legal teams',
-      monthlyPrice: '₹690.99',
-      annualPrice: '₹6633.50',
+      name: 'Chambers & Corporate',
+      tagline: 'For law chambers, senior counsels & corporate counsel',
+      monthlyPrice: '₹1,499',
+      annualPrice: '₹1,199',
       period: '/mo',
       popular: false,
-      btnLabel: 'Get Started',
+      btnLabel: 'Contact Chambers Team',
       features: [
-        'Unlimited document audits',
-        'Deep precedent research mode',
-        'Multi-user team vault',
-        'Custom law firm templates',
-        'Dedicated account manager'
+        'Everything in DhaaraAI Plus',
+        'Multi-advocate shared vault & chamber collaboration',
+        'Custom firm pleading templates & chamber letterheads',
+        'Bulk contract risk audits & redlining exports',
+        'Dedicated legal SLA & API data access',
+        'Custom fine-tuned firm precedent search'
       ]
     }
   ];
 
   return (
-    <section id="pricing" className="landing-section">
+    <section id="pricing" className="landing-section" style={{
+      maxWidth: '1280px',
+      margin: '4rem auto',
+      padding: '0 1.5rem'
+    }}>
       {/* Header and Toggle */}
       <div style={{
         display: 'flex',
@@ -67,14 +77,34 @@ export default function PricingSection({ onExplore }) {
         gap: '1.5rem'
       }}>
         <div>
-          <div className="eyebrow-badge">
-            <Tag size={14} /> TRANSPARENT PLANS
+          <div className="eyebrow-badge" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: '#eff6ff',
+            color: '#1d4ed8',
+            border: '1px solid #bfdbfe',
+            padding: '0.3rem 0.85rem',
+            borderRadius: '999px',
+            fontSize: '0.76rem',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginBottom: '0.75rem'
+          }}>
+            <Tag size={14} /> TRANSPARENT LEGAL PRICING
           </div>
-          <h2 className="landing-section-title" style={{ margin: '0 0 0.5rem 0' }}>
-            Choose the plan that fits you
+          <h2 className="landing-section-title" style={{
+            fontFamily: "'Newsreader', Georgia, serif",
+            fontWeight: '600',
+            color: '#0b1329',
+            lineHeight: '1.25',
+            margin: '0 0 0.5rem 0'
+          }}>
+            Simple, Transparent Plans for Every Practice
           </h2>
-          <p className="landing-section-desc" style={{ margin: 0, textAlign: 'left' }}>
-            Every plan includes an instant 3-day free trial. Cancel anytime.
+          <p className="landing-section-desc" style={{ margin: 0, textAlign: 'left', color: '#64748b', fontSize: '0.94rem' }}>
+            Start with the free tier today. Upgrade seamlessly anytime to unlock all 1,495+ provisions and advanced drafting.
           </p>
         </div>
 
@@ -82,7 +112,7 @@ export default function PricingSection({ onExplore }) {
         <div style={{
           background: '#ffffff',
           border: '1px solid #cbd5e1',
-          padding: '0.3rem',
+          padding: '0.35rem',
           borderRadius: '999px',
           display: 'flex',
           alignItems: 'center',
@@ -127,7 +157,7 @@ export default function PricingSection({ onExplore }) {
               fontSize: '0.7rem',
               background: '#ecfdf5',
               color: '#059669',
-              padding: '1px 6px',
+              padding: '1px 7px',
               borderRadius: '999px',
               fontWeight: '700'
             }}>
@@ -158,34 +188,38 @@ export default function PricingSection({ onExplore }) {
                 padding: '2.5rem 2rem',
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: isPop ? '0 16px 45px rgba(29, 78, 216, 0.12)' : '0 4px 18px rgba(11, 19, 41, 0.03)'
+                boxShadow: isPop ? '0 16px 45px rgba(29, 78, 216, 0.12)' : '0 4px 18px rgba(11, 19, 41, 0.03)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
               }}
             >
               {/* Popular Badge */}
               {isPop && (
                 <div style={{
                   position: 'absolute',
-                  top: '-12px',
+                  top: '-13px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  background: '#1d4ed8',
+                  background: 'linear-gradient(135deg, #1e40af, #2563eb)',
                   color: 'white',
-                  fontSize: '0.72rem',
+                  fontSize: '0.74rem',
                   fontWeight: '700',
-                  padding: '3px 14px',
+                  padding: '3px 16px',
                   borderRadius: '999px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
-                  boxShadow: '0 2px 8px rgba(29, 78, 216, 0.35)'
+                  boxShadow: '0 4px 12px rgba(29, 78, 216, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
                 }}>
-                  {plan.badge}
+                  <Sparkles size={12} /> {plan.badge}
                 </div>
               )}
 
               <div>
                 <h3 style={{
                   fontFamily: "'Outfit', sans-serif",
-                  fontSize: '1.3rem',
+                  fontSize: '1.35rem',
                   fontWeight: '700',
                   color: '#0b1329',
                   marginBottom: '0.3rem'
@@ -196,14 +230,14 @@ export default function PricingSection({ onExplore }) {
                 <div style={{
                   display: 'flex',
                   alignItems: 'baseline',
-                  gap: '0.3rem',
+                  gap: '0.35rem',
                   marginBottom: '0.35rem'
                 }}>
                   <span style={{
                     fontFamily: "'Outfit', sans-serif",
-                    fontSize: '2.4rem',
+                    fontSize: '2.5rem',
                     fontWeight: '800',
-                    color: '#0b1329'
+                    color: isPop ? '#1d4ed8' : '#0b1329'
                   }}>
                     {billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice}
                   </span>
@@ -212,7 +246,7 @@ export default function PricingSection({ onExplore }) {
                   </span>
                 </div>
 
-                <div style={{ color: '#64748b', fontSize: '0.82rem', marginBottom: '1.75rem' }}>
+                <div style={{ color: '#64748b', fontSize: '0.84rem', lineHeight: '1.5', minHeight: '40px', marginBottom: '1.75rem' }}>
                   {plan.tagline}
                 </div>
               </div>
@@ -225,7 +259,9 @@ export default function PricingSection({ onExplore }) {
                   width: '100%',
                   justifyContent: 'center',
                   marginBottom: '2rem',
-                  padding: '0.75rem 1rem'
+                  padding: '0.8rem 1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
                 }}
               >
                 {plan.btnLabel}
@@ -234,9 +270,9 @@ export default function PricingSection({ onExplore }) {
               {/* Features List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginTop: 'auto' }}>
                 {plan.features.map((feat, fIdx) => (
-                  <div key={fIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <CheckCircle2 size={16} color={isPop ? "#1d4ed8" : "#059669"} style={{ flexShrink: 0 }} />
-                    <span style={{ color: '#334155', fontSize: '0.86rem', fontWeight: '500' }}>
+                  <div key={fIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                    <CheckCircle2 size={16} color={isPop ? "#1d4ed8" : "#059669"} style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <span style={{ color: '#334155', fontSize: '0.86rem', fontWeight: '500', lineHeight: '1.45' }}>
                       {feat}
                     </span>
                   </div>
