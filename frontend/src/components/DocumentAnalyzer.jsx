@@ -224,7 +224,7 @@ export default function DocumentAnalyzer({
                       gap: '4px'
                     }}
                   >
-                    <Crown size={12} /> PLUS • UNLIMITED AUDITS
+                    <Crown size={12} /> PLUS
                   </span>
                 ) : (
                   <button

@@ -244,7 +244,7 @@ ${breachDetails || 'No indexed public breaches found.'}
               color: '#f59e0b', border: '1px solid rgba(245,158,11,0.35)',
               boxShadow: '0 2px 8px rgba(245,158,11,0.1)'
             }}>
-              ⭐ PLUS • UNLIMITED SCANS
+              PLUS
             </span>
           ) : (
             <button
@@ -296,13 +296,6 @@ ${breachDetails || 'No indexed public breaches found.'}
       <div className="cyber-scanner__workspace">
         <div className="cyber-scanner__workspace-inner">
 
-          {/* Source Badge */}
-          <div className="cyber-scanner__source-badge">
-            <Database size={13} />
-            <span>Verified Breach Index — XposedOrNot</span>
-            <span className="cyber-scanner__source-dot" />
-            <span>IT Act 2000 / 2008</span>
-          </div>
 
           <h3 className="cyber-scanner__prompt-title">
             {isHindi ? 'ईमेल ब्रीच सत्यापन' : 'Check Email for Known Security Breaches'}

@@ -889,7 +889,7 @@ TOTAL COMPOUNDABLE STATUTORY PENALTY: ${formatCurrency(totalFine)}
                     <input
                       type="checkbox"
                       checked={isChecked}
-                      onChange={() => {}} // handled by wrapper click
+                      onChange={() => { }} // handled by wrapper click
                       className="fee-calculator__violation-checkbox"
                     />
                     <div className="fee-calculator__violation-details">
@@ -1171,8 +1171,8 @@ TOTAL STATUTORY GST DEFICIT PAYABLE: ${formatCurrency(totalStatutoryGstPayable)}
     const courtTitle = advocateCourtLevel === 'district'
       ? 'District & Sessions Court'
       : advocateCourtLevel === 'highcourt'
-      ? 'High Court'
-      : 'Supreme Court of India';
+        ? 'High Court'
+        : 'Supreme Court of India';
 
     const receiptText = `════ DHAARAAI ADVOCATE PROFESSIONAL FEE AUDIT ════
 Standards: BAR COUNCIL OF INDIA RULES & HIGH COURT RULES
@@ -1425,12 +1425,12 @@ NALSA / Free Legal Aid Status: ${isFreeLegalAidEligible ? 'QUALIFIES FOR FREE LE
               <h2 className="fee-calculator__title">
                 {isHindi ? 'न्यायालय शुल्क और स्टाम्प ड्यूटी स्टूडियो' : 'Legal Fee & Stamp Duty Studio'}
               </h2>
-              <span className="fee-calc__version-badge">Advanced Statutory v2.4</span>
+              {/* <span className="fee-calc__version-badge">Advanced Statutory v2.4</span> */}
             </div>
             <p className="fee-calculator__subtitle">
               {isHindi
                 ? '6 प्रमुख विधिक मॉड्यूल: संपत्ति स्टाम्प, दीवानी कोर्ट, उपभोक्ता, ट्रैफिक, GST एवं अधिवक्ता शुल्क'
-                : '6 Dedicated Statutory Modules: Advanced Conveyance · Civil Ad-Valorem · Consumer CPA · Motor Vehicles · GST Late Fee · Advocate Benchmarks'}
+                : '6 Dedicated Statutory Modules'}
             </p>
           </div>
         </div>

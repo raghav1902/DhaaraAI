@@ -217,7 +217,7 @@ export default function LegalLibrary({
                     gap: '4px'
                   }}
                 >
-                  <Crown size={12} /> {activeTab === 'statutes' ? 'PLUS • ALL 1,495+ SECTIONS UNLOCKED' : 'PLUS • ALL 155+ TERMS UNLOCKED'}
+                  <Crown size={12} /> {activeTab === 'statutes' ? 'PLUS' : 'PLUS'}
                 </span>
               ) : (
                 <button
@@ -251,7 +251,7 @@ export default function LegalLibrary({
             <p className="legal-library__subtitle">
               {isHindi
                 ? 'भारतीय न्याय संहिता (BNS 2023), IPC 1860, BNSS एवं 150+ प्रमाणित विधिक शब्दों की सरल व्याख्या'
-                : 'Verified statutory repository of BNS & IPC Concordance, plus 150+ Indian Legal Terms with plain explanations'}
+                : 'Verified statutory repository of BNS & IPC Concordance, Indian Legal Terms with plain explanations'}
             </p>
           </div>
         </div>
