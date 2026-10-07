@@ -1,14 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { Scale, ArrowLeft, Eye, EyeOff, Check, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Scale, ArrowLeft, Eye, EyeOff, Check, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from '../config/apiConfig';
 
-export default function AuthPage({ onLogin, onBack }) {
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+const getPasswordStrength = (pwd) => {
+  if (!pwd) return { score: 0, label: '', color: '#e2e8f0' };
+  let score = 0;
+  if (pwd.length >= 6) score += 1;
+  if (pwd.length >= 8) score += 1;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score += 1;
+  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) score += 1;
+
+  if (score <= 1) return { score: 1, label: 'Weak', color: '#ef4444' };
+  if (score === 2) return { score: 2, label: 'Fair', color: '#f59e0b' };
+  if (score === 3) return { score: 3, label: 'Good', color: '#3b82f6' };
+  return { score: 4, label: 'Strong', color: '#10b981' };
+};
+
+const validateField = (name, value, allValues, loginMode) => {
+  const val = (value || '').trim();
+  switch (name) {
+    case 'firstName':
+      if (!loginMode) {
+        if (!val) return 'First name is required.';
+        if (val.length < 2) return 'First name must be at least 2 characters.';
+        if (!/^[a-zA-Z\s.'-]+$/.test(val)) return 'Name should only contain letters.';
+      }
+      return '';
+    case 'lastName':
+      if (!loginMode) {
+        if (!val) return 'Last name is required.';
+        if (!/^[a-zA-Z\s.'-]+$/.test(val)) return 'Name should only contain letters.';
+      }
+      return '';
+    case 'email':
+      if (!val) return 'Email address is required.';
+      if (!EMAIL_REGEX.test(val)) return 'Please enter a valid email address (e.g. advocate@chamber.in).';
+      if (val.length > 254) return 'Email address is too long (max 254 characters).';
+      return '';
+    case 'password':
+      if (!value) return 'Password is required.';
+      if (value.length < 6) return 'Password must be at least 6 characters.';
+      if (value.length > 128) return 'Password is too long (max 128 characters).';
+      return '';
+    case 'confirmPassword':
+      if (!loginMode) {
+        if (!value) return 'Please confirm your password.';
+        if (value !== allValues.password) return 'Passwords do not match.';
+      }
+      return '';
+    default:
+      return '';
+  }
+};
+
+export default function AuthPage({ onLogin, onBack, initialMode = 'login' }) {
   useEffect(() => {
     document.body.classList.remove('dark-theme');
     document.documentElement.classList.remove('dark-theme');
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    };
   }, []);
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,17 +78,87 @@ export default function AuthPage({ onLogin, onBack }) {
     password: '',
     confirmPassword: ''
   });
+  const [touched, setTouched] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authError, setAuthError] = useState('');
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setIsLogin(initialMode === 'login');
+    setAuthError('');
+    setFieldErrors({});
+    setTouched({});
+  }, [initialMode]);
+
+  const pwdStrength = useMemo(() => {
+    return getPasswordStrength(formData.password);
+  }, [formData.password]);
+
+  const handleFieldChange = (field, value) => {
+    const updatedForm = { ...formData, [field]: value };
+    setFormData(updatedForm);
+
+    if (touched[field]) {
+      const err = validateField(field, value, updatedForm, isLogin);
+      setFieldErrors((prev) => ({ ...prev, [field]: err }));
+    }
+
+    // Re-check confirmPassword when password updates if confirmPassword was already touched
+    if (field === 'password' && !isLogin && touched.confirmPassword) {
+      const confirmErr = validateField('confirmPassword', updatedForm.confirmPassword, updatedForm, isLogin);
+      setFieldErrors((prev) => ({ ...prev, confirmPassword: confirmErr }));
+    }
+  };
+
+  const handleFieldBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const err = validateField(field, formData[field], formData, isLogin);
+    setFieldErrors((prev) => ({ ...prev, [field]: err }));
+  };
+
+  const toggleAuthMode = () => {
+    setIsLogin(!isLogin);
+    setAuthError('');
+    setFieldErrors({});
+    setTouched({});
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
-    setIsSubmitting(true);
 
+    // Validate all applicable fields
+    const fieldsToValidate = isLogin
+      ? ['email', 'password']
+      : ['firstName', 'lastName', 'email', 'password', 'confirmPassword'];
+
+    const newTouched = {};
+    const newErrors = {};
+    let hasError = false;
+
+    fieldsToValidate.forEach((f) => {
+      newTouched[f] = true;
+      const err = validateField(f, formData[f], formData, isLogin);
+      if (err) {
+        newErrors[f] = err;
+        hasError = true;
+      }
+    });
+
+    setTouched((prev) => ({ ...prev, ...newTouched }));
+    setFieldErrors(newErrors);
+
+    if (hasError) {
+      const firstInvalidField = fieldsToValidate.find((f) => newErrors[f]);
+      if (firstInvalidField) {
+        document.getElementById(`auth-input-${firstInvalidField}`)?.focus();
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
     const emailTrimmed = formData.email.trim().toLowerCase();
 
     try {
@@ -43,7 +175,7 @@ export default function AuthPage({ onLogin, onBack }) {
 
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.detail || 'Invalid email or password');
+          throw new Error(errData.detail || 'Invalid email or password.');
         }
 
         const data = await response.json();
@@ -55,12 +187,6 @@ export default function AuthPage({ onLogin, onBack }) {
         });
       } else {
         // Registration flow
-        if (formData.password !== formData.confirmPassword) {
-          setAuthError('Passwords do not match. Please verify and try again.');
-          setIsSubmitting(false);
-          return;
-        }
-
         const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName.trim() || 'User';
 
         const response = await fetch(`${API_BASE}/api/auth/register`, {
@@ -127,6 +253,8 @@ export default function AuthPage({ onLogin, onBack }) {
       className="auth-page-root"
       style={{
         minHeight: '100vh',
+        minHeight: '100dvh',
+        width: '100%',
         backgroundColor: '#fbf9f6',
         backgroundImage: `radial-gradient(#e5e0d6 0.75px, transparent 0.75px)`,
         backgroundSize: '32px 32px',
@@ -134,7 +262,9 @@ export default function AuthPage({ onLogin, onBack }) {
         fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
         display: 'flex',
         flexDirection: 'column',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        overflowY: 'auto',
+        overflowX: 'hidden'
       }}
     >
       <style>{`
@@ -142,11 +272,11 @@ export default function AuthPage({ onLogin, onBack }) {
           width: 100%;
           max-width: 1140px;
           margin: 0 auto;
-          padding: 2rem 1.5rem 3.5rem;
+          padding: 1.5rem 1.5rem 4rem;
           display: grid;
           grid-template-columns: 4fr 5fr;
           gap: 3.5rem;
-          align-items: center;
+          align-items: flex-start;
           flex: 1;
           box-sizing: border-box;
           animation: pageFadeIn 0.35s ease-out forwards;
@@ -155,10 +285,10 @@ export default function AuthPage({ onLogin, onBack }) {
         .auth-brand-col {
           display: flex;
           flex-direction: column;
-          justifyContent: space-between;
-          height: 100%;
-          min-height: 520px;
+          justifyContent: flex-start;
+          min-height: auto;
           position: relative;
+          padding-top: 0.75rem;
         }
 
         .auth-bg-art {
@@ -212,7 +342,7 @@ export default function AuthPage({ onLogin, onBack }) {
           font-size: 0.9rem;
           color: #0f172a;
           outline: none;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
           box-sizing: border-box;
           font-family: inherit;
         }
@@ -220,6 +350,52 @@ export default function AuthPage({ onLogin, onBack }) {
         .auth-text-input:focus {
           border-color: #1d4ed8;
           box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+        }
+
+        .auth-text-input.input-error {
+          border-color: #ef4444 !important;
+          background-color: #fffafa !important;
+        }
+
+        .auth-text-input.input-error:focus {
+          border-color: #dc2626 !important;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14) !important;
+        }
+
+        .auth-text-input.input-success {
+          border-color: #10b981 !important;
+        }
+
+        .auth-field-error {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: #dc2626;
+          font-size: 0.75rem;
+          font-weight: 500;
+          margin-top: 0.32rem;
+          line-height: 1.35;
+          animation: fieldErrFade 0.18s ease-out;
+        }
+
+        @keyframes fieldErrFade {
+          from { opacity: 0; transform: translateY(-3px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pwd-strength-bar {
+          display: flex;
+          gap: 4px;
+          margin-top: 0.4rem;
+          align-items: center;
+        }
+
+        .pwd-strength-seg {
+          height: 3.5px;
+          flex: 1;
+          border-radius: 2px;
+          background: #e2e8f0;
+          transition: background-color 0.25s ease;
         }
 
         .auth-password-wrapper {
@@ -326,35 +502,102 @@ export default function AuthPage({ onLogin, onBack }) {
         @media (max-width: 900px) {
           .auth-shell {
             grid-template-columns: 1fr !important;
-            gap: 2.25rem !important;
-            padding: 1.5rem 1rem 3rem !important;
+            gap: 1.5rem !important;
+            padding: 1rem 1rem 2.5rem !important;
+            max-width: 520px !important;
           }
           .auth-brand-col {
             min-height: auto !important;
+            text-align: center !important;
+            align-items: center !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .auth-brand-logo-wrap {
+            justify-content: center !important;
+            margin-bottom: 0.85rem !important;
+          }
+          .auth-brand-col h1 {
+            font-size: clamp(1.4rem, 4.5vw, 1.85rem) !important;
+            margin-bottom: 0.5rem !important;
+            line-height: 1.25 !important;
+          }
+          .auth-brand-benefits {
+            display: none !important;
           }
           .auth-form-card {
             margin: 0 auto !important;
             max-width: 100% !important;
-            padding: 2rem 1.5rem !important;
+            padding: 2rem 1.75rem !important;
           }
           .auth-bg-art {
             display: none !important;
           }
         }
 
-        @media (max-width: 500px) {
-          .auth-names-grid {
-            grid-template-columns: 1fr !important;
-            gap: 0.85rem !important;
+        @media (max-width: 600px) {
+          .auth-header-bar {
+            padding: 0.85rem 1rem 0.25rem !important;
+          }
+          .auth-shell {
+            padding: 0.5rem 0.85rem 2rem !important;
+            gap: 1.15rem !important;
+          }
+          .auth-brand-logo-wrap {
+            margin-bottom: 0.6rem !important;
+          }
+          .auth-brand-col h1 {
+            font-size: 1.3rem !important;
+            margin-bottom: 0.25rem !important;
           }
           .auth-form-card {
-            padding: 1.75rem 1.25rem !important;
+            padding: 1.5rem 1.15rem !important;
+            border-radius: 16px !important;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important;
+          }
+          .auth-form-card h2 {
+            font-size: 1.4rem !important;
+          }
+          .auth-names-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+          }
+          .auth-text-input {
+            font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+            padding: 0.72rem 0.85rem !important;
+          }
+          .auth-password-wrapper .auth-text-input {
+            padding-right: 2.85rem !important;
+          }
+          .auth-eye-btn {
+            width: 38px !important;
+            height: 38px !important;
+            right: 0.25rem !important;
+          }
+          .auth-google-button {
+            padding: 0.75rem 0.85rem !important;
+            font-size: 0.85rem !important;
+            min-height: 44px !important;
+          }
+          .auth-primary-btn {
+            padding: 0.82rem 1rem !important;
+            font-size: 0.92rem !important;
+            min-height: 46px !important;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .auth-form-card {
+            padding: 1.25rem 0.85rem !important;
+            border-radius: 14px !important;
+          }
+          .auth-brand-col h1 {
+            font-size: 1.15rem !important;
           }
         }
       `}</style>
 
       {/* Top Bar with Back Link */}
-      <header style={{
+      <header className="auth-header-bar" style={{
         width: '100%',
         maxWidth: '1140px',
         margin: '0 auto',
@@ -392,7 +635,7 @@ export default function AuthPage({ onLogin, onBack }) {
         <section className="auth-brand-col">
           <div style={{ position: 'relative', zIndex: 2 }}>
             {/* DhaaraAI Logo */}
-            <div style={{
+            <div className="auth-brand-logo-wrap" style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.65rem',
@@ -437,7 +680,7 @@ export default function AuthPage({ onLogin, onBack }) {
             </h1>
 
             {/* 2-3 Short Benefit Points */}
-            <div style={{
+            <div className="auth-brand-benefits" style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '0.85rem',
@@ -588,7 +831,7 @@ export default function AuthPage({ onLogin, onBack }) {
           )}
 
           {/* Signup / Login Form */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
+          <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
             {/* First + Last Name (Signup mode) */}
             {!isLogin && (
               <div style={{
@@ -597,54 +840,80 @@ export default function AuthPage({ onLogin, onBack }) {
                 gap: '0.85rem'
               }} className="auth-names-grid">
                 <div>
-                  <label className="auth-input-label">First Name</label>
+                  <label htmlFor="auth-input-firstName" className="auth-input-label">First Name *</label>
                   <input
+                    id="auth-input-firstName"
                     type="text"
-                    required
                     placeholder="Rajesh"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="auth-text-input"
+                    onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                    onBlur={() => handleFieldBlur('firstName')}
+                    className={`auth-text-input ${touched.firstName && fieldErrors.firstName ? 'input-error' : ''}`}
+                    aria-invalid={!!(touched.firstName && fieldErrors.firstName)}
                   />
+                  {touched.firstName && fieldErrors.firstName && (
+                    <div className="auth-field-error">
+                      <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                      <span>{fieldErrors.firstName}</span>
+                    </div>
+                  )}
                 </div>
                 <div>
-                  <label className="auth-input-label">Last Name</label>
+                  <label htmlFor="auth-input-lastName" className="auth-input-label">Last Name *</label>
                   <input
+                    id="auth-input-lastName"
                     type="text"
-                    required
                     placeholder="Malhotra"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="auth-text-input"
+                    onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                    onBlur={() => handleFieldBlur('lastName')}
+                    className={`auth-text-input ${touched.lastName && fieldErrors.lastName ? 'input-error' : ''}`}
+                    aria-invalid={!!(touched.lastName && fieldErrors.lastName)}
                   />
+                  {touched.lastName && fieldErrors.lastName && (
+                    <div className="auth-field-error">
+                      <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                      <span>{fieldErrors.lastName}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Email Field */}
             <div>
-              <label className="auth-input-label">Email Address</label>
+              <label htmlFor="auth-input-email" className="auth-input-label">Email Address *</label>
               <input
+                id="auth-input-email"
                 type="email"
-                required
                 placeholder="advocate@chamber.in"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="auth-text-input"
+                onChange={(e) => handleFieldChange('email', e.target.value)}
+                onBlur={() => handleFieldBlur('email')}
+                className={`auth-text-input ${touched.email && fieldErrors.email ? 'input-error' : ''}`}
+                aria-invalid={!!(touched.email && fieldErrors.email)}
               />
+              {touched.email && fieldErrors.email && (
+                <div className="auth-field-error">
+                  <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                  <span>{fieldErrors.email}</span>
+                </div>
+              )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label className="auth-input-label">Password</label>
+              <label htmlFor="auth-input-password" className="auth-input-label">Password *</label>
               <div className="auth-password-wrapper">
                 <input
+                  id="auth-input-password"
                   type={showPassword ? 'text' : 'password'}
-                  required
                   placeholder="••••••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="auth-text-input"
+                  onChange={(e) => handleFieldChange('password', e.target.value)}
+                  onBlur={() => handleFieldBlur('password')}
+                  className={`auth-text-input ${touched.password && fieldErrors.password ? 'input-error' : ''}`}
+                  aria-invalid={!!(touched.password && fieldErrors.password)}
                 />
                 <button
                   type="button"
@@ -655,20 +924,53 @@ export default function AuthPage({ onLogin, onBack }) {
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
+              {touched.password && fieldErrors.password && (
+                <div className="auth-field-error">
+                  <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                  <span>{fieldErrors.password}</span>
+                </div>
+              )}
+              {!isLogin && formData.password.length > 0 && (
+                <div style={{ marginTop: '0.45rem' }}>
+                  <div className="pwd-strength-bar">
+                    {[1, 2, 3, 4].map((seg) => (
+                      <div
+                        key={seg}
+                        className="pwd-strength-seg"
+                        style={{
+                          backgroundColor: pwdStrength.score >= seg ? pwdStrength.color : '#e2e8f0'
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '0.25rem',
+                    fontSize: '0.72rem'
+                  }}>
+                    <span style={{ color: '#64748b' }}>Strength: <strong style={{ color: pwdStrength.color }}>{pwdStrength.label}</strong></span>
+                    <span style={{ color: '#94a3b8' }}>Min. 6 chars</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password (Signup mode) */}
             {!isLogin && (
               <div>
-                <label className="auth-input-label">Confirm Password</label>
+                <label htmlFor="auth-input-confirmPassword" className="auth-input-label">Confirm Password *</label>
                 <div className="auth-password-wrapper">
                   <input
+                    id="auth-input-confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    required
                     placeholder="••••••••••••"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="auth-text-input"
+                    onChange={(e) => handleFieldChange('confirmPassword', e.target.value)}
+                    onBlur={() => handleFieldBlur('confirmPassword')}
+                    className={`auth-text-input ${touched.confirmPassword && fieldErrors.confirmPassword ? 'input-error' : (touched.confirmPassword && !fieldErrors.confirmPassword && formData.confirmPassword ? 'input-success' : '')}`}
+                    aria-invalid={!!(touched.confirmPassword && fieldErrors.confirmPassword)}
                   />
                   <button
                     type="button"
@@ -679,6 +981,26 @@ export default function AuthPage({ onLogin, onBack }) {
                     {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
+                {touched.confirmPassword && fieldErrors.confirmPassword && (
+                  <div className="auth-field-error">
+                    <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                    <span>{fieldErrors.confirmPassword}</span>
+                  </div>
+                )}
+                {touched.confirmPassword && !fieldErrors.confirmPassword && formData.confirmPassword && formData.confirmPassword === formData.password && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    color: '#16a34a',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    marginTop: '0.3rem'
+                  }}>
+                    <CheckCircle2 size={13} style={{ flexShrink: 0 }} />
+                    <span>Passwords match</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -714,10 +1036,7 @@ export default function AuthPage({ onLogin, onBack }) {
             <span>{isLogin ? "Don't have an account? " : "Already have an account? "}</span>
             <button
               type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setAuthError('');
-              }}
+              onClick={toggleAuthMode}
               style={{
                 background: 'none',
                 border: 'none',

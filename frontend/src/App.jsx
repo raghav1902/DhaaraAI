@@ -61,6 +61,8 @@ function App() {
     }
   });
 
+  const [authMode, setAuthMode] = useState('login');
+
   const [sharedDocId, setSharedDocId] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -344,12 +346,33 @@ function App() {
   }
 
   if (appView === 'landing') {
-    return <LandingPage user={user} onExplore={() => setAppView(user ? 'app' : 'auth')} />;
+    return (
+      <LandingPage
+        user={user}
+        onExplore={(mode = 'signup') => {
+          if (user) {
+            setAppView('app');
+          } else {
+            setAuthMode(mode === 'login' ? 'login' : 'signup');
+            setAppView('auth');
+          }
+        }}
+        onLogin={() => {
+          if (user) {
+            setAppView('app');
+          } else {
+            setAuthMode('login');
+            setAppView('auth');
+          }
+        }}
+      />
+    );
   }
 
   if (appView === 'auth') {
     return (
       <AuthPage
+        initialMode={authMode}
         onLogin={(userData) => {
           setUser(userData);
           try {

@@ -215,32 +215,24 @@ export default function CyberChecker({
               type="button"
               onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Cyber Exposure & Breach Scanner', 'Upgrade to DhaaraAI Plus for unlimited scans and unmasked breach intelligence.') : onNavigateTab && onNavigateTab('settings')}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 500,
-                background: scansRemaining <= 0 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                color: scansRemaining <= 0 ? '#fca5a5' : 'var(--text-main, #e2e8f0)',
-                border: scansRemaining <= 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255, 255, 255, 0.12)',
-                cursor: 'pointer', transition: 'all 0.2s ease',
-                boxShadow: scansRemaining <= 0 ? '0 2px 10px rgba(239, 68, 68, 0.15)' : '0 2px 6px rgba(0, 0, 0, 0.2)'
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '3px 10px',
+                fontSize: '10.5px',
+                fontWeight: 800,
+                letterSpacing: '0.03em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
               }}
-              title={scansRemaining <= 0 ? "Quota exhausted. Click to upgrade." : "Live usage quota"}
+              title={isHindi ? 'DhaaraAI Plus में अपग्रेड करें' : 'Upgrade to DhaaraAI Plus'}
             >
-              <span style={{ color: scansRemaining <= 0 ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 600 }}>
-                Scans: <span style={{ color: scansRemaining <= 0 ? '#ef4444' : '#6366f1' }}>{scansUsed}</span>/{scanLimit}
-              </span>
-              <span style={{ opacity: 0.4 }}>•</span>
-              {scansRemaining <= 0 ? (
-                <span style={{ color: '#ef4444', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', display: 'inline-block', boxShadow: '0 0 6px #ef4444' }} />
-                  Limit Reached (Upgrade)
-                </span>
-              ) : (
-                <span style={{ color: '#10b981', fontWeight: 600 }}>
-                  {scansRemaining} left
-                </span>
-              )}
+              <span>★</span>
+              <span>{isHindi ? 'अपग्रेड करें' : 'UPGRADE'}</span>
             </button>
           )}
         </div>

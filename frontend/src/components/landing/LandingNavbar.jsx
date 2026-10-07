@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, ArrowRight, Menu, X } from 'lucide-react';
 
-export default function LandingNavbar({ isScrolled, onExplore, user }) {
+export default function LandingNavbar({ isScrolled, onExplore, onLogin, user }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
 
@@ -129,7 +129,7 @@ export default function LandingNavbar({ isScrolled, onExplore, user }) {
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <div className="nav-auth-desktop" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button
-              onClick={onExplore}
+              onClick={user ? () => onExplore() : (onLogin ? () => onLogin() : () => onExplore('login'))}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -144,7 +144,7 @@ export default function LandingNavbar({ isScrolled, onExplore, user }) {
             >
               {user ? 'Dashboard' : 'Login'}
             </button>
-            <button className="btn-primary-pill" onClick={onExplore}>
+            <button className="btn-primary-pill" onClick={() => onExplore('signup')}>
               {user ? 'Open Studio' : 'Start for Free'} <ArrowRight size={16} />
             </button>
           </div>
@@ -191,7 +191,7 @@ export default function LandingNavbar({ isScrolled, onExplore, user }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
             {!user && (
               <button
-                onClick={() => { setMobileMenuOpen(false); onExplore(); }}
+                onClick={() => { setMobileMenuOpen(false); onLogin ? onLogin() : onExplore('login'); }}
                 className="btn-secondary-pill"
                 style={{ width: '100%', justifyContent: 'center' }}
               >
@@ -200,7 +200,7 @@ export default function LandingNavbar({ isScrolled, onExplore, user }) {
             )}
             <button
               className="btn-primary-pill"
-              onClick={() => { setMobileMenuOpen(false); onExplore(); }}
+              onClick={() => { setMobileMenuOpen(false); onExplore('signup'); }}
               style={{ width: '100%', justifyContent: 'center' }}
             >
               {user ? 'Open Studio' : 'Start for Free'} <ArrowRight size={16} />

@@ -179,24 +179,24 @@ export default function BnsConverter({
                     type="button"
                     onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('BNS ↔ IPC Concordance Explorer') : onNavigateTab('settings')}
                     style={{
-                      background: bnsRemaining <= 2 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
-                      color: bnsRemaining <= 2 ? '#dc2626' : '#059669',
-                      border: `1px solid ${bnsRemaining <= 2 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.3)'}`,
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: '#ffffff',
+                      border: 'none',
                       borderRadius: '999px',
-                      padding: '3px 9px',
-                      fontSize: '11px',
+                      padding: '3px 10px',
+                      fontSize: '10.5px',
                       fontWeight: 800,
+                      letterSpacing: '0.03em',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px',
-                      cursor: 'pointer'
+                      gap: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
                     }}
-                    title={isHindi ? 'अपग्रेड करने के लिए क्लिक करें' : 'Click to upgrade to Plus'}
+                    title={isHindi ? 'DhaaraAI Plus में अपग्रेड करें' : 'Upgrade to DhaaraAI Plus'}
                   >
-                    <span>{isHindi ? `खोज: ${bnsUsed}/${bnsLimit} प्रयुक्त` : `Lookups: ${bnsUsed}/${bnsLimit} Used (${bnsRemaining} Left)`}</span>
-                    <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-                      ★ UPGRADE
-                    </span>
+                    <span>★</span>
+                    <span>{isHindi ? 'अपग्रेड करें' : 'UPGRADE'}</span>
                   </button>
                 )}
               </div>

@@ -469,25 +469,24 @@ export default function LegalChat({
                   type="button"
                   onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('AI Legal Chat (Ask AI)', 'Upgrade to DhaaraAI Plus for unlimited AI legal inquiries.') : onNavigateTab && onNavigateTab('settings')}
                   style={{
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '999px',
+                    padding: '3px 10px',
+                    fontSize: '10.5px',
+                    fontWeight: 800,
+                    letterSpacing: '0.03em',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 10px',
-                    borderRadius: '16px',
-                    fontSize: '11.5px',
-                    fontWeight: 600,
-                    background: isQuotaExhausted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-                    color: isQuotaExhausted ? '#ef4444' : 'var(--text-muted, #94a3b8)',
-                    border: isQuotaExhausted ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid var(--border-light, rgba(255, 255, 255, 0.1))',
-                    cursor: 'pointer'
+                    gap: '4px',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
                   }}
-                  title="Daily Chat Quota"
+                  title={isHindi ? 'DhaaraAI Plus में अपग्रेड करें' : 'Upgrade to DhaaraAI Plus'}
                 >
-                  <span>{chatUsed}/{chatLimit} Used</span>
-                  <span>•</span>
-                  <span style={{ color: isQuotaExhausted ? '#ef4444' : '#10b981' }}>
-                    {isQuotaExhausted ? 'Limit Reached' : `${chatRemaining} left`}
-                  </span>
+                  <span>★</span>
+                  <span>{isHindi ? 'अपग्रेड करें' : 'UPGRADE'}</span>
                 </button>
               )}
               <button
@@ -504,7 +503,7 @@ export default function LegalChat({
         ) : (
           <section className="ask-ai-hero" aria-labelledby="ask-ai-title">
             <div className="ask-ai-hero-copy">
-              <div className="ask-ai-brand" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div className="ask-ai-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span className="ask-ai-brand-mark"><Scale size={16} /></span>
                   <span>DhaaraAI LegalGPT Workspace</span>
@@ -514,24 +513,24 @@ export default function LegalChat({
                     type="button"
                     onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('AI Legal Chat (Ask AI)', 'Upgrade to DhaaraAI Plus for unlimited AI legal inquiries.') : onNavigateTab && onNavigateTab('settings')}
                     style={{
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '999px',
+                      padding: '3px 10px',
+                      fontSize: '10.5px',
+                      fontWeight: 800,
+                      letterSpacing: '0.03em',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '6px',
-                      padding: '4px 12px',
-                      borderRadius: '16px',
-                      fontSize: '11.5px',
-                      fontWeight: 600,
-                      background: isQuotaExhausted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-                      color: isQuotaExhausted ? '#ef4444' : 'var(--text-muted, #94a3b8)',
-                      border: isQuotaExhausted ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid var(--border-light, rgba(255, 255, 255, 0.1))',
-                      cursor: 'pointer'
+                      gap: '4px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
                     }}
+                    title={isHindi ? 'DhaaraAI Plus में अपग्रेड करें' : 'Upgrade to DhaaraAI Plus'}
                   >
-                    <span>Chats: {chatUsed}/{chatLimit} Used</span>
-                    <span>•</span>
-                    <span style={{ color: isQuotaExhausted ? '#ef4444' : '#10b981' }}>
-                      {isQuotaExhausted ? 'Limit Reached' : `${chatRemaining} left today`}
-                    </span>
+                    <span>★</span>
+                    <span>{isHindi ? 'अपग्रेड करें' : 'UPGRADE'}</span>
                   </button>
                 )}
               </div>
