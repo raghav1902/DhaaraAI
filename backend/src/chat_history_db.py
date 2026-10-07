@@ -153,6 +153,12 @@ def init_db():
 # Auto-initialize DB on import
 init_db()
 
+try:
+    from mongo_sync import hydrate_sqlite_from_mongo
+    hydrate_sqlite_from_mongo(DB_PATH)
+except Exception as e:
+    pass
+
 # ==============================================================================
 # INPUT VALIDATION
 # ==============================================================================
@@ -313,6 +319,20 @@ def register_user(email: str, password: str, full_name: str) -> Dict[str, Any]:
         )
         conn.commit()
     
+    try:
+        from mongo_sync import sync_user_to_mongo
+        sync_user_to_mongo({
+            "id": user_id,
+            "email": email_clean,
+            "password_hash": pwd_hash,
+            "salt": salt,
+            "full_name": safe_name,
+            "created_at": now_iso,
+            "plan_type": "free"
+        })
+    except Exception:
+        pass
+
     token = generate_signed_token(user_id, email_clean, "free")
     return {
         "user_id": user_id,
@@ -656,6 +676,21 @@ def create_conversation(owner_id: str, title: Optional[str] = None) -> Dict[str,
             (conv_id, owner_id, final_title, now_iso, now_iso, now_iso)
         )
         conn.commit()
+
+    try:
+        from mongo_sync import sync_conversation_to_mongo
+        sync_conversation_to_mongo({
+            "id": conv_id,
+            "owner_id": owner_id,
+            "title": final_title,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+            "last_message_at": now_iso,
+            "is_archived": 0,
+            "is_deleted": 0
+        })
+    except Exception:
+        pass
     
     return {
         "id": conv_id,
@@ -803,6 +838,20 @@ def add_message_to_conversation(
         )
         
         conn.commit()
+
+    try:
+        from mongo_sync import sync_message_to_mongo
+        sync_message_to_mongo({
+            "id": msg_id,
+            "conversation_id": conversation_id,
+            "role": role,
+            "content": content,
+            "sources_json": sources_json,
+            "metadata_json": metadata_json,
+            "created_at": now_iso
+        })
+    except Exception:
+        pass
     
     return {
         "id": msg_id,
