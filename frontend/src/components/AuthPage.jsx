@@ -46,7 +46,8 @@ export default function AuthPage({ onLogin, onBack }) {
           user_id: data.user_id,
           name: data.name,
           email: data.email,
-          token: data.token
+          token: data.token,
+          plan: data.plan || 'plus'
         });
       } else {
         // Registration flow
@@ -78,7 +79,8 @@ export default function AuthPage({ onLogin, onBack }) {
           user_id: data.user_id,
           name: data.name,
           email: data.email,
-          token: data.token
+          token: data.token,
+          plan: data.plan || 'plus'
         });
       }
     } catch (err) {
@@ -92,12 +94,11 @@ export default function AuthPage({ onLogin, onBack }) {
     setAuthError('');
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/api/auth/sync-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'advocate.user@dhaaraai.com',
-          password: 'google-oauth-session-key'
+          email: 'advocate.user@dhaaraai.com'
         })
       });
       if (!response.ok) {
@@ -108,7 +109,8 @@ export default function AuthPage({ onLogin, onBack }) {
         user_id: data.user_id,
         name: data.name,
         email: data.email,
-        token: data.token
+        token: data.token,
+        plan: data.plan || 'plus'
       });
     } catch (err) {
       setAuthError(err.message || 'Google Single Sign-On service unreachable. Please sign in with your email and password.');

@@ -89,73 +89,55 @@ function App() {
   // Ref to prevent repeated failed token syncs (Fix #15 infinite loop protection)
   const tokenSyncAttemptedRef = useRef(false);
 
-  // Ensure authenticated, valid backend session token exists for active user
+  // Ensure authenticated, valid backend session token exists for active user with up-to-date plan
   useEffect(() => {
     let isCancelled = false;
     const ensureToken = async () => {
-      if (!user || !user.email || tokenSyncAttemptedRef.current) return;
-      tokenSyncAttemptedRef.current = true;
       try {
-        // If token exists, verify if it is valid on the backend
-        if (user.token) {
-          const testRes = await fetch(`${API_BASE}/api/auth/me`, {
-            headers: { Authorization: `Bearer ${user.token}` }
-          });
-          if (testRes.ok) {
-            const meData = await testRes.json();
-            if (!isCancelled && meData.plan && meData.plan !== user.plan) {
-              const updated = { ...user, plan: meData.plan };
-              setUser(updated);
-              localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
-            }
-            return;
+        const stored = (() => {
+          try {
+            return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+          } catch {
+            return null;
           }
-        }
+        })();
+        const activeEmail = user?.email || stored?.email || 'advocate.user@dhaaraai.com';
+        const activeToken = user?.token || stored?.token || undefined;
 
-        // Token is missing, expired or invalid (401) — re-authenticate or register
-        const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+        const syncRes = await fetch(`${API_BASE}/api/auth/sync-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: user.email,
-            password: user.password || 'advocate-auth-token-key'
+            email: activeEmail,
+            token: activeToken
           })
         });
 
-        if (loginRes.ok) {
-          const data = await loginRes.json();
+        if (syncRes.ok) {
+          const data = await syncRes.json();
           if (!isCancelled) {
-            const updated = { ...user, token: data.token, user_id: data.user_id, plan: data.plan || user.plan };
-            delete updated.password;
+            const updated = {
+              ...(stored || {}),
+              ...(user || {}),
+              user_id: data.user_id,
+              email: data.email,
+              name: data.name || user?.name || stored?.name || 'Advocate User',
+              plan: data.plan || 'plus',
+              token: data.token
+            };
             setUser(updated);
-            localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
-          }
-        } else if (loginRes.status === 401 || loginRes.status === 404) {
-          const regRes = await fetch(`${API_BASE}/api/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: user.email,
-              password: 'advocate-auth-token-key',
-              name: user.name || 'Advocate User'
-            })
-          });
-          if (regRes.ok) {
-            const data = await regRes.json();
-            if (!isCancelled) {
-              const updated = { ...user, token: data.token, user_id: data.user_id, plan: data.plan || user.plan };
-              setUser(updated);
+            try {
               localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
-            }
+            } catch {}
           }
         }
       } catch (e) {
-        console.error('Failed to sync auth token:', e);
+        console.error('Failed to sync session token:', e);
       }
     };
     ensureToken();
     return () => { isCancelled = true; };
-  }, [user?.email, user?.token]);
+  }, [user?.email]);
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);

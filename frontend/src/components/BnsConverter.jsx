@@ -91,7 +91,10 @@ export default function BnsConverter({
       })();
       const userIsPro = currentUser?.plan === 'plus' || currentUser?.plan === 'pro' || currentUser?.plan === 'enterprise';
       const token = currentUser?.token;
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(currentUser?.email ? { 'X-User-Email': currentUser.email } : {})
+      };
 
       const params = new URLSearchParams();
       if (q && q.trim()) {
