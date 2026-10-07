@@ -1,12 +1,25 @@
-import React from 'react';
-import { ArrowRight, Play, CheckCircle2, Scale, Sparkles, Search, FileText, ArrowRightLeft, ShieldCheck, ExternalLink } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  ArrowRight, Play, CheckCircle2, Scale, Sparkles, Search, FileText,
+  ArrowRightLeft, ShieldCheck, ExternalLink, ShieldAlert, Calculator, Lock
+} from 'lucide-react';
 
 export default function HeroSection({ onExplore }) {
+  const [activeHeroTab, setActiveHeroTab] = useState('ask_ai');
+
+  const previewTabs = [
+    { id: 'ask_ai', label: 'Ask AI', icon: Search, badge: 'RAG AI' },
+    { id: 'concordance', label: 'BNS ↔ IPC', icon: ArrowRightLeft, badge: '2,016+ Acts' },
+    { id: 'cyber', label: 'Cyber Scanner', icon: ShieldAlert, badge: 'Live Leak' },
+    { id: 'fee_calc', label: 'Fee Calculator', icon: Calculator, badge: '28 States' },
+    { id: 'drafter', label: 'Legal Drafter', icon: FileText, badge: 'Bilingual' }
+  ];
+
   return (
     <section className="hero-section" style={{
-      padding: '7.5rem 1.5rem 2rem',
+      padding: '7.5rem 1.5rem 2.5rem',
       position: 'relative',
-      maxWidth: '1360px',
+      maxWidth: '1380px',
       margin: '0 auto',
       textAlign: 'center'
     }}>
@@ -14,11 +27,11 @@ export default function HeroSection({ onExplore }) {
       <div className="animate-fade-in-up" style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.5rem',
+        gap: '0.6rem',
         background: '#ffffff',
-        border: '1px solid #dbeafe',
-        boxShadow: '0 2px 12px rgba(37, 99, 235, 0.08)',
-        padding: '0.4rem 1.1rem',
+        border: '1px solid #bfdbfe',
+        boxShadow: '0 4px 18px rgba(37, 99, 235, 0.1)',
+        padding: '0.45rem 1.25rem',
         borderRadius: '999px',
         marginBottom: '1.75rem',
         fontSize: '0.82rem',
@@ -26,88 +39,110 @@ export default function HeroSection({ onExplore }) {
         fontWeight: '600'
       }}>
         <div style={{
-          width: '18px',
-          height: '18px',
+          width: '20px',
+          height: '20px',
           borderRadius: '50%',
-          background: '#2563eb',
+          background: 'linear-gradient(135deg, #1e40af, #2563eb)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: '0 2px 6px rgba(37,99,235,0.4)'
         }}>
           <Scale size={11} />
         </div>
-        <span>AI for Indian Law • BNS 2023 • Verified Sources</span>
+        <span style={{ letterSpacing: '0.02em' }}>
+          BNS 2023 Live • 2,016+ Concordance Provisions • Supreme Court Precedents
+        </span>
+        <span style={{
+          background: '#dbeafe',
+          color: '#1d4ed8',
+          fontSize: '0.7rem',
+          padding: '2px 8px',
+          borderRadius: '999px',
+          fontWeight: '700'
+        }}>
+          Plus Active
+        </span>
       </div>
 
       {/* 2. Strong Headline with Editorial Serif + Royal Blue Emphasis */}
       <h1 className="hero-title-main animate-fade-in-up delay-100" style={{
         fontFamily: "'Newsreader', Georgia, serif",
-        fontSize: 'clamp(2.5rem, 5.2vw, 4.2rem)',
+        fontSize: 'clamp(2.6rem, 5.4vw, 4.4rem)',
         fontWeight: '600',
-        lineHeight: '1.1',
+        lineHeight: '1.12',
         marginBottom: '1.4rem',
         color: '#0b1329',
         letterSpacing: '-0.025em',
-        maxWidth: '980px',
+        maxWidth: '1020px',
         margin: '0 auto 1.4rem'
       }}>
-        India’s Legal Intelligence,<br />
+        India’s Legal Intelligence Platform,<br />
         <span style={{
           color: '#1d4ed8',
           fontStyle: 'normal',
-          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #38bdf8 100%)',
+          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           display: 'inline-block'
         }}>
-          Built for Indian Law.
+          Engineered for Indian Law & Practice.
         </span>
       </h1>
 
       {/* 3. Subtitle */}
       <p className="animate-fade-in-up delay-200" style={{
-        fontSize: 'clamp(1rem, 1.35vw, 1.18rem)',
-        lineHeight: '1.65',
+        fontSize: 'clamp(1rem, 1.35vw, 1.2rem)',
+        lineHeight: '1.7',
         color: '#475569',
-        maxWidth: '740px',
+        maxWidth: '780px',
         margin: '0 auto 2.25rem',
         fontWeight: '400'
       }}>
-        Get verified legal answers, review complex contracts, translate IPC to BNS, and generate court-ready legal drafts in seconds — with citations from authentic sources.
+        Navigate the <strong>Bharatiya Nyaya Sanhita (BNS 2023)</strong> transition with 2,016+ concordance mappings,
+        cite authentic Supreme Court & High Court rulings, draft court-ready pleadings, calculate state-wise court fees,
+        and audit cyber exposures — in seconds.
       </p>
 
       {/* 4. Action CTA Buttons */}
       <div className="hero-cta-group animate-fade-in-up delay-300" style={{
         display: 'flex',
-        gap: '1rem',
+        gap: '1.1rem',
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
-        marginBottom: '1.75rem'
+        marginBottom: '1.85rem'
       }}>
         <button
           className="btn-primary-pill"
           onClick={onExplore}
           style={{
-            padding: '0.85rem 2.2rem',
-            fontSize: '1rem',
-            boxShadow: '0 6px 20px rgba(37, 99, 235, 0.35)',
-            cursor: 'pointer'
+            padding: '0.9rem 2.4rem',
+            fontSize: '1.02rem',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.35)',
+            cursor: 'pointer',
+            fontWeight: '600',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          Start for Free <ArrowRight size={18} />
+          Explore DhaaraAI Free <ArrowRight size={18} />
         </button>
         <a
           href="#demo"
           className="btn-secondary-pill"
           style={{
-            padding: '0.85rem 1.85rem',
-            fontSize: '1rem',
-            textDecoration: 'none'
+            padding: '0.9rem 2rem',
+            fontSize: '1.02rem',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          <Play size={16} fill="#0b1329" color="#0b1329" /> Watch Demo
+          <Play size={16} fill="#0b1329" color="#0b1329" /> Try Live Studio Demo
         </a>
       </div>
 
@@ -116,61 +151,46 @@ export default function HeroSection({ onExplore }) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '1.85rem',
+        gap: '2rem',
         flexWrap: 'wrap',
         marginBottom: '3.5rem',
-        fontSize: '0.84rem',
+        fontSize: '0.85rem',
         color: '#64748b',
         fontWeight: '500'
       }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> No Credit Card Required
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+          <CheckCircle2 size={16} color="#2563eb" /> Instant Access • Zero Credit Card
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> Instant Access
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+          <CheckCircle2 size={16} color="#2563eb" /> 2,016+ Mapped BNS Sections
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> Built for Indian Law
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+          <CheckCircle2 size={16} color="#2563eb" /> Zero-Knowledge Client Vault
         </span>
       </div>
 
-      {/* 6. Realistic Indian Legal Composition + Laptop Mockup */}
+      {/* 6. Realistic Indian Legal Studio Mockup with Live Interactive Switcher */}
       <div className="animate-fade-in-up delay-400" style={{
         position: 'relative',
-        borderRadius: '24px',
+        borderRadius: '26px',
         padding: '2.5rem 1.5rem 1rem',
-        background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, rgba(245,242,235,0.85) 100%)',
-        border: '1px solid rgba(226, 232, 240, 0.8)',
-        boxShadow: '0 25px 60px -15px rgba(11, 19, 41, 0.08)',
+        background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, rgba(245,242,235,0.92) 100%)',
+        border: '1px solid rgba(219, 234, 254, 0.9)',
+        boxShadow: '0 25px 65px -15px rgba(11, 19, 41, 0.1)',
         overflow: 'hidden'
       }}>
-        {/* Background Chamber Photo Vignette */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url(/assets/legal/hero/hero_chamber_bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
-          opacity: 0.28,
-          filter: 'blur(1px)',
-          zIndex: 1
-        }} />
-
         {/* Floating Legal Document & Citation Badges */}
-        <div className="floating-badge" style={{ top: '15%', left: '4%', display: 'none', md: 'flex' }}>
+        <div className="floating-badge" style={{ top: '10%', left: '3%', display: 'none', md: 'flex' }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
-          <span>Section 420 IPC → BNS § 318(4)</span>
+          <span>IPC § 420 ➔ BNS § 318(4) Concordance</span>
         </div>
 
-        <div className="floating-badge" style={{ top: '28%', right: '4%', animationDelay: '-2.5s', display: 'none', md: 'flex' }}>
+        <div className="floating-badge" style={{ top: '22%', right: '3%', animationDelay: '-2.5s', display: 'none', md: 'flex' }}>
           <ShieldCheck size={16} color="#2563eb" />
-          <span>Verified Supreme Court Precedents</span>
+          <span>25 High Courts & Supreme Court Indexed</span>
         </div>
 
-        {/* Laptop Mockup */}
+        {/* Laptop Mockup Wrapper */}
         <div className="laptop-mockup-wrapper" style={{ position: 'relative', zIndex: 10 }}>
           <div className="laptop-mockup-frame">
             <div className="laptop-mockup-camera" />
@@ -181,7 +201,7 @@ export default function HeroSection({ onExplore }) {
               <div style={{
                 background: '#ffffff',
                 borderBottom: '1px solid #e2e8f0',
-                padding: '0.65rem 1.25rem',
+                padding: '0.7rem 1.25rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -197,12 +217,12 @@ export default function HeroSection({ onExplore }) {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    fontWeight: '700',
                     fontFamily: 'Outfit',
+                    fontWeight: '700',
                     color: '#0b1329',
                     marginLeft: '0.5rem'
                   }}>
-                    <Scale size={15} color="#2563eb" /> DhaaraAI
+                    <Scale size={15} color="#2563eb" /> DhaaraAI LegalGPT
                   </div>
                 </div>
 
@@ -217,19 +237,21 @@ export default function HeroSection({ onExplore }) {
                   alignItems: 'center',
                   gap: '0.4rem'
                 }}>
-                  <span>app.dhaaraai.com/legal-intelligence-studio</span>
+                  <Lock size={11} color="#059669" />
+                  <span>app.dhaaraai.com/studio</span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{
-                    background: '#ecfdf5',
-                    color: '#059669',
-                    padding: '2px 8px',
+                    background: '#eff6ff',
+                    color: '#1d4ed8',
+                    border: '1px solid #bfdbfe',
+                    padding: '2px 9px',
                     borderRadius: '999px',
-                    fontSize: '0.7rem',
-                    fontWeight: '600'
+                    fontSize: '0.72rem',
+                    fontWeight: '700'
                   }}>
-                    BNS 2023 Active
+                    DhaaraAI Plus Active
                   </span>
                 </div>
               </div>
@@ -237,127 +259,299 @@ export default function HeroSection({ onExplore }) {
               {/* Studio Main Body */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '190px 1fr',
-                minHeight: '380px',
+                gridTemplateColumns: '200px 1fr',
+                minHeight: '390px',
                 textAlign: 'left',
                 background: '#f8fafc'
               }}>
-                {/* Left Mini Sidebar */}
+                {/* Left Mini Sidebar with Switchable Tabs */}
                 <div style={{
                   background: '#ffffff',
                   borderRight: '1px solid #e2e8f0',
-                  padding: '1rem 0.75rem',
+                  padding: '1rem 0.65rem',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.4rem'
+                  gap: '0.35rem'
                 }}>
-                  <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', padding: '0 0.5rem 0.4rem', letterSpacing: '0.05em' }}>
-                    Workspace
+                  <div style={{
+                    fontSize: '0.68rem',
+                    fontWeight: '700',
+                    color: '#94a3b8',
+                    textTransform: 'uppercase',
+                    padding: '0 0.5rem 0.4rem',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Capabilities
                   </div>
-                  {[
-                    { icon: Search, label: 'Ask AI', active: true },
-                    { icon: FileText, label: 'Legal Drafting' },
-                    { icon: ShieldCheck, label: 'Contract Audit' },
-                    { icon: ArrowRightLeft, label: 'BNS ↔ IPC' },
-                    { icon: Scale, label: 'Precedents' }
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.55rem',
-                        padding: '0.45rem 0.65rem',
-                        borderRadius: '8px',
-                        background: item.active ? '#eff6ff' : 'transparent',
-                        color: item.active ? '#1d4ed8' : '#64748b',
-                        fontWeight: item.active ? '600' : '500',
-                        fontSize: '0.8rem'
-                      }}
-                    >
-                      <item.icon size={14} color={item.active ? '#2563eb' : '#94a3b8'} />
-                      <span>{item.label}</span>
-                    </div>
-                  ))}
+
+                  {previewTabs.map((item) => {
+                    const isActive = activeHeroTab === item.id;
+                    const IconComp = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveHeroTab(item.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.45rem 0.65rem',
+                          borderRadius: '8px',
+                          background: isActive ? '#eff6ff' : 'transparent',
+                          color: isActive ? '#1d4ed8' : '#64748b',
+                          fontWeight: isActive ? '600' : '500',
+                          fontSize: '0.78rem',
+                          border: isActive ? '1px solid #bfdbfe' : '1px solid transparent',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <IconComp size={14} color={isActive ? '#2563eb' : '#94a3b8'} />
+                          <span>{item.label}</span>
+                        </div>
+                        <span style={{
+                          fontSize: '0.65rem',
+                          background: isActive ? '#dbeafe' : '#f1f5f9',
+                          color: isActive ? '#1e40af' : '#64748b',
+                          padding: '1px 5px',
+                          borderRadius: '4px',
+                          fontWeight: '600'
+                        }}>
+                          {item.badge}
+                        </span>
+                      </button>
+                    );
+                  })}
 
                   <div style={{ marginTop: 'auto', padding: '0.75rem 0.5rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: '700', color: '#0b1329' }}>Indian Law Corpus</div>
-                    <div style={{ fontSize: '0.68rem', color: '#64748b' }}>2.4M+ Rulings Indexed</div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748b' }}>2,016+ BNS Provisions Mapped</div>
                   </div>
                 </div>
 
-                {/* Right Chat & Search Workspace */}
+                {/* Right Interactive Canvas Rendering Selected Tool */}
                 <div style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column' }}>
-                  {/* Top query bar */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '12px',
-                    padding: '0.65rem 1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                    marginBottom: '1rem'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#0b1329', fontSize: '0.85rem', fontWeight: '500' }}>
-                      <Search size={16} color="#2563eb" />
-                      <span>What is section 420 IPC in the new BNS?</span>
-                    </div>
-                    <span style={{ fontSize: '0.72rem', background: '#eff6ff', color: '#2563eb', padding: '2px 8px', borderRadius: '6px', fontWeight: '600' }}>
-                      RAG Verified
-                    </span>
-                  </div>
-
-                  {/* Legal Output Card */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '14px',
-                    padding: '1.25rem',
-                    boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ width: '26px', height: '26px', borderRadius: '6px', background: '#1d4ed8', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Scale size={14} />
+                  {activeHeroTab === 'ask_ai' && (
+                    <>
+                      <div style={{
+                        background: '#ffffff',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '12px',
+                        padding: '0.65rem 1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                        marginBottom: '1rem'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#0b1329', fontSize: '0.85rem', fontWeight: '500' }}>
+                          <Search size={16} color="#2563eb" />
+                          <span>What is section 420 IPC in the new BNS?</span>
                         </div>
-                        <div>
-                          <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0b1329' }}>
-                            Statutory Concordance & Legal Analysis
+                        <span style={{ fontSize: '0.72rem', background: '#eff6ff', color: '#2563eb', padding: '2px 8px', borderRadius: '6px', fontWeight: '600' }}>
+                          RAG Verified
+                        </span>
+                      </div>
+
+                      <div style={{
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '14px',
+                        padding: '1.25rem',
+                        boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ width: '26px', height: '26px', borderRadius: '6px', background: '#1d4ed8', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Scale size={14} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0b1329' }}>
+                                Statutory Concordance & Legal Analysis
+                              </div>
+                              <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                                Bharatiya Nyaya Sanhita, 2023 • Chapter XVIII (Offences Against Property)
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                            Bharatiya Nyaya Sanhita, 2023 • Chapter XVIII (Offences Against Property)
+                          <span style={{ fontSize: '0.72rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '2px 8px', borderRadius: '999px', fontWeight: '600' }}>
+                            ✓ 100% Citation Confidence
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '0.82rem', color: '#334155', lineHeight: '1.6', marginBottom: '0.85rem' }}>
+                          Under the new penal framework, <strong>Section 420 of the Indian Penal Code (Cheating and dishonestly inducing delivery of property)</strong> has been mapped to <strong>Section 318(4) of the Bharatiya Nyaya Sanhita (BNS) 2023</strong>.
+                        </div>
+
+                        <div style={{
+                          background: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          padding: '0.55rem 0.85rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          fontSize: '0.75rem'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e40af', fontWeight: '600' }}>
+                            <ExternalLink size={13} />
+                            <span>Supreme Court • Vesa Holdings P. Ltd. v. State of Kerala (2015) 8 SCC 293</span>
                           </div>
+                          <span style={{ color: '#64748b', fontSize: '0.7rem' }}>Cheating intent elements upheld</span>
                         </div>
                       </div>
-                      <span style={{ fontSize: '0.72rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '2px 8px', borderRadius: '999px', fontWeight: '600' }}>
-                        ✓ 100% Citation Confidence
-                      </span>
-                    </div>
+                    </>
+                  )}
 
-                    <div style={{ fontSize: '0.82rem', color: '#334155', lineHeight: '1.6', marginBottom: '0.85rem' }}>
-                      Under the new penal framework, <strong>Section 420 of the Indian Penal Code (Cheating and dishonestly inducing delivery of property)</strong> has been mapped to <strong>Section 318(4) of the Bharatiya Nyaya Sanhita (BNS) 2023</strong>.
-                    </div>
-
-                    {/* Precedent Citation Pill */}
+                  {activeHeroTab === 'concordance' && (
                     <div style={{
-                      background: '#f8fafc',
+                      background: '#ffffff',
                       border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      padding: '0.55rem 0.85rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: '0.75rem'
+                      borderRadius: '14px',
+                      padding: '1.25rem',
+                      boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e40af', fontWeight: '600' }}>
-                        <ExternalLink size={13} />
-                        <span>Supreme Court of India • Vesa Holdings P. Ltd. v. State of Kerala (2015) 8 SCC 293</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <ArrowRightLeft size={16} color="#2563eb" />
+                          <span style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0b1329' }}>
+                            Live Concordance Explorer (1,495 Provisions Unlocked)
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: '999px', fontWeight: '600' }}>
+                          All Unlocked (Plus Active)
+                        </span>
                       </div>
-                      <span style={{ color: '#64748b', fontSize: '0.7rem' }}>Cheating intent elements upheld</span>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+                        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
+                          <div style={{ fontSize: '0.68rem', color: '#991b1b', fontWeight: '700' }}>OLD STATUTE (IPC 1860)</div>
+                          <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#7f1d1d' }}>Section 302 IPC — Murder</div>
+                          <div style={{ fontSize: '0.72rem', color: '#991b1b' }}>Death or imprisonment for life + fine</div>
+                        </div>
+                        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '0.65rem 0.85rem' }}>
+                          <div style={{ fontSize: '0.68rem', color: '#1e40af', fontWeight: '700' }}>NEW STATUTE (BNS 2023)</div>
+                          <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#1e3a8a' }}>Section 103(1) BNS — Murder</div>
+                          <div style={{ fontSize: '0.72rem', color: '#1e40af' }}>Death or life imprisonment; Sec 103(2) mob lynching penalty added</div>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: '0.76rem', color: '#64748b', display: 'flex', gap: '1rem' }}>
+                        <span>• Cognizable: <strong>Yes</strong></span>
+                        <span>• Bailable: <strong>Non-Bailable</strong></span>
+                        <span>• Court: <strong>Court of Session</strong></span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {activeHeroTab === 'cyber' && (
+                    <div style={{
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '14px',
+                      padding: '1.25rem',
+                      boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <ShieldAlert size={16} color="#ea580c" />
+                          <span style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0b1329' }}>
+                            Cyber Exposure & Public Breach Report
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', background: '#fee2e2', color: '#dc2626', padding: '2px 8px', borderRadius: '999px', fontWeight: '700' }}>
+                          HIGH EXPOSURE
+                        </span>
+                      </div>
+
+                      <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '8px', padding: '0.75rem', marginBottom: '0.85rem' }}>
+                        <div style={{ fontSize: '0.78rem', color: '#9a3412', fontWeight: '600' }}>
+                          Target: advocate.consultancy@gmail.com • 2 Breaches Detected
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#c2410c', marginTop: '0.2rem' }}>
+                          Exposed Fields: Passwords, Full Name, Contact Numbers, IP History
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: '0.76rem', color: '#334155', lineHeight: '1.6' }}>
+                        <strong>Immediate Legal Remedy:</strong> File complaint on <em>cybercrime.gov.in</em> or call <strong>1930 National Cyber Helpline</strong>. Relevant offences under <strong>IT Act 2000 Section 66, 66C &amp; 72A</strong> (Breach of confidentiality).
+                      </div>
+                    </div>
+                  )}
+
+                  {activeHeroTab === 'fee_calc' && (
+                    <div style={{
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '14px',
+                      padding: '1.25rem',
+                      boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Calculator size={16} color="#d97706" />
+                          <span style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0b1329' }}>
+                            Court Fee Computation • Delhi High Court Rules
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', background: '#fef3c7', color: '#b45309', padding: '2px 8px', borderRadius: '999px', fontWeight: '700' }}>
+                          Ad-Valorem Computed
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem', marginBottom: '0.85rem' }}>
+                        <div style={{ background: '#f8fafc', padding: '0.5rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b' }}>SUIT VALUATION</div>
+                          <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0b1329' }}>₹15,00,000</div>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: '0.5rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b' }}>COURT FEE LEVIED</div>
+                          <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#16a34a' }}>₹21,240</div>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: '0.5rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.65rem', color: '#64748b' }}>PROCESS &amp; ADV STAMP</div>
+                          <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0b1329' }}>₹500 + ₹25</div>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                        Verified under Court Fees Act 1870 (Delhi Amendment) Schedule I, Article 1.
+                      </div>
+                    </div>
+                  )}
+
+                  {activeHeroTab === 'drafter' && (
+                    <div style={{
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '14px',
+                      padding: '1.25rem',
+                      boxShadow: '0 4px 12px rgba(11, 19, 41, 0.03)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <FileText size={16} color="#7c3aed" />
+                          <span style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0b1329' }}>
+                            Statutory Legal Notice under Section 138 NI Act
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', background: '#faf5ff', color: '#7c3aed', padding: '2px 8px', borderRadius: '999px', fontWeight: '700' }}>
+                          Court Formatted
+                        </span>
+                      </div>
+
+                      <div style={{ background: '#faf8f5', border: '1px solid #e7e3da', borderRadius: '8px', padding: '0.75rem', fontSize: '0.76rem', color: '#334155', lineHeight: '1.55', fontFamily: 'serif' }}>
+                        <em>"TAKE NOTICE that Cheque No. 448102 dated 14/08/2026 for ₹4,50,000/- drawn on HDFC Bank was returned unpaid with endorsement 'FUNDS INSUFFICIENT'. You are hereby called upon to remit payment within 15 days of receipt hereof..."</em>
+                      </div>
+
+                      <div style={{ marginTop: '0.65rem', fontSize: '0.72rem', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Bilingual (English / हिन्दी) ready</span>
+                        <span>Formatted for Advocate Notice Paper</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

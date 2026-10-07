@@ -36,14 +36,14 @@ export default function LogoMarquee() {
         }} className="trust-metrics-container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Users size={20} color="#1d4ed8" />
+              <Scale size={20} color="#1d4ed8" />
             </div>
             <div>
               <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.75rem', fontWeight: '800', color: '#0b1329', lineHeight: 1 }}>
-                10,000+
+                2,016+
               </div>
               <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
-                Legal Professionals
+                BNS Concordance Provisions
               </div>
             </div>
           </div>
@@ -54,10 +54,10 @@ export default function LogoMarquee() {
             </div>
             <div>
               <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.75rem', fontWeight: '800', color: '#0b1329', lineHeight: 1 }}>
-                2.4M+
+                28 States
               </div>
               <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.25rem' }}>
-                Statutes & Precedents
+                Court Fee &amp; Stamp Rules
               </div>
             </div>
           </div>

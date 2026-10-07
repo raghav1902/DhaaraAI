@@ -32,13 +32,21 @@ export default function InteractiveDemo() {
       citation: "Supreme Court Bench Guidelines • C.C. Alavi Haji v. Palapetty Muhammed (2007) 6 SCC 555",
       tags: ["Ready to Print Notice", "Order 37 CPC Compliant", "Interest Clause Factored"]
     },
-    "Check legality of termination clause": {
-      category: "Employment & Corporate Governance",
-      statute: "Industrial Disputes Act 1947 & Specific Relief Act 1963",
-      oldRef: "Termination at Will Provisions",
-      answer: "Clause 14 allows 'Immediate termination without written cause or severance'. For non-managerial staff, this violates retrenchment mandates under Chapter V-A of the Industrial Disputes Act. For senior managerial executives, statutory notice of minimum 30 days or salary in lieu is required under state Shops & Establishments enactments.",
-      citation: "Delhi High Court • GE Capital Transportation v. Dr. Tarun Roy (2009)",
-      tags: ["Statutory Notice Required", "Severance Flag", "High Court Compliant"]
+    "Calculate Court Fee for ₹15 Lakh Suit in Delhi": {
+      category: "Court Fee & Stamp Valuation",
+      statute: "Court Fees Act 1870 (Delhi Amendment) Schedule I, Article 1",
+      oldRef: "Ad-Valorem Valuation on Plaint",
+      answer: "For a commercial recovery suit valued at ₹15,00,000/- before the District Courts of Delhi: Fixed ad-valorem fee payable is ₹21,240/-. Process fee: ₹500/-, Advocate Welfare Stamp: ₹25/-. No exemption applies as plaintiff is a corporate entity.",
+      citation: "Delhi High Court (Original Side) Rules 2018 & Court Fees Act 1870",
+      tags: ["₹21,240 Court Fee Computed", "Delhi State Rules", "District Court & High Court Ready"]
+    },
+    "Scan email for cyber data breach and fraud remedies": {
+      category: "Cyber Exposure & Statutory Remedy",
+      statute: "Information Technology Act 2000 (Sections 66, 66C, 72A)",
+      oldRef: "Identity Theft & Data Confidentiality Breach",
+      answer: "Target identified in 2 historical database exposures. Leaked data classes include plain text credentials, phone records, and login identifiers. Immediate action required: invoke National Cyber Helpline 1930, lodge complaint on cybercrime.gov.in, and file statutory breach claim under Section 43A & 72A IT Act 2000.",
+      citation: "IT Act 2000 Sec 66C (Identity Theft) & Sec 72A (Disclosure in breach of lawful contract)",
+      tags: ["High Risk Alert", "1930 Helpline Recourse", "IT Act 2000 Ready"]
     }
   };
 
