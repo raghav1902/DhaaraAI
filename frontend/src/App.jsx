@@ -344,7 +344,7 @@ function App() {
   }
 
   if (appView === 'landing') {
-    return <LandingPage onExplore={() => setAppView('auth')} />;
+    return <LandingPage user={user} onExplore={() => setAppView(user ? 'app' : 'auth')} />;
   }
 
   if (appView === 'auth') {

@@ -4,8 +4,19 @@ import {
   ArrowRightLeft, ShieldCheck, ExternalLink, ShieldAlert, Calculator, Lock
 } from 'lucide-react';
 
-export default function HeroSection({ onExplore }) {
+export default function HeroSection({ onExplore, user }) {
   const [activeHeroTab, setActiveHeroTab] = useState('ask_ai');
+
+  const activeUser = user || (() => {
+    try {
+      return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+    } catch {
+      return null;
+    }
+  })();
+
+  const isPlus = activeUser?.plan === 'plus' || activeUser?.plan === 'pro' || activeUser?.plan === 'enterprise';
+  const hasUser = Boolean(activeUser && (activeUser.email || activeUser.user_id));
 
   const previewTabs = [
     { id: 'ask_ai', label: 'Ask AI', icon: Search, badge: 'RAG AI' },
@@ -54,16 +65,45 @@ export default function HeroSection({ onExplore }) {
         <span style={{ letterSpacing: '0.02em' }}>
           BNS 2023 Live • 2,016+ Concordance Provisions • Supreme Court Precedents
         </span>
-        <span style={{
-          background: '#dbeafe',
-          color: '#1d4ed8',
-          fontSize: '0.7rem',
-          padding: '2px 8px',
-          borderRadius: '999px',
-          fontWeight: '700'
-        }}>
-          Plus Active
-        </span>
+        {hasUser ? (
+          isPlus ? (
+            <span style={{
+              background: '#ecfdf5',
+              color: '#059669',
+              border: '1px solid #a7f3d0',
+              fontSize: '0.72rem',
+              padding: '2px 9px',
+              borderRadius: '999px',
+              fontWeight: '700'
+            }}>
+              ✓ Plus Active
+            </span>
+          ) : (
+            <span style={{
+              background: '#fef3c7',
+              color: '#b45309',
+              border: '1px solid #fde68a',
+              fontSize: '0.72rem',
+              padding: '2px 9px',
+              borderRadius: '999px',
+              fontWeight: '700'
+            }}>
+              Free Tier
+            </span>
+          )
+        ) : (
+          <span style={{
+            background: '#dbeafe',
+            color: '#1d4ed8',
+            border: '1px solid #bfdbfe',
+            fontSize: '0.72rem',
+            padding: '2px 9px',
+            borderRadius: '999px',
+            fontWeight: '700'
+          }}>
+            Free Trial Available
+          </span>
+        )}
       </div>
 
       {/* 2. Strong Headline with Editorial Serif + Royal Blue Emphasis */}
@@ -82,7 +122,7 @@ export default function HeroSection({ onExplore }) {
         <span style={{
           color: '#1d4ed8',
           fontStyle: 'normal',
-          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 100%)',
+          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 40%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           display: 'inline-block'
@@ -242,17 +282,43 @@ export default function HeroSection({ onExplore }) {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{
-                    background: '#eff6ff',
-                    color: '#1d4ed8',
-                    border: '1px solid #bfdbfe',
-                    padding: '2px 9px',
-                    borderRadius: '999px',
-                    fontSize: '0.72rem',
-                    fontWeight: '700'
-                  }}>
-                    DhaaraAI Plus Active
-                  </span>
+                  {hasUser && isPlus ? (
+                    <span style={{
+                      background: '#ecfdf5',
+                      color: '#059669',
+                      border: '1px solid #a7f3d0',
+                      padding: '2px 9px',
+                      borderRadius: '999px',
+                      fontSize: '0.72rem',
+                      fontWeight: '700'
+                    }}>
+                      ✓ DhaaraAI Plus Active
+                    </span>
+                  ) : hasUser ? (
+                    <span style={{
+                      background: '#fef3c7',
+                      color: '#b45309',
+                      border: '1px solid #fde68a',
+                      padding: '2px 9px',
+                      borderRadius: '999px',
+                      fontSize: '0.72rem',
+                      fontWeight: '700'
+                    }}>
+                      Free Plan Active
+                    </span>
+                  ) : (
+                    <span style={{
+                      background: '#eff6ff',
+                      color: '#1d4ed8',
+                      border: '1px solid #bfdbfe',
+                      padding: '2px 9px',
+                      borderRadius: '999px',
+                      fontSize: '0.72rem',
+                      fontWeight: '700'
+                    }}>
+                      Live Studio Preview
+                    </span>
+                  )}
                 </div>
               </div>
 
