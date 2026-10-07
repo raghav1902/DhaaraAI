@@ -1,7 +1,11 @@
-import React from 'react';
-import { FileText, Check, Sparkles } from 'lucide-react';
+import { FileText, Check, Sparkles, Crown } from 'lucide-react';
 
-export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft }) {
+export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft, usageInfo, onUpgradeClick }) {
+  const isPro = usageInfo?.isPro;
+  const remaining = usageInfo?.draftsRemaining ?? 3;
+  const used = usageInfo?.draftsUsed ?? 0;
+  const limit = usageInfo?.draftLimit ?? 3;
+
   return (
     <div className="drafter-header" style={{
       padding: '16px 20px',
@@ -31,10 +35,52 @@ export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft 
           <FileText size={22} />
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
               {isHindi ? 'स्वचालित FIR एवं विधिक नोटिस ड्राफ्टर' : 'Automated FIR & Legal Notice Drafter'}
             </h2>
+            {isPro ? (
+              <span
+                style={{
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  color: '#d97706',
+                  border: '1px solid #f59e0b',
+                  borderRadius: '999px',
+                  padding: '2px 8px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Crown size={12} /> PLUS • UNLIMITED
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={onUpgradeClick}
+                style={{
+                  background: remaining <= 1 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(37, 99, 235, 0.1)',
+                  color: remaining <= 1 ? '#dc2626' : '#2563eb',
+                  border: `1px solid ${remaining <= 1 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(37, 99, 235, 0.3)'}`,
+                  borderRadius: '999px',
+                  padding: '3px 9px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  cursor: 'pointer'
+                }}
+                title={isHindi ? 'अपग्रेड करने के लिए क्लिक करें' : 'Click to upgrade to Plus'}
+              >
+                <span>{isHindi ? `ड्राफ्ट: ${used}/${limit} प्रयुक्त` : `Drafts: ${used}/${limit} Used (${remaining} Left)`}</span>
+                <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                  ★ UPGRADE
+                </span>
+              </button>
+            )}
           </div>
           <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '2px 0 0' }}>
             {isHindi ? 'धारा 173 BNSS एवं भारतीय न्याय संहिता (BNS 2023) के प्रमाणित प्रारूप' : 'Statutory procedural formats under Section 173 BNSS & BNS 2023'}

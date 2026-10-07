@@ -75,8 +75,9 @@ class DhaaraRAGEngine:
             return
         self._init_groq_client(key)
 
-    def _format_concordance_context(self, question: str, user_role: str) -> str:
-        diagnosis = diagnose_situation(question, user_role=user_role)
+    def _format_concordance_context(self, question: str, user_role: str, diagnosis: Optional[Dict[str, Any]] = None) -> str:
+        if diagnosis is None:
+            diagnosis = diagnose_situation(question, user_role=user_role)
         blocks = []
 
         transition = diagnosis.get("transition", {})
@@ -449,7 +450,8 @@ class DhaaraRAGEngine:
             used_chunks = statute_chunks + case_chunks
 
         # Format context blocks
-        concordance_ctx = self._format_concordance_context(question, user_role)
+        diagnosis_data = diagnose_situation(question, user_role=user_role)
+        concordance_ctx = self._format_concordance_context(question, user_role, diagnosis=diagnosis_data)
         retrieved_ctx = self._format_retrieved_chunks(statute_chunks)
         case_law_ctx = self._format_case_law_chunks(case_chunks, question)
 
@@ -674,7 +676,7 @@ class DhaaraRAGEngine:
                             "sources": used_chunks,
                             "question": question,
                             "language": language,
-                            "concordance": diagnose_situation(question, user_role)
+                            "concordance": diagnosis_data
                         }
             except Exception as api_err:
                 print(f"[rag_engine] Model '{model}' failed: {api_err}. Trying next fallback...")
@@ -700,7 +702,7 @@ class DhaaraRAGEngine:
             "sources": used_chunks,
             "question": question,
             "language": language,
-            "concordance": diagnose_situation(question, user_role)
+            "concordance": diagnosis_data
         }
 
     def generate_legal_draft(

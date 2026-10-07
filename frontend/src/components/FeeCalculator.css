@@ -24,15 +24,6 @@
   box-sizing: border-box;
 }
 
-.fee-calculator__header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--amber-600), var(--royal-600));
-}
 
 .fee-calculator__header-left {
   display: flex;
@@ -234,35 +225,50 @@ body.dark-theme .fee-statutory-receipt {
 .fee-statutory-receipt__top-bar {
   background: linear-gradient(90deg, #1e3a8a 0%, #172554 100%);
   color: #f8fafc;
-  padding: 8px 16px;
+  padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 body.dark-theme .fee-statutory-receipt__top-bar {
-  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, #172554 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .fee-statutory-receipt__badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 2px 8px;
-  border-radius: var(--radius-xs);
-  font-size: 10.5px;
-  letter-spacing: 0.04em;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  max-width: 100%;
+  line-height: 1.35;
+}
+
+.fee-statutory-receipt__badge svg {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .fee-statutory-receipt__series {
   font-size: 10px;
-  opacity: 0.8;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .fee-statutory-receipt__body {
@@ -552,3 +558,259 @@ body.dark-theme .fee-statutory-receipt__total-row {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Rate Preview Chips ─────────────────────────────────── */
+.fee-calc__rate-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.fee-calc__rate-chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}
+.fee-calc__rate-chip.is-green {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+.fee-calc__rate-chip.is-warning {
+  background: var(--warning-light);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+.fee-calc__rate-chip.is-danger {
+  background: var(--danger-light);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+.fee-calc__rate-chip.is-blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+/* ── Info Note & Header Group ────────────────────────────── */
+.fee-calc__header-group {
+  margin-bottom: 18px;
+}
+.fee-calc__section-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+  line-height: 1.45;
+}
+.fee-calc__version-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  padding: 2px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.04em;
+}
+.fee-calc__field-helper {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.fee-calc__info-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.fee-calc__info-note svg { flex-shrink: 0; margin-top: 1px; color: var(--primary); }
+
+/* ── Checkboxes & Toggles ─────────────────────────────────── */
+.fee-calc__check-row {
+  margin-top: 12px;
+}
+.fee-calc__check-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+.fee-calc__checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+.fee-calc__checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  border-radius: 3px;
+}
+.fee-calc__vehicle-toggle-row {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Enhanced Traffic Violation Card ─────────────────────── */
+.fee-calculator__violation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--subtle-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.fee-calculator__violation-card:hover {
+  background: var(--card-bg);
+  border-color: var(--card-border-hover);
+}
+.fee-calculator__violation-card.is-selected {
+  background: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+.fee-calculator__violation-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+}
+.fee-calculator__violation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fee-calculator__violation-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fee-calculator__violation-section {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.fee-calculator__violation-extra {
+  font-size: 11px;
+  color: var(--warning);
+}
+.fee-calculator__court-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-light);
+  border: 1px solid var(--danger-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.fee-calculator__violation-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.fee-calc__repeat-btn {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.fee-calc__repeat-btn.is-active {
+  background: var(--danger);
+  color: #ffffff;
+  border-color: var(--danger);
+}
+
+/* ── Free Legal Aid Banner ────────────────────────────────── */
+.fee-calc__legal-aid-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Advocate Fee Range ─────────────────────────────────── */
+.fee-calc__advocate-range {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 16px 0;
+}
+.fee-calc__range-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+.fee-calc__range-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+.fee-calc__range-val.is-max { color: var(--warning); }
+.fee-calc__range-sep {
+  font-size: 20px;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 300;
+}
+
+/* ── 6-tab grid ─────────────────────────────────────────── */
+.fee-calculator__tabs-bar {
+  grid-template-columns: repeat(6, 1fr);
+}
+@media (max-width: 900px) {
+  .fee-calculator__tabs-bar { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .fee-calculator__tabs-bar { grid-template-columns: repeat(2, 1fr); }
+}
+

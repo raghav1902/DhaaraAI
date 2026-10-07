@@ -26,6 +26,7 @@ import { sanitizeMarkdownForSpeech, getPromptSuggestions } from './LegalChat/spe
 import ChatMessageItem from './LegalChat/ChatMessageItem';
 import ChatInputArea from './LegalChat/ChatInputArea';
 import ChatHistorySidebar from './LegalChat/ChatHistorySidebar';
+import { API_BASE } from '../config/apiConfig';
 import './LegalChat/LegalChat.css';
 
 export default function LegalChat({
@@ -33,7 +34,9 @@ export default function LegalChat({
   onQueryConsumed = () => { },
   language = 'English',
   onLanguageChange = () => { },
-  user = null
+  user = null,
+  onNavigateTab = () => { },
+  onOpenUpgradeModal = null
 }) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
@@ -66,21 +69,51 @@ export default function LegalChat({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Daily AI Chat Quota tracking
+  const [dailyUsage, setDailyUsage] = useState(null);
+  const isPro = user?.plan === 'plus' || user?.plan === 'pro' || user?.plan === 'enterprise';
+  const chatLimit = 7;
+  const chatUsed = dailyUsage?.features?.ai_chat?.used ?? 0;
+  const chatRemaining = isPro ? 9999 : (dailyUsage?.features?.ai_chat?.remaining ?? Math.max(0, chatLimit - chatUsed));
+  const isQuotaExhausted = !isPro && dailyUsage !== null && chatRemaining <= 0;
+
+  const fetchUsage = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/api/user/usage`, {
+        headers: getAuthHeaders()
+      });
+      if (res.data) {
+        setDailyUsage(res.data);
+      }
+    } catch (err) {
+      // Ignore background usage fetch error
+    }
+  }, [getAuthHeaders]);
+
+  useEffect(() => {
+    fetchUsage();
+  }, [fetchUsage, user?.plan]);
+
   // Fetch conversations list for authenticated user
   const fetchConversations = useCallback(async () => {
     if (!user || !user.token) return;
     setIsLoadingList(true);
     try {
-      const res = await axios.get('http://localhost:8000/api/conversations', {
+      const res = await axios.get(`${API_BASE}/api/conversations`, {
         headers: getAuthHeaders()
       });
       setConversations(res.data || []);
     } catch (err) {
-      console.error('Failed to load conversations:', err);
+      if (err.response?.status === 401) {
+        // Stale session or unauthorized - reset conversations cleanly without spam
+        setConversations([]);
+      } else {
+        console.error('Failed to load conversations:', err);
+      }
     } finally {
       setIsLoadingList(false);
     }
-  }, [user, getAuthHeaders]);
+  }, [user?.token, getAuthHeaders]);
 
   useEffect(() => {
     fetchConversations();
@@ -89,26 +122,27 @@ export default function LegalChat({
   // Handle Search in conversations
   useEffect(() => {
     if (!user || !user.token) return;
+    if (!searchQuery.trim()) {
+      return;
+    }
     const timer = setTimeout(async () => {
-      if (!searchQuery.trim()) {
-        fetchConversations();
-        return;
-      }
       try {
         setIsLoadingList(true);
-        const res = await axios.get(`http://localhost:8000/api/conversations/search?q=${encodeURIComponent(searchQuery)}`, {
+        const res = await axios.get(`${API_BASE}/api/conversations/search?q=${encodeURIComponent(searchQuery)}`, {
           headers: getAuthHeaders()
         });
         setConversations(res.data || []);
       } catch (err) {
-        console.error('Search failed:', err);
+        if (err.response?.status !== 401) {
+          console.error('Search failed:', err);
+        }
       } finally {
         setIsLoadingList(false);
       }
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, user, getAuthHeaders, fetchConversations]);
+  }, [searchQuery, user?.token, getAuthHeaders]);
 
   // Select and load a conversation (Strict User Isolation)
   const handleSelectConversation = async (convId) => {
@@ -117,7 +151,7 @@ export default function LegalChat({
     setIsLoading(true);
 
     try {
-      const res = await axios.get(`http://localhost:8000/api/conversations/${convId}`, {
+      const res = await axios.get(`${API_BASE}/api/conversations/${convId}`, {
         headers: getAuthHeaders()
       });
 
@@ -165,7 +199,7 @@ export default function LegalChat({
   // Rename a conversation
   const handleRenameConversation = async (convId, newTitle) => {
     try {
-      await axios.patch(`http://localhost:8000/api/conversations/${convId}`, {
+      await axios.patch(`${API_BASE}/api/conversations/${convId}`, {
         title: newTitle
       }, {
         headers: getAuthHeaders()
@@ -179,7 +213,7 @@ export default function LegalChat({
   // Delete a conversation
   const handleDeleteConversation = async (convId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/conversations/${convId}`, {
+      await axios.delete(`${API_BASE}/api/conversations/${convId}`, {
         headers: getAuthHeaders()
       });
       setConversations(prev => prev.filter(c => c.id !== convId));
@@ -310,7 +344,7 @@ export default function LegalChat({
     synthRef.current.speak(utterance);
   };
 
-  const handleSendWithText = async (textToSend) => {
+  const handleSendWithText = useCallback(async (textToSend) => {
     if (!textToSend.trim() || isLoading) return;
 
     if (synthRef.current) {
@@ -318,13 +352,13 @@ export default function LegalChat({
       setSpeakingIndex(null);
     }
 
-    const userMessage = { role: 'user', content: textToSend, language };
+    const userMessage = { id: `msg_u_${Date.now()}_${Math.random()}`, role: 'user', content: textToSend, language };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/query', {
+      const response = await axios.post(`${API_BASE}/api/query`, {
         question: userMessage.content,
         language: userMessage.language,
         user_role: 'general',
@@ -345,25 +379,47 @@ export default function LegalChat({
       }
 
       setMessages(prev => [...prev, {
+        id: `msg_a_${Date.now()}_${Math.random()}`,
         role: 'assistant',
         content: response.data.answer,
         sources: response.data.sources || [],
         language: response.data.language,
         concordance: response.data.concordance || null
       }]);
+      fetchUsage();
     } catch (error) {
       console.error('Error fetching legal response:', error);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: isHindi
-          ? 'त्रुटि: लीगलजीपीटी बैकएंड सर्वर से कनेक्ट नहीं हो सका। कृपया जांचें कि सर्वर चल रहा है।'
-          : 'Error: Cannot connect to LegalGPT backend. Make sure the FastAPI server is running.',
-        isError: true
-      }]);
+      if (error.response?.status === 403) {
+        fetchUsage();
+        const msg = error.response?.data?.detail?.message ||
+          (isHindi
+            ? 'निःशुल्क दैनिक सीमा (7 चैट्स/दिन) समाप्त हो गई है। असीमित AI विधिक परामर्श के लिए Plus में अपग्रेड करें।'
+            : 'Daily free limit of 7 AI chats reached. Upgrade to DhaaraAI Plus for unlimited legal queries.');
+        setMessages(prev => [...prev, {
+          id: `msg_err_${Date.now()}`,
+          role: 'assistant',
+          content: msg,
+          isError: true
+        }]);
+        if (onOpenUpgradeModal) {
+          onOpenUpgradeModal('AI Legal Chat (Ask AI)', msg);
+        } else if (onNavigateTab) {
+          onNavigateTab('settings');
+        }
+      } else {
+        setMessages(prev => [...prev, {
+          id: `msg_err_${Date.now()}`,
+          role: 'assistant',
+          content: isHindi
+            ? 'त्रुटि: लीगलजीपीटी बैकएंड सर्वर से कनेक्ट नहीं हो सका। कृपया जांचें कि सर्वर चल रहा है।'
+            : 'Error: Cannot connect to LegalGPT backend. Make sure the FastAPI server is running.',
+          isError: true
+        }]);
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, language, activeConversationId, getAuthHeaders, fetchConversations, fetchUsage, isHindi, onOpenUpgradeModal, onNavigateTab]);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -407,7 +463,33 @@ export default function LegalChat({
                 </span>
               </div>
             </div>
-            <div className="ask-ai-session-actions">
+            <div className="ask-ai-session-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {!isPro && (
+                <button
+                  type="button"
+                  onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('AI Legal Chat (Ask AI)', 'Upgrade to DhaaraAI Plus for unlimited AI legal inquiries.') : onNavigateTab && onNavigateTab('settings')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '11.5px',
+                    fontWeight: 600,
+                    background: isQuotaExhausted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                    color: isQuotaExhausted ? '#ef4444' : 'var(--text-muted, #94a3b8)',
+                    border: isQuotaExhausted ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid var(--border-light, rgba(255, 255, 255, 0.1))',
+                    cursor: 'pointer'
+                  }}
+                  title="Daily Chat Quota"
+                >
+                  <span>{chatUsed}/{chatLimit} Used</span>
+                  <span>•</span>
+                  <span style={{ color: isQuotaExhausted ? '#ef4444' : '#10b981' }}>
+                    {isQuotaExhausted ? 'Limit Reached' : `${chatRemaining} left`}
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleNewChat}
@@ -422,9 +504,36 @@ export default function LegalChat({
         ) : (
           <section className="ask-ai-hero" aria-labelledby="ask-ai-title">
             <div className="ask-ai-hero-copy">
-              <div className="ask-ai-brand">
-                <span className="ask-ai-brand-mark"><Scale size={16} /></span>
-                <span>DhaaraAI LegalGPT Workspace</span>
+              <div className="ask-ai-brand" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="ask-ai-brand-mark"><Scale size={16} /></span>
+                  <span>DhaaraAI LegalGPT Workspace</span>
+                </div>
+                {!isPro && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('AI Legal Chat (Ask AI)', 'Upgrade to DhaaraAI Plus for unlimited AI legal inquiries.') : onNavigateTab && onNavigateTab('settings')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '4px 12px',
+                      borderRadius: '16px',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      background: isQuotaExhausted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                      color: isQuotaExhausted ? '#ef4444' : 'var(--text-muted, #94a3b8)',
+                      border: isQuotaExhausted ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid var(--border-light, rgba(255, 255, 255, 0.1))',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>Chats: {chatUsed}/{chatLimit} Used</span>
+                    <span>•</span>
+                    <span style={{ color: isQuotaExhausted ? '#ef4444' : '#10b981' }}>
+                      {isQuotaExhausted ? 'Limit Reached' : `${chatRemaining} left today`}
+                    </span>
+                  </button>
+                )}
               </div>
 
               <div className="ask-ai-heading-row">
@@ -491,7 +600,7 @@ export default function LegalChat({
         <div className="ask-ai-transcript" aria-live="polite">
           {messages.map((msg, idx) => (
             <ChatMessageItem
-              key={idx}
+              key={msg.id || `msg_${idx}`}
               msg={msg}
               idx={idx}
               speakingIndex={speakingIndex}
@@ -546,6 +655,8 @@ export default function LegalChat({
           handleToggleVoiceInput={handleToggleVoiceInput}
           speechError={speechError}
           isHindi={isHindi}
+          isQuotaExhausted={isQuotaExhausted}
+          onOpenUpgrade={() => onOpenUpgradeModal ? onOpenUpgradeModal('AI Legal Chat (Ask AI)', 'Upgrade to DhaaraAI Plus for unlimited AI legal inquiries.') : onNavigateTab && onNavigateTab('settings')}
         />
         <p className="ask-ai-disclaimer">
           {isHindi

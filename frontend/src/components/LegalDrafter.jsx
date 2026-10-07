@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -11,10 +11,40 @@ import DrafterStep3 from './LegalDrafter/DrafterStep3';
 import DrafterStep4 from './LegalDrafter/DrafterStep4';
 import DrafterStep5 from './LegalDrafter/DrafterStep5';
 import DraftContextPanel from './LegalDrafter/DraftContextPanel';
+import { API_BASE } from '../config/apiConfig';
+import ProFeatureLock from './ProFeatureLock';
 import './LegalDrafter/LegalDrafter.css';
 
-export default function LegalDrafter({ language = 'English', onLanguageChange = () => { } }) {
+export default function LegalDrafter({
+  language = 'English',
+  onLanguageChange = () => { },
+  user,
+  onNavigateTab,
+  onOpenUpgradeModal
+}) {
   const isHindi = language === 'Hindi' || language === 'हिंदी';
+  const isPro = user?.plan === 'plus' || user?.plan === 'pro' || user?.plan === 'enterprise';
+
+  const [usageStats, setUsageStats] = useState(null);
+
+  const fetchUsage = async () => {
+    try {
+      const token = user?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get(`${API_BASE}/api/user/usage`, { headers });
+      setUsageStats(res.data);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchUsage();
+  }, [user]);
+
+  const draftsUsed = usageStats?.features?.draft?.used ?? 0;
+  const draftLimit = usageStats?.features?.draft?.limit ?? 3;
+  const draftsRemaining = isPro ? 999 : Math.max(0, draftLimit - draftsUsed);
 
   // Step management: 1 (Type & Category), 2 (Parties), 3 (Facts & Evidence), 4 (Review & Generate), 5 (Result)
   const [step, setStep] = useState(1);
@@ -73,6 +103,19 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
   };
 
   const handleGenerateDraft = async () => {
+    if (!isPro && draftsRemaining <= 0) {
+      const msg = isHindi
+        ? 'निःशुल्क 3 ड्राफ्ट की सीमा पूरी हो चुकी है। असीमित ड्राफ्टिंग के लिए DhaaraAI Plus में अपग्रेड करें।'
+        : 'Free tier limit of 3 drafts reached. Upgrade to DhaaraAI Plus for unlimited legal drafting.';
+      setDraftError(msg);
+      if (onOpenUpgradeModal) {
+        onOpenUpgradeModal(isHindi ? 'विधिक ड्राफ्टिंग' : 'Legal Drafting', msg);
+      } else if (onNavigateTab) {
+        onNavigateTab('settings');
+      }
+      return;
+    }
+
     setIsGenerating(true);
     setDraftError(null);
 
@@ -85,7 +128,10 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/draft', {
+      const token = user?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const response = await axios.post(`${API_BASE}/api/draft`, {
         document_type: documentType,
         language: language,
         complainant: complainant,
@@ -100,15 +146,27 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         evidence: evidenceList.join(', '),
         relief_sought: reliefSought,
         extra_fields: extraFields
-      });
+      }, { headers });
 
       setGeneratedResult(response.data);
       setStep(5);
+      fetchUsage();
     } catch (err) {
       console.error('Drafting request error:', err);
-      setDraftError(isHindi
-        ? '[500 Internal Server Error] ड्राफ्ट जनरेट करने में त्रुटि हुई। कृपया जांचें कि बैकएंड सर्वर चल रहा है।'
-        : '[500 Internal Server Error] Failed to generate draft. Please ensure the backend server is running.');
+      if (err.response?.status === 403) {
+        const msg = err.response?.data?.detail?.message ||
+          (isHindi ? 'निःशुल्क 3 ड्राफ्ट की सीमा पूरी हो चुकी है। Plus में अपग्रेड करें।' : 'Free tier limit of 3 drafts reached. Upgrade to Plus.');
+        setDraftError(msg);
+        if (onOpenUpgradeModal) {
+          onOpenUpgradeModal(isHindi ? 'विधिक ड्राफ्टिंग' : 'Legal Drafting', msg);
+        } else if (onNavigateTab) {
+          onNavigateTab('settings');
+        }
+      } else {
+        setDraftError(isHindi
+          ? '[500 Internal Server Error] ड्राफ्ट जनरेट करने में त्रुटि हुई। कृपया जांचें कि बैकएंड सर्वर चल रहा है।'
+          : '[500 Internal Server Error] Failed to generate draft. Please ensure the backend server is running.');
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -174,6 +232,11 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
         onLanguageChange={onLanguageChange}
         isHindi={isHindi}
         onNewDraft={() => { setStep(1); setGeneratedResult(null); setDraftError(null); setExtraFields({}); }}
+        usageInfo={{ isPro, draftsRemaining, draftsUsed, draftLimit }}
+        onUpgradeClick={() => {
+          if (onOpenUpgradeModal) onOpenUpgradeModal('Legal Drafter');
+          else if (onNavigateTab) onNavigateTab('settings');
+        }}
       />
 
       {step < 5 && (
@@ -186,7 +249,22 @@ export default function LegalDrafter({ language = 'English', onLanguageChange = 
       )}
 
       {step < 5 && <div className="drafter-workspace">
-      <div className="drafter-config-column">
+      <div className="drafter-config-column" style={{ position: 'relative' }}>
+      {step === 4 && !isPro && draftsRemaining <= 0 && (
+        <ProFeatureLock
+          isHindi={isHindi}
+          title={isHindi ? 'ड्राफ्टिंग सीमा पूरी हुई (3/3 प्रयुक्त)' : 'Draft Quota Reached (3/3 Used)'}
+          description={
+            isHindi
+              ? 'आपने अपने निःशुल्क 3 विधिक ड्राफ्ट पूरे कर लिए हैं। असीमित ड्राफ्टिंग जारी रखने के लिए DhaaraAI Plus में अपग्रेड करें।'
+              : 'You have used all 3 free legal drafts. Upgrade to DhaaraAI Plus for unlimited statutory document generation.'
+          }
+          onUpgradeClick={() => {
+            if (onOpenUpgradeModal) onOpenUpgradeModal('Legal Drafter');
+            else if (onNavigateTab) onNavigateTab('settings');
+          }}
+        />
+      )}
       {step === 1 && (
         <DrafterStep1
           documentType={documentType}

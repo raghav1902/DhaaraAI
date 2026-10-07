@@ -1,12 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ArrowRightLeft, Search, Scale, ChevronLeft, Sparkles } from 'lucide-react';
+import { ArrowRightLeft, Search, Scale, ChevronLeft, Sparkles, Crown } from 'lucide-react';
 import { FALLBACK_CONCORDANCE_DB, POPULAR_QUERIES } from '../data/concordanceData';
+import { API_BASE } from '../config/apiConfig';
 import BnsComparisonCard from './BnsConverter/BnsComparisonCard';
+import ProFeatureLock from './ProFeatureLock';
 import './BnsConverter/BnsConverter.css';
 
-export default function BnsConverter({ language = 'English', onAskAi = null }) {
-  const isHindi = language === 'Hindi';
+export default function BnsConverter({
+  language = 'English',
+  onAskAi = null,
+  user,
+  onNavigateTab,
+  onOpenUpgradeModal
+}) {
+  const activeUser = user || (() => {
+    try {
+      return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+    } catch {
+      return null;
+    }
+  })();
+  const isHindi = language === 'Hindi' || language === 'हिंदी';
+  const isPro = activeUser?.plan === 'plus' || activeUser?.plan === 'pro' || activeUser?.plan === 'enterprise';
+
+  const [usageStats, setUsageStats] = useState(null);
+
+  const fetchUsage = async () => {
+    try {
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      const token = currentUser?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get(`${API_BASE}/api/user/usage`, { headers });
+      setUsageStats(res.data);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchUsage();
+  }, [user]);
+
+  const bnsUsed = usageStats?.features?.bns_lookup?.used ?? 0;
+  const bnsLimit = usageStats?.features?.bns_lookup?.limit ?? 2;
+  const bnsRemaining = isPro ? 999 : Math.max(0, bnsLimit - bnsUsed);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [items, setItems] = useState(FALLBACK_CONCORDANCE_DB);
   const [selectedItem, setSelectedItem] = useState(FALLBACK_CONCORDANCE_DB[0] || null);
@@ -37,15 +82,38 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
     }
 
     try {
-      const res = await axios.get(`http://localhost:8000/api/converter${q ? `?query=${encodeURIComponent(q)}` : ''}`);
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      const userIsPro = currentUser?.plan === 'plus' || currentUser?.plan === 'pro' || currentUser?.plan === 'enterprise';
+      const token = currentUser?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const params = new URLSearchParams();
+      if (q && q.trim()) {
+        params.append('query', q.trim());
+      }
+      params.append('limit', userIsPro ? '2500' : '15');
+
+      const res = await axios.get(`${API_BASE}/api/converter?${params.toString()}`, { headers });
       if (res.data && res.data.mappings && res.data.mappings.length > 0) {
         setItems(res.data.mappings);
         if (!selectedItem || !res.data.mappings.find(m => m.id === selectedItem.id)) {
           setSelectedItem(res.data.mappings[0]);
         }
       }
+      if (q) fetchUsage();
     } catch (err) {
-      // Graceful fallback to local
+      if (err.response?.status === 403) {
+        const msg = err.response?.data?.detail?.message ||
+          (isHindi ? 'निःशुल्क 2 BNS खोज सीमा समाप्त हो गई है।' : 'Free tier limit of 2 concordance searches reached.');
+        if (onOpenUpgradeModal) onOpenUpgradeModal('BNS ↔ IPC Concordance Explorer', msg);
+        else if (onNavigateTab) onNavigateTab('settings');
+      }
     }
   };
 
@@ -69,31 +137,75 @@ export default function BnsConverter({ language = 'English', onAskAi = null }) {
     <div className="bns-concordance animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
       {/* Header Banner */}
       <div className="bns-concordance__header module-header-banner">
-        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '75%' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, var(--emerald-600), #047857)',
-            padding: '10px',
-            borderRadius: 'var(--radius-sm)',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
-            flexShrink: 0
-          }}>
-            <ArrowRightLeft size={22} />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
-                {isHindi ? 'BNS 2023 ↔ IPC 1860 विधिक संदर्भ तालिका' : 'BNS 2023 ↔ IPC 1860 Statutory Concordance Explorer'}
-              </h2>
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', maxWidth: '75%' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, var(--emerald-600), #047857)',
+              padding: '10px',
+              borderRadius: 'var(--radius-sm)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+              flexShrink: 0
+            }}>
+              <ArrowRightLeft size={22} />
             </div>
-            <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              {isHindi
-                ? 'पुरानी आईपीसी अथवा नई BNS की धारा दर्ज करें और सजा, जमानत व BNSS प्रक्रियात्मक बदलाव तुरंत देखें।'
-                : 'Cross-reference IPC 1860 and Bharatiya Nyaya Sanhita 2023. Compare sections, bail status, punishments, and trial procedure.'}
-            </p>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                  {isHindi ? 'BNS 2023 ↔ IPC 1860 विधिक संदर्भ तालिका' : 'BNS 2023 ↔ IPC 1860 Statutory Concordance Explorer'}
+                </h2>
+                {isPro ? (
+                  <span
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      color: '#d97706',
+                      border: '1px solid #f59e0b',
+                      borderRadius: '999px',
+                      padding: '2px 8px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Crown size={12} /> PLUS • UNLIMITED LOOKUPS
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('BNS ↔ IPC Concordance Explorer') : onNavigateTab('settings')}
+                    style={{
+                      background: bnsRemaining <= 2 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                      color: bnsRemaining <= 2 ? '#dc2626' : '#059669',
+                      border: `1px solid ${bnsRemaining <= 2 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.3)'}`,
+                      borderRadius: '999px',
+                      padding: '3px 9px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      cursor: 'pointer'
+                    }}
+                    title={isHindi ? 'अपग्रेड करने के लिए क्लिक करें' : 'Click to upgrade to Plus'}
+                  >
+                    <span>{isHindi ? `खोज: ${bnsUsed}/${bnsLimit} प्रयुक्त` : `Lookups: ${bnsUsed}/${bnsLimit} Used (${bnsRemaining} Left)`}</span>
+                    <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                      ★ UPGRADE
+                    </span>
+                  </button>
+                )}
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                {isHindi
+                  ? 'पुरानी आईपीसी अथवा नई BNS की धारा दर्ज करें और सजा, जमानत व BNSS प्रक्रियात्मक बदलाव तुरंत देखें।'
+                  : 'Cross-reference IPC 1860 and Bharatiya Nyaya Sanhita 2023. Compare sections, bail status, punishments, and trial procedure.'}
+              </p>
+            </div>
           </div>
         </div>
 

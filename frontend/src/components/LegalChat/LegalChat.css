@@ -163,21 +163,28 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 38%;
+  width: 48%;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
   border-top-right-radius: var(--radius-lg);
   border-bottom-right-radius: var(--radius-lg);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.08) 12%, rgba(0, 0, 0, 0.5) 40%, black 75%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.08) 12%, rgba(0, 0, 0, 0.5) 40%, black 75%);
 }
 
 .ask-ai-hero-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 25%;
   filter: contrast(1.05) saturate(1.08);
   transform: scale(1.02);
+}
+
+body.dark-theme .ask-ai-hero-image {
+  opacity: 0.82;
+  filter: contrast(1.08) saturate(1.05) brightness(0.92);
 }
 
 .ask-ai-hero-gradient-overlay {
@@ -185,17 +192,17 @@
   inset: 0;
   background: linear-gradient(90deg,
       var(--card-bg) 0%,
-      color-mix(in srgb, var(--card-bg) 95%, transparent) 25%,
-      color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
-      rgba(15, 23, 42, 0.2) 100%);
+      color-mix(in srgb, var(--card-bg) 85%, transparent) 25%,
+      color-mix(in srgb, var(--card-bg) 35%, transparent) 60%,
+      transparent 100%);
 }
 
 body.dark-theme .ask-ai-hero-gradient-overlay {
   background: linear-gradient(90deg,
       var(--card-bg) 0%,
-      color-mix(in srgb, var(--card-bg) 95%, transparent) 30%,
-      color-mix(in srgb, var(--card-bg) 50%, transparent) 70%,
-      rgba(15, 23, 42, 0.5) 100%);
+      color-mix(in srgb, var(--card-bg) 90%, transparent) 30%,
+      color-mix(in srgb, var(--card-bg) 40%, transparent) 70%,
+      rgba(15, 23, 42, 0.35) 100%);
 }
 
 .ask-ai-brand {
