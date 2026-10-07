@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Scale, ArrowLeft, Eye, EyeOff, Check, Loader2 } from 'lucide-react';
 import { API_BASE } from '../config/apiConfig';
 
 export default function AuthPage({ onLogin, onBack }) {
+  useEffect(() => {
+    document.body.classList.remove('dark-theme');
+    document.documentElement.classList.remove('dark-theme');
+  }, []);
+
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -293,61 +298,6 @@ export default function AuthPage({ onLogin, onBack }) {
           border-color: #94a3b8;
         }
 
-        /* Fix #26: Full Dark Theme Support for AuthPage */
-        html.dark-theme .auth-page-root,
-        body.dark-theme .auth-page-root {
-          background-color: var(--bg-color, #080c16) !important;
-          background-image: radial-gradient(rgba(255, 255, 255, 0.07) 0.75px, transparent 0.75px) !important;
-          color: var(--text-main, #f8fafc) !important;
-        }
-
-        html.dark-theme .auth-form-card,
-        body.dark-theme .auth-form-card {
-          background: var(--card-bg, #0f172a) !important;
-          border-color: var(--card-border, rgba(255, 255, 255, 0.08)) !important;
-          box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.7) !important;
-        }
-
-        html.dark-theme .auth-input-label,
-        body.dark-theme .auth-input-label {
-          color: var(--text-secondary, #cbd5e1) !important;
-        }
-
-        html.dark-theme .auth-text-input,
-        body.dark-theme .auth-text-input {
-          background: var(--subtle-bg, #141e33) !important;
-          border-color: var(--card-border, rgba(255, 255, 255, 0.12)) !important;
-          color: var(--text-main, #f8fafc) !important;
-        }
-
-        html.dark-theme .auth-text-input:focus,
-        body.dark-theme .auth-text-input:focus {
-          border-color: var(--primary, #3b82f6) !important;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-        }
-
-        html.dark-theme .auth-google-button,
-        body.dark-theme .auth-google-button {
-          background: var(--subtle-bg, #141e33) !important;
-          border-color: var(--card-border, rgba(255, 255, 255, 0.12)) !important;
-          color: var(--text-main, #f8fafc) !important;
-        }
-
-        html.dark-theme .auth-google-button:hover,
-        body.dark-theme .auth-google-button:hover {
-          background: #1a2744 !important;
-          border-color: rgba(255, 255, 255, 0.2) !important;
-        }
-
-        html.dark-theme .auth-eye-btn,
-        body.dark-theme .auth-eye-btn {
-          color: var(--text-muted, #94a3b8) !important;
-        }
-
-        html.dark-theme .auth-eye-btn:hover,
-        body.dark-theme .auth-eye-btn:hover {
-          color: var(--text-main, #f8fafc) !important;
-        }
 
         @keyframes pageFadeIn {
           from { opacity: 0; }

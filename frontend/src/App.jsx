@@ -264,6 +264,11 @@ function App() {
   };
 
   useEffect(() => {
+    if (appView === 'landing' || appView === 'auth') {
+      document.body.classList.remove('dark-theme');
+      document.documentElement.classList.remove('dark-theme');
+      return;
+    }
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
       document.documentElement.classList.add('dark-theme');
@@ -271,7 +276,7 @@ function App() {
       document.body.classList.remove('dark-theme');
       document.documentElement.classList.remove('dark-theme');
     }
-  }, [theme]);
+  }, [theme, appView]);
 
   const handleAskAiFromExternal = (queryText) => {
     setInjectedQuery(queryText);

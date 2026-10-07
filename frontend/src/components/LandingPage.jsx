@@ -23,6 +23,8 @@ export default function LandingPage({ onExplore }) {
   const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
+    document.body.classList.remove('dark-theme');
+    document.documentElement.classList.remove('dark-theme');
     const handleScroll = () => setIsScrolled(window.scrollY > 25);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
