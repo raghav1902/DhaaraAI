@@ -25,7 +25,7 @@ export default function FeaturesSection() {
             </div>
             <h3 style={{
               fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: '2rem',
+              fontSize: '1.55rem',
               color: '#0b1329',
               marginBottom: '0.85rem',
               lineHeight: 1.25,
@@ -93,7 +93,7 @@ export default function FeaturesSection() {
             </div>
             <h3 style={{
               fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: '2rem',
+              fontSize: '1.55rem',
               color: '#0b1329',
               marginBottom: '0.85rem',
               lineHeight: 1.25,
@@ -171,7 +171,7 @@ export default function FeaturesSection() {
             </div>
             <h3 style={{
               fontFamily: "'Newsreader', Georgia, serif",
-              fontSize: '2rem',
+              fontSize: '1.55rem',
               color: '#0b1329',
               marginBottom: '0.85rem',
               lineHeight: 1.25,

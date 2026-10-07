@@ -36,7 +36,7 @@ export default function CtaBanner({ onExplore }) {
         }} />
 
         {/* Content Container */}
-        <div style={{
+        <div className="cta-banner-content" style={{
           position: 'relative',
           zIndex: 10,
           padding: '5rem 2rem',
@@ -47,25 +47,25 @@ export default function CtaBanner({ onExplore }) {
         }}>
           <h2 style={{
             fontFamily: "'Newsreader', Georgia, serif",
-            fontSize: 'clamp(2.1rem, 4.4vw, 3.2rem)',
+            fontSize: 'clamp(1.65rem, 2.8vw, 2.3rem)',
             fontWeight: '600',
-            lineHeight: '1.2',
-            marginBottom: '1rem',
+            lineHeight: '1.25',
+            marginBottom: '0.85rem',
             letterSpacing: '-0.02em',
             color: '#ffffff'
           }}>
-            Ready to transform your legal practice?
+            Ready to Elevate Your Legal Practice?
           </h2>
 
           <p style={{
-            fontSize: '1.05rem',
+            fontSize: '0.96rem',
             lineHeight: '1.65',
             color: '#cbd5e1',
-            maxWidth: '640px',
-            margin: '0 auto 2.5rem',
+            maxWidth: '620px',
+            margin: '0 auto 2.25rem',
             fontWeight: '400'
           }}>
-            Join 10,000+ advocates, corporate counsels, and startups delivering precise legal research in a fraction of the time.
+            Empower your chambers with instant BNS concordance, verified case citations, and courtroom-ready drafts.
           </p>
 
           <div style={{
@@ -75,6 +75,7 @@ export default function CtaBanner({ onExplore }) {
           }}>
             <button
               onClick={onExplore}
+              className="cta-banner-btn"
               style={{
                 background: '#ffffff',
                 color: '#1d4ed8',
@@ -126,6 +127,20 @@ export default function CtaBanner({ onExplore }) {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .cta-banner-content {
+            padding: 3.5rem 1.25rem !important;
+          }
+          .cta-banner-btn {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.85rem 1.25rem !important;
+            font-size: 0.95rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

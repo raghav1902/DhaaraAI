@@ -124,11 +124,11 @@ export default function BlogSection({ onSelectArticle }) {
             <div style={{ padding: '1.4rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
               <h3 style={{
                 fontFamily: "'Newsreader', Georgia, serif",
-                fontSize: '1.25rem',
+                fontSize: '1.12rem',
                 fontWeight: '600',
                 color: '#0b1329',
                 lineHeight: '1.35',
-                marginBottom: '0.5rem'
+                marginBottom: '0.45rem'
               }}>
                 {post.title}
               </h3>

@@ -63,7 +63,7 @@ export default function ToolkitSection() {
   ];
 
   return (
-    <section id="toolkit" className="landing-section" style={{
+    <section id="toolkit" className="landing-section toolkit-section-root" style={{
       background: '#ffffff',
       borderRadius: '28px',
       margin: '4rem auto',
@@ -92,23 +92,22 @@ export default function ToolkitSection() {
         </div>
         <h2 className="landing-section-title" style={{
           fontFamily: "'Newsreader', Georgia, serif",
-          fontSize: 'clamp(2rem, 3.2vw, 2.7rem)',
           fontWeight: '600',
           color: '#0b1329',
-          lineHeight: '1.2',
-          margin: '0 0 0.75rem 0'
+          lineHeight: '1.25',
+          margin: '0 0 0.65rem 0'
         }}>
-          Everything an Indian Advocate &amp; Legal Team Needs in One Platform
+          Comprehensive Practice Suite for the Modern Legal Bar
         </h2>
-        <p className="landing-section-desc" style={{ margin: 0, maxWidth: '780px', color: '#64748b', fontSize: '1rem', lineHeight: '1.6' }}>
-          Eliminate tedious manual searches through fat commentaries. DhaaraAI unifies statutory concordance, bilingual drafting, cyber security, and court fee computation.
+        <p className="landing-section-desc" style={{ margin: 0, maxWidth: '740px', color: '#64748b', fontSize: '0.95rem', lineHeight: '1.65' }}>
+          Unify statutory concordance, bilingual drafting, contract audits, and state-wise court fee computations into one cohesive workspace.
         </p>
       </div>
 
       {/* Grid: 6 Capabilities Cards */}
-      <div style={{
+      <div className="toolkit-grid" style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
         gap: '1.5rem'
       }}>
         {tools.map((tool, idx) => (

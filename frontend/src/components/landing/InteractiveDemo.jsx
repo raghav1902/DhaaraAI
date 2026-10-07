@@ -86,9 +86,9 @@ export default function InteractiveDemo() {
         <div className="eyebrow-badge">
           <Sparkles size={14} /> INTERACTIVE PREVIEW
         </div>
-        <h2 className="landing-section-title">See DhaaraAI in Action</h2>
+        <h2 className="landing-section-title">Experience DhaaraAI in Action</h2>
         <p className="landing-section-desc">
-          Watch how our AI legal associate cross-references BNS codes, audits contracts, and generates drafts under 60 seconds.
+          Test real-world statutory cross-referencing, contractual clause audits, and legal notice drafting with verified citations.
         </p>
       </div>
 
@@ -115,13 +115,13 @@ export default function InteractiveDemo() {
           }} className="handwritten-note">
             <span style={{
               fontFamily: "'Caveat', cursive",
-              fontSize: '1.45rem',
+              fontSize: '1.2rem',
               color: '#1d4ed8',
               fontWeight: '700',
-              lineHeight: 1.1,
+              lineHeight: 1.15,
               display: 'block'
             }}>
-              Real queries.<br />Real answers.<br />Real Indian law. ⤵
+              Authentic Indian statutory intelligence ⤵
             </span>
           </div>
 

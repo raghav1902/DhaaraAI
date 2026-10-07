@@ -106,61 +106,59 @@ export default function HeroSection({ onExplore, user }) {
         )}
       </div>
 
-      {/* 2. Strong Headline with Editorial Serif + Royal Blue Emphasis */}
+      {/* 2. Headline with Editorial Serif + Royal Blue Emphasis */}
       <h1 className="hero-title-main animate-fade-in-up delay-100" style={{
         fontFamily: "'Newsreader', Georgia, serif",
-        fontSize: 'clamp(2.6rem, 5.4vw, 4.4rem)',
+        fontSize: 'clamp(2rem, 3.8vw, 3.1rem)',
         fontWeight: '600',
-        lineHeight: '1.12',
-        marginBottom: '1.4rem',
+        lineHeight: '1.18',
+        marginBottom: '1.1rem',
         color: '#0b1329',
-        letterSpacing: '-0.025em',
-        maxWidth: '1020px',
-        margin: '0 auto 1.4rem'
+        letterSpacing: '-0.02em',
+        maxWidth: '880px',
+        margin: '0 auto 1.1rem'
       }}>
-        India’s Legal Intelligence Platform,<br />
+        Intelligent Legal Research &amp; Drafting,<br />
         <span style={{
           color: '#1d4ed8',
           fontStyle: 'normal',
-          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 40%)',
+          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #0284c7 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           display: 'inline-block'
         }}>
-          Engineered for Indian Law & Practice.
+          Build for Indian Law &amp; BNS 2023.
         </span>
       </h1>
 
       {/* 3. Subtitle */}
       <p className="animate-fade-in-up delay-200" style={{
-        fontSize: 'clamp(1rem, 1.35vw, 1.2rem)',
-        lineHeight: '1.7',
+        fontSize: '1.02rem',
+        lineHeight: '1.65',
         color: '#475569',
-        maxWidth: '780px',
-        margin: '0 auto 2.25rem',
+        maxWidth: '680px',
+        margin: '0 auto 2rem',
         fontWeight: '400'
       }}>
-        Navigate the <strong>Bharatiya Nyaya Sanhita (BNS 2023)</strong> transition with 2,016+ concordance mappings,
-        cite authentic Supreme Court & High Court rulings, draft court-ready pleadings, calculate state-wise court fees,
-        and audit cyber exposures — in seconds.
+        Cross-reference <strong>BNS ↔ IPC</strong> concordance instantly, cite authentic Supreme Court &amp; High Court rulings, draft court-ready legal notices, and audit contractual risks in seconds.
       </p>
 
       {/* 4. Action CTA Buttons */}
       <div className="hero-cta-group animate-fade-in-up delay-300" style={{
         display: 'flex',
-        gap: '1.1rem',
+        gap: '0.85rem',
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
-        marginBottom: '1.85rem'
+        marginBottom: '1.75rem'
       }}>
         <button
           className="btn-primary-pill"
           onClick={onExplore}
           style={{
-            padding: '0.9rem 2.4rem',
-            fontSize: '1.02rem',
-            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.35)',
+            padding: '0.78rem 1.85rem',
+            fontSize: '0.95rem',
+            boxShadow: '0 6px 20px rgba(37, 99, 235, 0.3)',
             cursor: 'pointer',
             fontWeight: '600',
             display: 'inline-flex',
@@ -168,21 +166,21 @@ export default function HeroSection({ onExplore, user }) {
             gap: '0.5rem'
           }}
         >
-          Explore DhaaraAI Free <ArrowRight size={18} />
+          Explore DhaaraAI Free <ArrowRight size={16} />
         </button>
         <a
           href="#demo"
           className="btn-secondary-pill"
           style={{
-            padding: '0.9rem 2rem',
-            fontSize: '1.02rem',
+            padding: '0.78rem 1.65rem',
+            fontSize: '0.95rem',
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.5rem'
           }}
         >
-          <Play size={16} fill="#0b1329" color="#0b1329" /> Try Live Studio Demo
+          <Play size={15} fill="#0b1329" color="#0b1329" /> Try Live Studio Demo
         </a>
       </div>
 
@@ -191,21 +189,21 @@ export default function HeroSection({ onExplore, user }) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '2rem',
+        gap: '1.75rem',
         flexWrap: 'wrap',
-        marginBottom: '3.5rem',
-        fontSize: '0.85rem',
+        marginBottom: '3rem',
+        fontSize: '0.82rem',
         color: '#64748b',
         fontWeight: '500'
       }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> Instant Access • Zero Credit Card
+          <CheckCircle2 size={15} color="#2563eb" /> 2,016+ Mapped BNS Provisions
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> 2,016+ Mapped BNS Sections
+          <CheckCircle2 size={15} color="#2563eb" /> Supreme Court &amp; 25 High Courts
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-          <CheckCircle2 size={16} color="#2563eb" /> Zero-Knowledge Client Vault
+          <CheckCircle2 size={15} color="#2563eb" /> Zero Client Model Retention
         </span>
       </div>
 
@@ -266,7 +264,7 @@ export default function HeroSection({ onExplore, user }) {
                   </div>
                 </div>
 
-                <div style={{
+                <div className="hero-studio-url-bar" style={{
                   background: '#f1f5f9',
                   borderRadius: '999px',
                   padding: '0.25rem 1rem',
@@ -323,7 +321,7 @@ export default function HeroSection({ onExplore, user }) {
               </div>
 
               {/* Studio Main Body */}
-              <div style={{
+              <div className="hero-studio-body" style={{
                 display: 'grid',
                 gridTemplateColumns: '200px 1fr',
                 minHeight: '390px',
@@ -331,7 +329,7 @@ export default function HeroSection({ onExplore, user }) {
                 background: '#f8fafc'
               }}>
                 {/* Left Mini Sidebar with Switchable Tabs */}
-                <div style={{
+                <div className="hero-studio-sidebar" style={{
                   background: '#ffffff',
                   borderRight: '1px solid #e2e8f0',
                   padding: '1rem 0.65rem',
@@ -398,7 +396,7 @@ export default function HeroSection({ onExplore, user }) {
                 </div>
 
                 {/* Right Interactive Canvas Rendering Selected Tool */}
-                <div style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column' }}>
+                <div className="hero-studio-content" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column' }}>
                   {activeHeroTab === 'ask_ai' && (
                     <>
                       <div style={{
@@ -629,6 +627,56 @@ export default function HeroSection({ onExplore, user }) {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 868px) {
+          .hero-section {
+            padding: 5.5rem 1rem 2rem !important;
+          }
+          .hero-studio-body {
+            grid-template-columns: 1fr !important;
+            min-height: auto !important;
+          }
+          .hero-studio-sidebar {
+            flex-direction: row !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.65rem 0.5rem !important;
+            border-right: none !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            gap: 0.5rem !important;
+          }
+          .hero-studio-sidebar button {
+            flex-shrink: 0 !important;
+          }
+          .hero-studio-sidebar > div {
+            display: none !important;
+          }
+          .hero-studio-content {
+            padding: 1rem !important;
+          }
+          .floating-badge {
+            display: none !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .hero-studio-url-bar {
+            display: none !important;
+          }
+          .hero-title-main {
+            font-size: 1.75rem !important;
+            line-height: 1.25 !important;
+          }
+          .hero-cta-group {
+            flex-direction: column !important;
+            width: 100% !important;
+          }
+          .hero-cta-group button, .hero-cta-group a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

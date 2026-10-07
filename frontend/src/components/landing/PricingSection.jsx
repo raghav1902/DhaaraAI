@@ -96,16 +96,15 @@ export default function PricingSection({ onExplore }) {
           </div>
           <h2 className="landing-section-title" style={{
             fontFamily: "'Newsreader', Georgia, serif",
-            fontSize: 'clamp(2rem, 3.2vw, 2.7rem)',
             fontWeight: '600',
             color: '#0b1329',
-            lineHeight: '1.2',
+            lineHeight: '1.25',
             margin: '0 0 0.5rem 0'
           }}>
-            Simple, Honest Plans for Every Advocate
+            Simple, Transparent Plans for Every Practice
           </h2>
-          <p className="landing-section-desc" style={{ margin: 0, textAlign: 'left', color: '#64748b', fontSize: '1rem' }}>
-            Start for free today. Upgrade anytime directly within your account settings to unlock all 1,495+ provisions.
+          <p className="landing-section-desc" style={{ margin: 0, textAlign: 'left', color: '#64748b', fontSize: '0.94rem' }}>
+            Start with the free tier today. Upgrade seamlessly anytime to unlock all 1,495+ provisions and advanced drafting.
           </p>
         </div>
 

@@ -245,20 +245,20 @@ export default function LandingStyles() {
 
       .landing-section-title {
         font-family: var(--font-serif);
-        font-size: clamp(2.1rem, 3.8vw, 2.75rem);
+        font-size: clamp(1.65rem, 2.6vw, 2.2rem);
         font-weight: 600;
-        line-height: 1.2;
-        margin-bottom: 0.85rem;
+        line-height: 1.25;
+        margin-bottom: 0.75rem;
         color: var(--text-dark);
         letter-spacing: -0.02em;
       }
 
       .landing-section-desc {
         color: var(--text-muted);
-        font-size: 1.02rem;
-        max-width: 640px;
+        font-size: 0.95rem;
+        max-width: 660px;
         margin: 0 auto;
-        line-height: 1.6;
+        line-height: 1.65;
       }
 
       .premium-card {
@@ -377,8 +377,14 @@ export default function LandingStyles() {
         .nav-links-desktop {
           display: none !important;
         }
+        .landing-section {
+          padding: 3.5rem 1.25rem !important;
+        }
+        .landing-section-header {
+          margin-bottom: 2.25rem !important;
+        }
         .hero-title-main {
-          font-size: 2.35rem !important;
+          font-size: 2.1rem !important;
         }
         .laptop-mockup-base {
           margin: 0 10px;
@@ -387,14 +393,43 @@ export default function LandingStyles() {
 
       @media (max-width: 480px) {
         .landing-nav {
-          padding: 0.75rem 1rem;
+          padding: 0.75rem 0.85rem;
+        }
+        .landing-section {
+          padding: 2.5rem 0.85rem !important;
+        }
+        .landing-section-title {
+          font-size: 1.55rem !important;
+        }
+        .landing-section-desc {
+          font-size: 0.9rem !important;
+        }
+        .premium-card {
+          padding: 1.25rem 1rem !important;
+          border-radius: 14px !important;
+        }
+        .laptop-mockup-frame {
+          padding: 8px 8px 12px 8px !important;
+          border-radius: 14px 14px 4px 4px !important;
+        }
+        .laptop-mockup-base {
+          height: 8px !important;
+          margin: 0 10px !important;
+          border-radius: 0 0 14px 14px !important;
+        }
+        .laptop-mockup-notch {
+          width: 60px !important;
+          height: 4px !important;
+        }
+        .mobile-menu-drawer {
+          padding: 1.25rem 1rem !important;
         }
         .btn-primary-pill, .btn-secondary-pill {
           padding: 0.58rem 1.15rem;
           font-size: 0.84rem;
         }
         .hero-title-main {
-          font-size: 1.95rem !important;
+          font-size: 1.7rem !important;
         }
         .hero-cta-group {
           flex-direction: column;

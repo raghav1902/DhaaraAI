@@ -6,24 +6,24 @@ export default function HowItWorksSection() {
     {
       num: '1',
       icon: FileUp,
-      title: 'Ask or Upload',
-      desc: 'Type your legal question or upload contracts, petitions, or FIR drafts in PDF or Word formats.',
+      title: 'Query or Case Upload',
+      desc: 'Enter statutory queries, or upload trial court orders, contracts, and FIR briefs in PDF or Word formats.',
       accent: '#2563eb',
       bg: '#eff6ff'
     },
     {
       num: '2',
       icon: Sparkles,
-      title: 'AI Analyzes Precedents',
-      desc: 'Our RAG engine cross-checks Supreme Court judgments, High Court rulings, statutory acts, and the new BNS framework.',
+      title: 'Statutory Synthesis',
+      desc: 'Our engine indexes Supreme Court & High Court precedents alongside the Bharatiya Nyaya Sanhita (BNS 2023) framework.',
       accent: '#1d4ed8',
       bg: '#eff6ff'
     },
     {
       num: '3',
       icon: CheckCircle2,
-      title: 'Get Actionable Intelligence',
-      desc: 'Receive clear explanations, risk assessments, citations, and ready to use legal drafts.',
+      title: 'Actionable Legal Output',
+      desc: 'Receive structured citations, paragraph references, contractual risk audits, and court-ready drafts in seconds.',
       accent: '#059669',
       bg: '#ecfdf5'
     }
@@ -43,10 +43,10 @@ export default function HowItWorksSection() {
           <Layers size={14} /> HOW IT WORKS
         </div>
         <h2 className="landing-section-title">
-          From legal query to actionable results in three simple steps
+          From legal query to actionable intelligence in three simple steps
         </h2>
         <p className="landing-section-desc" style={{ margin: 0, maxWidth: '780px' }}>
-          DhaaraAI combines India's legal database with advanced AI to give you accurate, practical and easy-to-understand answers.
+          Streamline statutory research, contract analysis, and draft preparation through verified Indian legal data.
         </p>
       </div>
 
@@ -175,7 +175,7 @@ export default function HowItWorksSection() {
           }}>
             <p style={{
               fontFamily: "'Caveat', cursive",
-              fontSize: '1.35rem',
+              fontSize: '1.18rem',
               color: '#1e3a8a',
               fontWeight: '700',
               margin: '0 0 0.25rem 0',
