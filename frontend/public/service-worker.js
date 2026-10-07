@@ -30,22 +30,29 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
+  // Only handle http/https GET requests (ignore chrome-extension://, etc.)
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
+
+  // Don't intercept API calls
+  if (event.request.url.includes('/api/')) return;
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Return cached response if found, else fetch from network
-      return response || fetch(event.request).then((fetchResponse) => {
-        // Cache the dynamically fetched resources (like JS/CSS bundles)
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, fetchResponse.clone());
-          return fetchResponse;
+    fetch(event.request)
+      .then((fetchResponse) => {
+        // Only cache successful basic/cors responses
+        if (fetchResponse && fetchResponse.status === 200) {
+          const responseToCache = fetchResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          }).catch(() => {});
+        }
+        return fetchResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          return cached || caches.match('/');
         });
-      });
-    }).catch(() => {
-      // Offline fallback
-      return caches.match('/');
-    })
+      })
   );
 });
