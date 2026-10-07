@@ -24,34 +24,33 @@
   box-sizing: border-box;
 }
 
-.legal-library__header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--royal-600), var(--purple-600));
-}
-
 .legal-library__banner-visual {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 36%;
+  width: 44%;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.1) 15%, rgba(0, 0, 0, 0.7) 50%, black 100%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.1) 15%, rgba(0, 0, 0, 0.7) 50%, black 100%);
 }
 
 .legal-library__banner-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 35%;
-  filter: contrast(1.05) saturate(1.1);
-  transform: scale(1.02);
+  object-position: right 35%;
+  opacity: 0.65;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05) saturate(1.05);
+}
+
+body.dark-theme .legal-library__banner-image {
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  filter: contrast(1.15) brightness(0.85);
 }
 
 .legal-library__banner-gradient {
@@ -59,17 +58,15 @@
   inset: 0;
   background: linear-gradient(90deg,
       var(--card-bg) 0%,
-      color-mix(in srgb, var(--card-bg) 96%, transparent) 22%,
-      color-mix(in srgb, var(--card-bg) 40%, transparent) 65%,
-      rgba(15, 23, 42, 0.25) 100%);
+      color-mix(in srgb, var(--card-bg) 75%, transparent) 40%,
+      transparent 100%);
 }
 
 body.dark-theme .legal-library__banner-gradient {
   background: linear-gradient(90deg,
       var(--card-bg) 0%,
-      color-mix(in srgb, var(--card-bg) 95%, transparent) 26%,
-      color-mix(in srgb, var(--card-bg) 48%, transparent) 65%,
-      rgba(15, 23, 42, 0.55) 100%);
+      color-mix(in srgb, var(--card-bg) 75%, transparent) 45%,
+      transparent 100%);
 }
 
 @media (max-width: 960px) {

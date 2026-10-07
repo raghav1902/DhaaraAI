@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Scale, ArrowLeft, Eye, EyeOff, Check } from 'lucide-react';
+import { Scale, ArrowLeft, Eye, EyeOff, Check, Loader2 } from 'lucide-react';
+import { API_BASE } from '../config/apiConfig';
 
 export default function AuthPage({ onLogin, onBack }) {
   const [isLogin, setIsLogin] = useState(false);
@@ -26,7 +27,7 @@ export default function AuthPage({ onLogin, onBack }) {
     try {
       if (isLogin) {
         // Authenticate with backend
-        const response = await fetch('http://localhost:8000/api/auth/login', {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -57,7 +58,7 @@ export default function AuthPage({ onLogin, onBack }) {
 
         const fullName = `${formData.firstName} ${formData.lastName}`.trim() || formData.firstName.trim() || 'User';
 
-        const response = await fetch('http://localhost:8000/api/auth/register', {
+        const response = await fetch(`${API_BASE}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -91,9 +92,7 @@ export default function AuthPage({ onLogin, onBack }) {
     setAuthError('');
     setIsSubmitting(true);
     try {
-      // Simulate OAuth redirect or dummy login
-      alert("Google Single Sign-On is in Sandbox mode. Logging in as Demo Advocate User.");
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -101,6 +100,9 @@ export default function AuthPage({ onLogin, onBack }) {
           password: 'google-oauth-session-key'
         })
       });
+      if (!response.ok) {
+        throw new Error('Google Sign-In is unavailable or backend is not reachable. Please use email & password.');
+      }
       const data = await response.json();
       onLogin({
         user_id: data.user_id,
@@ -108,30 +110,28 @@ export default function AuthPage({ onLogin, onBack }) {
         email: data.email,
         token: data.token
       });
-    } catch {
-      onLogin({
-        user_id: 'usr_advocate_demo',
-        name: 'Advocate User',
-        email: 'advocate.user@dhaaraai.com',
-        token: 'local_token'
-      });
+    } catch (err) {
+      setAuthError(err.message || 'Google Single Sign-On service unreachable. Please sign in with your email and password.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#fbf9f6',
-      backgroundImage: `radial-gradient(#e5e0d6 0.75px, transparent 0.75px)`,
-      backgroundSize: '32px 32px',
-      color: '#0f172a',
-      fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-      display: 'flex',
-      flexDirection: 'column',
-      boxSizing: 'border-box'
-    }}>
+    <div
+      className="auth-page-root"
+      style={{
+        minHeight: '100vh',
+        backgroundColor: '#fbf9f6',
+        backgroundImage: `radial-gradient(#e5e0d6 0.75px, transparent 0.75px)`,
+        backgroundSize: '32px 32px',
+        color: '#0f172a',
+        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box'
+      }}
+    >
       <style>{`
         .auth-shell {
           width: 100%;
@@ -291,6 +291,62 @@ export default function AuthPage({ onLogin, onBack }) {
         .auth-google-button:hover {
           background: #f8fafc;
           border-color: #94a3b8;
+        }
+
+        /* Fix #26: Full Dark Theme Support for AuthPage */
+        html.dark-theme .auth-page-root,
+        body.dark-theme .auth-page-root {
+          background-color: var(--bg-color, #080c16) !important;
+          background-image: radial-gradient(rgba(255, 255, 255, 0.07) 0.75px, transparent 0.75px) !important;
+          color: var(--text-main, #f8fafc) !important;
+        }
+
+        html.dark-theme .auth-form-card,
+        body.dark-theme .auth-form-card {
+          background: var(--card-bg, #0f172a) !important;
+          border-color: var(--card-border, rgba(255, 255, 255, 0.08)) !important;
+          box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        html.dark-theme .auth-input-label,
+        body.dark-theme .auth-input-label {
+          color: var(--text-secondary, #cbd5e1) !important;
+        }
+
+        html.dark-theme .auth-text-input,
+        body.dark-theme .auth-text-input {
+          background: var(--subtle-bg, #141e33) !important;
+          border-color: var(--card-border, rgba(255, 255, 255, 0.12)) !important;
+          color: var(--text-main, #f8fafc) !important;
+        }
+
+        html.dark-theme .auth-text-input:focus,
+        body.dark-theme .auth-text-input:focus {
+          border-color: var(--primary, #3b82f6) !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+        }
+
+        html.dark-theme .auth-google-button,
+        body.dark-theme .auth-google-button {
+          background: var(--subtle-bg, #141e33) !important;
+          border-color: var(--card-border, rgba(255, 255, 255, 0.12)) !important;
+          color: var(--text-main, #f8fafc) !important;
+        }
+
+        html.dark-theme .auth-google-button:hover,
+        body.dark-theme .auth-google-button:hover {
+          background: #1a2744 !important;
+          border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        html.dark-theme .auth-eye-btn,
+        body.dark-theme .auth-eye-btn {
+          color: var(--text-muted, #94a3b8) !important;
+        }
+
+        html.dark-theme .auth-eye-btn:hover,
+        body.dark-theme .auth-eye-btn:hover {
+          color: var(--text-main, #f8fafc) !important;
         }
 
         @keyframes pageFadeIn {
@@ -678,8 +734,21 @@ export default function AuthPage({ onLogin, onBack }) {
 
             {/* Primary Action Button */}
             <div style={{ marginTop: '0.4rem' }}>
-              <button type="submit" className="auth-primary-btn">
-                {isLogin ? 'Sign In' : 'Create Account'}
+              <button
+                type="submit"
+                className="auth-primary-btn"
+                disabled={isSubmitting}
+                style={{
+                  opacity: isSubmitting ? 0.7 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                {isSubmitting ? (isLogin ? 'Signing In...' : 'Creating Account...') : (isLogin ? 'Sign In' : 'Create Account')}
               </button>
             </div>
           </form>

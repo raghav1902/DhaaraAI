@@ -37,31 +37,10 @@
     var(--bg-color);
 }
 
-/* Very faint legal architectural watermark texture */
-.app-container::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.018;
-  background-image: url('./assets/workspace/legal-court-texture.jpg');
-  background-size: cover;
-  background-position: right bottom;
-  mix-blend-mode: multiply;
-}
-
 body.dark-theme .app-container::before {
   background: 
-    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.09), transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.06), transparent 35%),
-    radial-gradient(circle at 10% 85%, rgba(168, 85, 247, 0.05), transparent 35%),
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.06), transparent 45%),
     var(--bg-color);
-}
-
-body.dark-theme .app-container::after {
-  opacity: 0.015;
-  mix-blend-mode: screen;
 }
 
 /* Focus indicator for keyboard accessibility */

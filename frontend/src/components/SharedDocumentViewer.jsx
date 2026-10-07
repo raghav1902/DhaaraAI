@@ -17,8 +17,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import './SharedDocumentViewer.css';
-
-const API_BASE = typeof window !== 'undefined' && (window.location.port === '5173' || window.location.port === '3000') ? '' : 'http://localhost:8000';
+import { API_BASE } from '../config/apiConfig';
 
 export default function SharedDocumentViewer({ shareId, onBack = null }) {
   const [loading, setLoading] = useState(true);

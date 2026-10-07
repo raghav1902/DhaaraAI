@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import {
   FileSearch,
@@ -10,14 +10,45 @@ import {
   Upload,
   FileCheck,
   Loader2,
-  ShieldCheck
+  ShieldCheck,
+  Crown
 } from 'lucide-react';
 import { SAMPLE_CONTRACTS } from '../data/contractAnalyzerData';
 import AnalysisResultsView from './DocumentAnalyzer/AnalysisResultsView';
+import { API_BASE } from '../config/apiConfig';
+import ProFeatureLock from './ProFeatureLock';
 import './DocumentAnalyzer/DocumentAnalyzer.css';
 
-export default function DocumentAnalyzer({ language = 'English' }) {
+export default function DocumentAnalyzer({
+  language = 'English',
+  user,
+  onNavigateTab,
+  onOpenUpgradeModal
+}) {
   const isHindi = language === 'Hindi';
+  const isPro = user?.plan === 'plus' || user?.plan === 'pro' || user?.plan === 'enterprise';
+
+  const [usageStats, setUsageStats] = useState(null);
+
+  const fetchUsage = async () => {
+    try {
+      const token = user?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.get(`${API_BASE}/api/user/usage`, { headers });
+      setUsageStats(res.data);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchUsage();
+  }, [user]);
+
+  const auditsUsed = usageStats?.features?.contract_audit?.used ?? 0;
+  const auditLimit = usageStats?.features?.contract_audit?.limit ?? 3;
+  const auditsRemaining = isPro ? 999 : Math.max(0, auditLimit - auditsUsed);
+
   const [documentType, setDocumentType] = useState('Rental / Lease Agreement');
   const [documentText, setDocumentText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,15 +80,29 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       return;
     }
 
+    if (!isPro && auditsRemaining <= 0) {
+      const msg = isHindi
+        ? 'निःशुल्क 3 अनुबंध ऑडिट की सीमा पूरी हो चुकी है। असीमित दस्तावेज़ ऑडिट के लिए DhaaraAI Plus में अपग्रेड करें।'
+        : 'Free tier limit of 3 contract audits reached. Upgrade to DhaaraAI Plus for unlimited file audits.';
+      setError(msg);
+      if (onOpenUpgradeModal) onOpenUpgradeModal('Contract Risk Audit', msg);
+      else if (onNavigateTab) onNavigateTab('settings');
+      return;
+    }
+
     setUploading(true);
     setError(null);
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const res = await axios.post('http://localhost:8000/api/upload-document', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const token = user?.token;
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      };
+
+      const res = await axios.post(`${API_BASE}/api/upload-document`, formData, { headers });
 
       if (res.data && res.data.text) {
         setDocumentText(res.data.text);
@@ -68,8 +113,16 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       }
     } catch (err) {
       console.error('File upload error:', err);
-      const detail = err.response?.data?.detail;
-      setError(detail || (isHindi ? 'दस्तावेज अपलोड करने में त्रुटि आई।' : 'Failed to upload and extract document.'));
+      if (err.response?.status === 403) {
+        const detail = err.response?.data?.detail?.message ||
+          (isHindi ? 'निःशुल्क ऑडिट सीमा समाप्त हो गई है।' : 'Free contract audit limit reached.');
+        setError(detail);
+        if (onOpenUpgradeModal) onOpenUpgradeModal('Contract Risk Audit', detail);
+        else if (onNavigateTab) onNavigateTab('settings');
+      } else {
+        const detail = err.response?.data?.detail;
+        setError(detail || (isHindi ? 'दस्तावेज अपलोड करने में त्रुटि आई।' : 'Failed to upload and extract document.'));
+      }
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -83,20 +136,44 @@ export default function DocumentAnalyzer({ language = 'English' }) {
       setError(isHindi ? 'कृपया अनुबंध का टेक्स्ट दर्ज करें।' : 'Please enter or paste the contract text to audit.');
       return;
     }
+
+    if (!isPro && auditsRemaining <= 0) {
+      const msg = isHindi
+        ? 'निःशुल्क 3 अनुबंध ऑडिट की सीमा पूरी हो चुकी है। असीमित विश्लेषण के लिए DhaaraAI Plus में अपग्रेड करें।'
+        : 'Free tier limit of 3 contract audits reached. Upgrade to DhaaraAI Plus for unlimited audits.';
+      setError(msg);
+      if (onOpenUpgradeModal) onOpenUpgradeModal('Contract Risk Audit', msg);
+      else if (onNavigateTab) onNavigateTab('settings');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post('http://localhost:8000/api/analyze-contract', {
+      const token = user?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const res = await axios.post(`${API_BASE}/api/analyze-contract`, {
         document_text: documentText,
         document_type: documentType,
         language: language
-      });
+      }, { headers });
+
       setAnalysis(res.data);
+      fetchUsage();
     } catch (err) {
       console.error('Contract audit error:', err);
-      setError(isHindi
-        ? '[500 Internal Server Error] दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।'
-        : '[500 Internal Server Error] Failed to analyze document. Ensure backend server is running.');
+      if (err.response?.status === 403) {
+        const detail = err.response?.data?.detail?.message ||
+          (isHindi ? 'निःशुल्क 3 अनुबंध ऑडिट की सीमा समाप्त हो गई है।' : 'Free tier limit of 3 audits reached.');
+        setError(detail);
+        if (onOpenUpgradeModal) onOpenUpgradeModal('Contract Risk Audit', detail);
+        else if (onNavigateTab) onNavigateTab('settings');
+      } else {
+        setError(isHindi
+          ? '[500 Internal Server Error] दस्तावेज विश्लेषण में त्रुटि आई। कृपया पुनः प्रयास करें या बैकएंड की स्थिति जांचें।'
+          : '[500 Internal Server Error] Failed to analyze document. Ensure backend server is running.');
+      }
     } finally {
       setLoading(false);
     }
@@ -128,10 +205,52 @@ export default function DocumentAnalyzer({ language = 'English' }) {
               <FileSearch size={22} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
                   {isHindi ? 'अनुबंध जोखिम ऑडिट' : 'Contract Risk & Unfair Clause Audit'}
                 </h2>
+                {isPro ? (
+                  <span
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      color: '#d97706',
+                      border: '1px solid #f59e0b',
+                      borderRadius: '999px',
+                      padding: '2px 8px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Crown size={12} /> PLUS • UNLIMITED AUDITS
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Contract Risk Audit') : onNavigateTab('settings')}
+                    style={{
+                      background: auditsRemaining <= 1 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(37, 99, 235, 0.1)',
+                      color: auditsRemaining <= 1 ? '#dc2626' : '#2563eb',
+                      border: `1px solid ${auditsRemaining <= 1 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(37, 99, 235, 0.3)'}`,
+                      borderRadius: '999px',
+                      padding: '3px 9px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      cursor: 'pointer'
+                    }}
+                    title={isHindi ? 'अपग्रेड करने के लिए क्लिक करें' : 'Click to upgrade to Plus'}
+                  >
+                    <span>{isHindi ? `ऑडिट: ${auditsUsed}/${auditLimit} प्रयुक्त` : `Audits: ${auditsUsed}/${auditLimit} Used (${auditsRemaining} Left)`}</span>
+                    <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                      ★ UPGRADE
+                    </span>
+                  </button>
+                )}
               </div>
               <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)' }}>
                 {isHindi
@@ -143,7 +262,7 @@ export default function DocumentAnalyzer({ language = 'English' }) {
         </div>
 
         {/* Quick Sample Selector Chips */}
-        <div style={{ position: 'relative', zIndex: 2, marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', width: '100%', borderTop: '1px solid var(--card-border)', paddingTop: '12px' }}>
+        <div style={{ position: 'relative', zIndex: 2, marginTop: '14px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', maxWidth: 'min(760px, calc(100% - 240px))', borderTop: '1px solid var(--card-border)', paddingTop: '12px' }}>
           <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Sparkles size={14} color="var(--primary)" />
             {isHindi ? 'त्वरित नमूना अनुबंध लोड करें:' : 'Try Sample Legal Agreements:'}

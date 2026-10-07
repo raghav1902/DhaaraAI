@@ -32,8 +32,8 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import './LegalVault.css';
-
-const API_BASE = typeof window !== 'undefined' && (window.location.port === '5173' || window.location.port === '3000') ? '' : 'http://localhost:8000';
+import { API_BASE } from '../config/apiConfig';
+import { hashPin } from '../utils/cryptoUtils';
 
 // Available Folder Taxonomies with legal classification
 const VAULT_FOLDERS = [
@@ -243,7 +243,7 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
     }
   };
 
-  const verifyPin = (fullPin) => {
+  const verifyPin = async (fullPin) => {
     if (fullPin.length < 4) {
       setError(isHindi ? 'कृपया 4 अंकों का पिन दर्ज करें।' : 'Please enter all 4 digits of your PIN.');
       return;
@@ -251,7 +251,13 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
 
     if (hasPin) {
       const storedPin = localStorage.getItem('dhaara_vault_pin');
-      if (fullPin === storedPin) {
+      const hashedEntered = await hashPin(fullPin);
+      // Verify against hashed PIN or migrate legacy unhashed PIN
+      if (storedPin === hashedEntered || storedPin === fullPin) {
+        if (storedPin === fullPin) {
+          // Auto-migrate legacy plaintext PIN to hash
+          localStorage.setItem('dhaara_vault_pin', hashedEntered);
+        }
         setIsAuthenticated(true);
         setError('');
       } else {
@@ -260,7 +266,8 @@ export default function LegalVault({ language = 'English', onNavigateTab = () =>
         digitRefs[0].current?.focus();
       }
     } else {
-      localStorage.setItem('dhaara_vault_pin', fullPin);
+      const hashedNew = await hashPin(fullPin);
+      localStorage.setItem('dhaara_vault_pin', hashedNew);
       setIsAuthenticated(true);
       setError('');
     }

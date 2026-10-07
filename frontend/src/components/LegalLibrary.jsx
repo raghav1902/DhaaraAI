@@ -1,10 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Search, BookOpen, Scale, ShieldCheck, Sparkles, ChevronDown, ChevronUp, Award } from 'lucide-react';
+import { Search, BookOpen, Scale, ShieldCheck, Sparkles, ChevronDown, ChevronUp, Award, Crown, Lock } from 'lucide-react';
 import { FALLBACK_CONCORDANCE_DB } from '../data/concordanceData';
+import { API_BASE } from '../config/apiConfig';
+import ProFeatureLock from './ProFeatureLock';
 import './LegalLibrary.css';
 
-export default function LegalLibrary({ onAskAi, language = 'English' }) {
+export default function LegalLibrary({
+  onAskAi,
+  language = 'English',
+  user,
+  onNavigateTab,
+  onOpenUpgradeModal
+}) {
+  const activeUser = user || (() => {
+    try {
+      return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+    } catch {
+      return null;
+    }
+  })();
+  const isPro = activeUser?.plan === 'plus' || activeUser?.plan === 'pro' || activeUser?.plan === 'enterprise';
   // Sub-tab: 'statutes' | 'glossary'
   const [activeTab, setActiveTab] = useState('statutes');
 
@@ -48,8 +64,24 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
 
   const fetchLibraryData = useCallback(async () => {
     try {
-      const catParam = selectedStatuteCategory !== 'All' ? `?category=${encodeURIComponent(selectedStatuteCategory)}` : '';
-      const response = await axios.get(`http://localhost:8000/api/library${catParam}`, { timeout: 3000 });
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      const userIsPro = currentUser?.plan === 'plus' || currentUser?.plan === 'pro' || currentUser?.plan === 'enterprise';
+      const token = currentUser?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const params = new URLSearchParams();
+      if (selectedStatuteCategory !== 'All') {
+        params.append('category', selectedStatuteCategory);
+      }
+      params.append('limit', userIsPro ? '2500' : '15');
+
+      const response = await axios.get(`${API_BASE}/api/library?${params.toString()}`, { headers, timeout: 7000 });
       if (response.data && response.data.items && response.data.items.length > 0) {
         setStatutes(response.data.items);
         setUsingFallback(false);
@@ -62,7 +94,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
     } catch {
       applyFallbackFilter();
     }
-  }, [selectedStatuteCategory, applyFallbackFilter]);
+  }, [selectedStatuteCategory, applyFallbackFilter, user, isPro]);
 
   // Load Statutes
   useEffect(() => {
@@ -71,8 +103,24 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
 
   const fetchGlossaryData = useCallback(async () => {
     try {
-      const catParam = selectedGlossaryCategory !== 'All' ? `&category=${encodeURIComponent(selectedGlossaryCategory)}` : '';
-      const response = await axios.get(`http://localhost:8000/api/glossary?limit=200${catParam}`, { timeout: 4000 });
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem('dhaara_active_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      const userIsPro = currentUser?.plan === 'plus' || currentUser?.plan === 'pro' || currentUser?.plan === 'enterprise';
+      const token = currentUser?.token;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const params = new URLSearchParams();
+      if (selectedGlossaryCategory !== 'All') {
+        params.append('category', selectedGlossaryCategory);
+      }
+      params.append('limit', userIsPro ? '200' : '15');
+
+      const response = await axios.get(`${API_BASE}/api/glossary?${params.toString()}`, { headers, timeout: 5000 });
       if (response.data && response.data.terms) {
         setGlossaryTerms(response.data.terms);
         if (response.data.categories) {
@@ -82,7 +130,7 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
     } catch (err) {
       console.warn('Could not load glossary from backend API, using core terms.', err);
     }
-  }, [selectedGlossaryCategory]);
+  }, [selectedGlossaryCategory, user]);
 
   // Load Glossary
   useEffect(() => {
@@ -150,10 +198,55 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
             <BookOpen size={22} />
           </div>
           <div>
-            <div className="legal-library__title-row">
+            <div className="legal-library__title-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               <h2 className="legal-library__title">
                 {isHindi ? 'कानूनी पुस्तकालय एवं शब्दावली' : 'Legal Statutory Library & Glossary'}
               </h2>
+              {isPro ? (
+                <span
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    color: '#d97706',
+                    border: '1px solid #f59e0b',
+                    borderRadius: '999px',
+                    padding: '2px 8px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Crown size={12} /> {activeTab === 'statutes' ? 'PLUS • ALL 1,495+ SECTIONS UNLOCKED' : 'PLUS • ALL 155+ TERMS UNLOCKED'}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Legal Statutory Library') : onNavigateTab('settings')}
+                  style={{
+                    background: 'rgba(37, 99, 235, 0.1)',
+                    color: '#2563eb',
+                    border: '1px solid rgba(37, 99, 235, 0.3)',
+                    borderRadius: '999px',
+                    padding: '3px 9px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>
+                    {activeTab === 'statutes'
+                      ? (isHindi ? 'निःशुल्क पूर्वावलोकन मोड (शीर्ष 15 धाराएं)' : 'Free 15-Section Preview')
+                      : (isHindi ? 'निःशुल्क पूर्वावलोकन मोड (15 विधिक शब्द)' : 'Free 15-Term Preview')}
+                  </span>
+                  <span style={{ fontSize: '9.5px', fontWeight: 800, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#ffffff', borderRadius: '4px', padding: '1.5px 6px', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                    ★ UPGRADE
+                  </span>
+                </button>
+              )}
             </div>
             <p className="legal-library__subtitle">
               {isHindi
@@ -375,6 +468,43 @@ export default function LegalLibrary({ onAskAi, language = 'English' }) {
                             <p className="legal-library__info-text">{item.accused_guidance}</p>
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {item.is_locked && !isPro && (
+                      <div
+                        style={{
+                          margin: '12px 0 6px',
+                          padding: '10px 14px',
+                          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(37, 99, 235, 0.08))',
+                          border: '1px dashed rgba(245, 158, 11, 0.5)',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '10px'
+                        }}
+                      >
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Lock size={13} color="#d97706" />
+                          {isHindi ? 'पूर्ण BNSS प्रक्रिया व सुप्रीम कोर्ट निर्देश Plus में अनलॉक करें' : 'Unlock full BNSS procedural text & precedents'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Comprehensive Legal Library') : onNavigateTab('settings')}
+                          style={{
+                            background: '#d97706',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {isHindi ? 'अनलॉक करें' : 'Unlock Pro'}
+                        </button>
                       </div>
                     )}
 

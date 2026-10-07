@@ -12,6 +12,8 @@ import FeeCalculator from './components/FeeCalculator';
 import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
+import UpgradeModal from './components/UpgradeModal';
+import { API_BASE } from './config/apiConfig';
 import './WorkspaceVisuals.css';
 import './Sidebar.css';
 import {
@@ -69,32 +71,91 @@ function App() {
     return null;
   });
 
-  // Ensure authenticated backend session token exists for active user
+  // Global Upgrade Paywall Modal State
+  const [upgradeModal, setUpgradeModal] = useState({
+    isOpen: false,
+    featureName: '',
+    message: ''
+  });
+
+  const handleOpenUpgradeModal = (featureName, message) => {
+    setUpgradeModal({
+      isOpen: true,
+      featureName: featureName || '',
+      message: message || ''
+    });
+  };
+
+  // Ref to prevent repeated failed token syncs (Fix #15 infinite loop protection)
+  const tokenSyncAttemptedRef = useRef(false);
+
+  // Ensure authenticated, valid backend session token exists for active user
   useEffect(() => {
+    let isCancelled = false;
     const ensureToken = async () => {
-      if (user && !user.token && user.email) {
-        try {
-          const res = await fetch('http://localhost:8000/api/auth/login', {
+      if (!user || !user.email || tokenSyncAttemptedRef.current) return;
+      tokenSyncAttemptedRef.current = true;
+      try {
+        // If token exists, verify if it is valid on the backend
+        if (user.token) {
+          const testRes = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${user.token}` }
+          });
+          if (testRes.ok) {
+            const meData = await testRes.json();
+            if (!isCancelled && meData.plan && meData.plan !== user.plan) {
+              const updated = { ...user, plan: meData.plan };
+              setUser(updated);
+              localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
+            }
+            return;
+          }
+        }
+
+        // Token is missing, expired or invalid (401) — re-authenticate or register
+        const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            password: user.password || 'advocate-auth-token-key'
+          })
+        });
+
+        if (loginRes.ok) {
+          const data = await loginRes.json();
+          if (!isCancelled) {
+            const updated = { ...user, token: data.token, user_id: data.user_id, plan: data.plan || user.plan };
+            delete updated.password;
+            setUser(updated);
+            localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
+          }
+        } else if (loginRes.status === 401 || loginRes.status === 404) {
+          const regRes = await fetch(`${API_BASE}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: user.email,
-              password: user.password || 'session_sync_pwd_dhaara'
+              password: 'advocate-auth-token-key',
+              name: user.name || 'Advocate User'
             })
           });
-          if (res.ok) {
-            const data = await res.json();
-            const updated = { ...user, token: data.token, user_id: data.user_id };
-            setUser(updated);
-            localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
+          if (regRes.ok) {
+            const data = await regRes.json();
+            if (!isCancelled) {
+              const updated = { ...user, token: data.token, user_id: data.user_id, plan: data.plan || user.plan };
+              setUser(updated);
+              localStorage.setItem('dhaara_active_user', JSON.stringify(updated));
+            }
           }
-        } catch (e) {
-          console.error('Failed to sync auth token:', e);
         }
+      } catch (e) {
+        console.error('Failed to sync auth token:', e);
       }
     };
     ensureToken();
-  }, [user]);
+    return () => { isCancelled = true; };
+  }, [user?.email, user?.token]);
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
@@ -119,35 +180,23 @@ function App() {
   });
 
   const applyThemeChange = (nextTheme) => {
-    // Instantly suppress CSS transitions across all DOM elements to eliminate slow white/gray fading
-    document.documentElement.classList.add('disable-theme-transitions');
-
-    setTheme(nextTheme);
-    try {
-      localStorage.setItem('dhaara_theme', nextTheme);
-    } catch { }
-
+    // Suppress all CSS transitions instantly during theme swap
+    const el = document.documentElement;
+    el.classList.add('no-transition');
     if (nextTheme === 'dark') {
+      el.classList.add('dark-theme');
       document.body.classList.add('dark-theme');
-      document.documentElement.classList.add('dark-theme');
     } else {
+      el.classList.remove('dark-theme');
       document.body.classList.remove('dark-theme');
-      document.documentElement.classList.remove('dark-theme');
     }
-
-    // Force synchronous browser layout reflow so new CSS variables take effect immediately in 0ms
-    void document.documentElement.offsetHeight;
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        document.documentElement.classList.remove('disable-theme-transitions');
-      });
-    });
+    // Re-enable transitions after paint
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('no-transition')));
+    setTheme(nextTheme);
+    try { localStorage.setItem('dhaara_theme', nextTheme); } catch { }
   };
 
-  const toggleTheme = () => {
-    applyThemeChange(theme === 'dark' ? 'light' : 'dark');
-  };
+  const toggleTheme = () => applyThemeChange(theme === 'dark' ? 'light' : 'dark');
 
   const [injectedQuery, setInjectedQuery] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -452,10 +501,18 @@ function App() {
                 </button>
 
                 <button
-                  onClick={() => {
+                  onClick={async () => {
+                    const activeToken = user?.token;
                     try {
+                      if (activeToken) {
+                        fetch(`${API_BASE}/api/auth/logout`, {
+                          method: 'POST',
+                          headers: { 'Authorization': `Bearer ${activeToken}` }
+                        }).catch(() => {});
+                      }
                       localStorage.removeItem('dhaara_active_user');
                     } catch { }
+                    setUser(null);
                     setAppView('landing');
                     setShowProfileMenu(false);
                   }}
@@ -642,17 +699,25 @@ function App() {
               language={language}
               onLanguageChange={setLanguage}
               user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
             />
           )}
           {activeTab === 'drafting' && (
             <LegalDrafter
               language={language}
               onLanguageChange={setLanguage}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
             />
           )}
           {activeTab === 'analyzer' && (
             <DocumentAnalyzer
               language={language}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
             />
           )}
           {activeTab === 'rights' && (
@@ -664,12 +729,18 @@ function App() {
             <BnsConverter
               language={language}
               onAskAi={handleAskAiFromExternal}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
             />
           )}
           {activeTab === 'library' && (
             <LegalLibrary
               onAskAi={handleAskAiFromExternal}
               language={language}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
             />
           )}
           {activeTab === 'vault' && (
@@ -680,10 +751,20 @@ function App() {
             />
           )}
           {activeTab === 'calculator' && (
-            <FeeCalculator language={language} />
+            <FeeCalculator
+              language={language}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
+            />
           )}
           {activeTab === 'cyber' && (
-            <CyberChecker language={language} />
+            <CyberChecker
+              language={language}
+              user={user}
+              onNavigateTab={setActiveTab}
+              onOpenUpgradeModal={handleOpenUpgradeModal}
+            />
           )}
           {activeTab === 'settings' && (
             <Settings
@@ -702,6 +783,23 @@ function App() {
           )}
         </div>
       </main>
+
+      {/* Global Upgrade to Plus Paywall Modal */}
+      <UpgradeModal
+        isOpen={upgradeModal.isOpen}
+        onClose={() => setUpgradeModal({ isOpen: false, featureName: '', message: '' })}
+        featureName={upgradeModal.featureName}
+        message={upgradeModal.message}
+        user={user}
+        onUpgradeSuccess={(updatedUser) => {
+          setUser(updatedUser);
+          try {
+            localStorage.setItem('dhaara_active_user', JSON.stringify(updatedUser));
+          } catch (e) {}
+        }}
+        onNavigateTab={setActiveTab}
+        language={language}
+      />
     </div>
   </div>
 );

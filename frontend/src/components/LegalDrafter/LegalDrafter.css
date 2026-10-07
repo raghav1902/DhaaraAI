@@ -39,6 +39,8 @@
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.1) 15%, rgba(0, 0, 0, 0.6) 45%, black 80%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.1) 15%, rgba(0, 0, 0, 0.6) 45%, black 80%);
 }
 
 .drafter-header-image {
