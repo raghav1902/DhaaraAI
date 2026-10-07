@@ -159,20 +159,20 @@ export default function CyberChecker({
     const lines = result.status === 'safe'
       ? [`DHAARAAI CYBER SCAN REPORT\nEmail: ${result.email}\nStatus: CLEAN — No public breaches found.\nScan Date: ${new Date().toLocaleDateString('en-IN')}`]
       : [
-          `DHAARAAI CYBER BREACH REPORT`,
-          `Email: ${result.email}`,
-          `Breaches Found: ${result.count}`,
-          `Risk Level: ${getRiskScore(result.count).label}`,
-          `\nAFFECTED PLATFORMS:`,
-          ...result.breaches.map(b => `• ${b.name} — Data: ${b.data.join(', ')} [${b.severity.toUpperCase()}]`),
-          `\nREMEDIATION:`,
-          `1. Change passwords on all affected platforms immediately`,
-          `2. Enable 2FA on all accounts`,
-          `3. If financial fraud: Call 1930 (National Cyber Helpline)`,
-          `4. File complaint: cybercrime.gov.in`,
-          `5. Legal remedy: IT Act 2000 Sec 66, 66C, 72A`,
-          `\nScan Date: ${new Date().toLocaleDateString('en-IN')}`,
-        ];
+        `DHAARAAI CYBER BREACH REPORT`,
+        `Email: ${result.email}`,
+        `Breaches Found: ${result.count}`,
+        `Risk Level: ${getRiskScore(result.count).label}`,
+        `\nAFFECTED PLATFORMS:`,
+        ...result.breaches.map(b => `• ${b.name} — Data: ${b.data.join(', ')} [${b.severity.toUpperCase()}]`),
+        `\nREMEDIATION:`,
+        `1. Change passwords on all affected platforms immediately`,
+        `2. Enable 2FA on all accounts`,
+        `3. If financial fraud: Call 1930 (National Cyber Helpline)`,
+        `4. File complaint: cybercrime.gov.in`,
+        `5. Legal remedy: IT Act 2000 Sec 66, 66C, 72A`,
+        `\nScan Date: ${new Date().toLocaleDateString('en-IN')}`,
+      ];
     navigator.clipboard.writeText(lines.join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -208,7 +208,7 @@ export default function CyberChecker({
               color: '#f59e0b', border: '1px solid rgba(245,158,11,0.35)',
               boxShadow: '0 2px 8px rgba(245,158,11,0.1)'
             }}>
-              ⭐ PLUS • UNLIMITED SCANS
+              PLUS
             </span>
           ) : (
             <button
@@ -260,13 +260,6 @@ export default function CyberChecker({
       <div className="cyber-scanner__workspace">
         <div className="cyber-scanner__workspace-inner">
 
-          {/* Source Badge */}
-          <div className="cyber-scanner__source-badge">
-            <Database size={13} />
-            <span>Verified Breach Index — XposedOrNot</span>
-            <span className="cyber-scanner__source-dot" />
-            <span>IT Act 2000 / 2008</span>
-          </div>
 
           <h3 className="cyber-scanner__prompt-title">
             {isHindi ? 'ईमेल ब्रीच सत्यापन' : 'Check Email for Known Security Breaches'}

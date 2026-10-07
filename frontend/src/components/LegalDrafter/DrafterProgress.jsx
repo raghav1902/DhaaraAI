@@ -54,7 +54,7 @@ export function DrafterHeader({ language, onLanguageChange, isHindi, onNewDraft,
                   gap: '4px'
                 }}
               >
-                <Crown size={12} /> PLUS • UNLIMITED
+                <Crown size={12} /> PLUS
               </span>
             ) : (
               <button

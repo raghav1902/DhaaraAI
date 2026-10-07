@@ -172,7 +172,7 @@ export default function BnsConverter({
                       gap: '4px'
                     }}
                   >
-                    <Crown size={12} /> PLUS • UNLIMITED LOOKUPS
+                    <Crown size={12} /> PLUS
                   </span>
                 ) : (
                   <button
