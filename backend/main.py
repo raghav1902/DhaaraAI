@@ -49,6 +49,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root_health_check():
+    return {
+        "status": "online",
+        "service": "DhaaraAI LegalGPT Backend",
+        "version": "1.0.0"
+    }
+
 # ==============================================================================
 # SERVER-SIDE AUTHENTICATION & STRICT USER ISOLATION DEPENDENCY
 # ==============================================================================
