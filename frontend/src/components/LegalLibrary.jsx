@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Search, BookOpen, Scale, ShieldCheck, Sparkles, ChevronDown, ChevronUp, Award, Crown, Lock } from 'lucide-react';
+import { BookOpen, Scale, Sparkles, Crown } from 'lucide-react';
 import { FALLBACK_CONCORDANCE_DB } from '../data/concordanceData';
 import { API_BASE } from '../config/apiConfig';
-import ProFeatureLock from './ProFeatureLock';
 import './LegalLibrary.css';
+import StatutesTab from './LegalLibrary/StatutesTab';
+import GlossaryTab from './LegalLibrary/GlossaryTab';
 
 export default function LegalLibrary({
   onAskAi,
@@ -21,7 +22,6 @@ export default function LegalLibrary({
     }
   })();
   const isPro = activeUser?.plan === 'plus' || activeUser?.plan === 'pro' || activeUser?.plan === 'enterprise';
-  // Sub-tab: 'statutes' | 'glossary'
   const [activeTab, setActiveTab] = useState('statutes');
 
   // Statutes State
@@ -36,7 +36,6 @@ export default function LegalLibrary({
   const [selectedStatuteCategory, setSelectedStatuteCategory] = useState('All');
   const [statuteSearch, setStatuteSearch] = useState('');
   const [expandedStatuteId, setExpandedStatuteId] = useState(null);
-  const [usingFallback, setUsingFallback] = useState(false);
 
   // Glossary State
   const [glossaryTerms, setGlossaryTerms] = useState([]);
@@ -48,7 +47,6 @@ export default function LegalLibrary({
   const isHindi = language === 'Hindi' || language === 'हिंदी';
 
   const applyFallbackFilter = useCallback(() => {
-    setUsingFallback(true);
     let items = FALLBACK_CONCORDANCE_DB || [];
     if (selectedStatuteCategory !== 'All') {
       items = items.filter(i => i.category === selectedStatuteCategory);
@@ -84,7 +82,6 @@ export default function LegalLibrary({
       const response = await axios.get(`${API_BASE}/api/library?${params.toString()}`, { headers, timeout: 7000 });
       if (response.data && response.data.items && response.data.items.length > 0) {
         setStatutes(response.data.items);
-        setUsingFallback(false);
         if (response.data.categories && response.data.categories.length > 0) {
           setStatuteCategories(response.data.categories);
         }
@@ -96,7 +93,6 @@ export default function LegalLibrary({
     }
   }, [selectedStatuteCategory, applyFallbackFilter, user, isPro]);
 
-  // Load Statutes
   useEffect(() => {
     fetchLibraryData();
   }, [fetchLibraryData]);
@@ -132,7 +128,6 @@ export default function LegalLibrary({
     }
   }, [selectedGlossaryCategory, user]);
 
-  // Load Glossary
   useEffect(() => {
     fetchGlossaryData();
   }, [fetchGlossaryData]);
@@ -321,417 +316,35 @@ export default function LegalLibrary({
         </button>
       </div>
 
-      {/* ========================================================
-          TAB 1: STATUTES & CONCORDANCE
-          ======================================================== */}
-      {activeTab === 'statutes' && (
-        <>
-          {/* Search Input Bar */}
-          <div className="legal-library__search-wrapper">
-            <Search size={18} className="legal-library__search-icon" />
-            <input
-              type="text"
-              className="legal-library__search-input"
-              value={statuteSearch}
-              onChange={(e) => setStatuteSearch(e.target.value)}
-              placeholder={
-                isHindi
-                  ? 'BNS धारा, IPC धारा, अपराध का नाम (उदा: 302, 420, 103, 318, साइबर ठगी, चेक बाउंस)...'
-                  : 'Search by BNS Section, IPC Section, crime title (e.g. 103, 318, 420, cyber theft, bail)...'
-              }
-            />
-            {statuteSearch && (
-              <button
-                type="button"
-                onClick={() => setStatuteSearch('')}
-                className="legal-library__search-clear"
-                title="Clear"
-              >
-                &times;
-              </button>
-            )}
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="legal-library__categories">
-            {statuteCategories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                className={`legal-library__category-chip ${selectedStatuteCategory === cat ? 'is-active' : ''}`}
-                onClick={() => setSelectedStatuteCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Results Grid */}
-          {filteredStatutes.length === 0 ? (
-            <div className="legal-library__empty-state">
-              <div className="legal-library__empty-icon">
-                <BookOpen size={28} />
-              </div>
-              <h3 className="legal-library__empty-title">
-                {isHindi ? 'कोई प्रासंगिक धारा नहीं मिली' : 'No Matching Sections Found'}
-              </h3>
-              <p className="legal-library__empty-desc">
-                {isHindi
-                  ? 'कृपया धारा संख्या (जैसे: 302, 420, 103, 318) अथवा सामान्य कानूनी शब्द खोज कर देखें।'
-                  : 'Try searching by section number (e.g. 103, 318, 420, 281) or offence keyword.'}
-              </p>
-            </div>
-          ) : (
-            <div className="legal-library__results-grid">
-              {filteredStatutes.map((item) => {
-                const isExpanded = expandedStatuteId === item.id;
-                const bailableStr = item.bailable ? item.bailable.toLowerCase() : '';
-                const isNonBailable = bailableStr.includes('non');
-                const isBailable = bailableStr.includes('bailable') && !isNonBailable;
-                const isCognizable = item.nature && !item.nature.toLowerCase().includes('non-cognizable');
-
-                return (
-                  <div key={item.id} className="legal-library__card">
-                    <div className="legal-library__card-head">
-                      <div className="legal-library__card-tags">
-                        <span className="badge badge-primary font-mono font-bold">
-                          {item.bns_section}
-                        </span>
-                        {item.ipc_section && item.ipc_section !== 'Refer text' && (
-                          <span className="legal-library__legacy-tag">
-                            {String(item.ipc_section).trim().startsWith('IPC') ? item.ipc_section : `IPC ${item.ipc_section}`}
-                          </span>
-                        )}
-                      </div>
-                      <span className="legal-library__category-badge">
-                        {item.category}
-                      </span>
-                    </div>
-
-                    <h3 className="legal-library__offense-title">
-                      {item.offense_en}
-                    </h3>
-                    {item.offense_hi && item.offense_hi !== item.offense_en && (
-                      <p className="legal-library__offense-hindi">
-                        {item.offense_hi}
-                      </p>
-                    )}
-
-                    <div className="legal-library__badges-row">
-                      {item.nature && (
-                        <span className={`badge ${isCognizable ? 'badge-danger' : 'badge-neutral'}`}>
-                          {item.nature}
-                        </span>
-                      )}
-                      {item.bailable && (
-                        <span className={`badge ${isBailable ? 'badge-success' : 'badge-warning'}`}>
-                          {item.bailable}
-                        </span>
-                      )}
-                      {item.punishment && (
-                        <span className="badge badge-neutral" title="Statutory Punishment">
-                          <Scale size={12} style={{ marginRight: '4px' }} />
-                          {item.punishment}
-                        </span>
-                      )}
-                    </div>
-
-                    {isExpanded && (
-                      <div className="legal-library__card-expanded animate-fade-in">
-                        {item.bnss_procedure && (
-                          <div className="legal-library__info-box">
-                            <span className="legal-library__info-title">
-                              <ShieldCheck size={14} />
-                              {isHindi ? 'BNSS 2023 प्रक्रिया व अधिकार' : 'BNSS 2023 Procedure & Safeguards'}
-                            </span>
-                            <p className="legal-library__info-text">{item.bnss_procedure}</p>
-                          </div>
-                        )}
-
-                        {item.victim_guidance && (
-                          <div className="legal-library__info-box legal-library__info-box--victim">
-                            <span className="legal-library__info-title legal-library__info-title--victim">
-                              {isHindi ? 'पीड़ित / शिकायतकर्ता के लिए कानूनी कदम' : 'Complainant Action Protocol'}
-                            </span>
-                            <p className="legal-library__info-text">{item.victim_guidance}</p>
-                          </div>
-                        )}
-
-                        {item.accused_guidance && (
-                          <div className="legal-library__info-box legal-library__info-box--accused">
-                            <span className="legal-library__info-title legal-library__info-title--accused">
-                              {isHindi ? 'अभियुक्त के कानूनी अधिकार व सुरक्षा' : 'Accused Legal Safeguards'}
-                            </span>
-                            <p className="legal-library__info-text">{item.accused_guidance}</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {item.is_locked && !isPro && (
-                      <div
-                        style={{
-                          margin: '12px 0 6px',
-                          padding: '10px 14px',
-                          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(37, 99, 235, 0.08))',
-                          border: '1px dashed rgba(245, 158, 11, 0.5)',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: '10px'
-                        }}
-                      >
-                        <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Lock size={13} color="#d97706" />
-                          {isHindi ? 'पूर्ण BNSS प्रक्रिया व सुप्रीम कोर्ट निर्देश Plus में अनलॉक करें' : 'Unlock full BNSS procedural text & precedents'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => onOpenUpgradeModal ? onOpenUpgradeModal('Comprehensive Legal Library') : onNavigateTab('settings')}
-                          style={{
-                            background: '#d97706',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '4px 10px',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {isHindi ? 'अनलॉक करें' : 'Unlock Pro'}
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="legal-library__card-footer">
-                      <button
-                        onClick={() => setExpandedStatuteId(prev => prev === item.id ? null : item.id)}
-                        className="legal-library__expand-btn"
-                        type="button"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <span>{isHindi ? 'संक्षेप में देखें' : 'Show Less'}</span>
-                            <ChevronUp size={16} />
-                          </>
-                        ) : (
-                          <>
-                            <span>{isHindi ? 'विस्तृत अधिकार व प्रक्रिया' : 'View Full Details'}</span>
-                            <ChevronDown size={16} />
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleAskSection(item)}
-                        className="btn-ghost legal-library__ask-btn"
-                        type="button"
-                        title={isHindi ? 'AI से परामर्श करें' : 'Analyze in Ask AI'}
-                      >
-                        <Sparkles size={14} />
-                        <span>{isHindi ? 'AI से पूछें' : 'Ask AI'}</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
-      )}
-
-      {/* ========================================================
-          TAB 2: LEGAL GLOSSARY (150+ TERMS)
-          ======================================================== */}
-      {activeTab === 'glossary' && (
-        <>
-          {/* Glossary Search Bar */}
-          <div className="legal-library__search-wrapper">
-            <Search size={18} className="legal-library__search-icon" />
-            <input
-              type="text"
-              className="legal-library__search-input"
-              value={glossarySearch}
-              onChange={(e) => setGlossarySearch(e.target.value)}
-              placeholder={
-                isHindi
-                  ? 'विधिक शब्द खोजें (उदा: जमानत, FIR, कॉग्निजेंस, कैविएट, पर्जरी, इनजंक्शन, रिमांड)...'
-                  : 'Search legal term (e.g. bail, cognizance, caveat, perjury, remand, res judicata, injunction)...'
-              }
-            />
-            {glossarySearch && (
-              <button
-                type="button"
-                onClick={() => setGlossarySearch('')}
-                className="legal-library__search-clear"
-                title="Clear"
-              >
-                &times;
-              </button>
-            )}
-          </div>
-
-          {/* Glossary Category Pills */}
-          <div className="legal-library__categories">
-            {glossaryCategories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                className={`legal-library__category-chip ${selectedGlossaryCategory === cat ? 'is-active' : ''}`}
-                onClick={() => setSelectedGlossaryCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Glossary Cards Grid */}
-          {filteredGlossary.length === 0 ? (
-            <div className="legal-library__empty-state">
-              <div className="legal-library__empty-icon">
-                <Sparkles size={28} />
-              </div>
-              <h3 className="legal-library__empty-title">
-                {isHindi ? 'कोई विधिक शब्द नहीं मिला' : 'No Matching Legal Terms Found'}
-              </h3>
-              <p className="legal-library__empty-desc">
-                {isHindi
-                  ? 'कृपया अन्य विधिक शब्द या श्रेणी चुनकर खोजें।'
-                  : 'Try searching by term, synonym, or selecting another legal category.'}
-              </p>
-            </div>
-          ) : (
-            <div className="legal-library__results-grid">
-              {filteredGlossary.map((term) => {
-                const isExpanded = expandedGlossaryId === term.id;
-
-                return (
-                  <div key={term.id} className="legal-library__card" style={{ display: 'flex', flexDirection: 'column' }}>
-                    {/* Head */}
-                    <div className="legal-library__card-head">
-                      <span className="badge badge-primary font-bold">
-                        {term.term}
-                      </span>
-                      <span className="legal-library__category-badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)' }}>
-                        {term.category}
-                      </span>
-                    </div>
-
-                    {/* Hindi Term Title */}
-                    <h3 className="legal-library__offense-title" style={{ fontSize: '15.5px', marginTop: '4px' }}>
-                      {term.hindi_term || term.term}
-                    </h3>
-
-                    {/* Plain Citizen Explanation */}
-                    <p style={{ fontSize: '13px', color: 'var(--text-main)', margin: '6px 0', lineHeight: '1.5' }}>
-                      {isHindi ? term.simple_hi_explanation : term.simple_en_explanation}
-                    </p>
-
-                    {/* Secondary Language Subtext */}
-                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 10px', fontStyle: 'italic', lineHeight: '1.4' }}>
-                      {isHindi ? term.simple_en_explanation : term.simple_hi_explanation}
-                    </p>
-
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div className="legal-library__card-expanded animate-fade-in" style={{ borderTop: '1px solid var(--card-border)', paddingTop: '10px' }}>
-                        {/* Legal Context */}
-                        <div className="legal-library__info-box" style={{ background: 'var(--subtle-bg)' }}>
-                          <span className="legal-library__info-title">
-                            <Scale size={14} />
-                            {isHindi ? 'औपचारिक प्रक्रियात्मक संदर्भ' : 'Formal Procedural & Statutory Context'}
-                          </span>
-                          <p className="legal-library__info-text">{term.legal_context}</p>
-                        </div>
-
-                        {/* Related Acts & Sections */}
-                        {((term.related_acts && term.related_acts.length > 0) || (term.related_sections && term.related_sections.length > 0)) && (
-                          <div style={{ marginTop: '10px' }}>
-                            <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                              {isHindi ? 'संबंधित अधिनियम व धाराएं:' : 'Related Enactments & Sections:'}
-                            </span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                              {(term.related_sections || []).map((sec, idx) => (
-                                <span key={idx} className="badge badge-primary font-mono" style={{ fontSize: '11px' }}>
-                                  {sec}
-                                </span>
-                              ))}
-                              {(term.related_acts || []).map((act, idx) => (
-                                <span key={idx} className="badge badge-neutral" style={{ fontSize: '11px' }}>
-                                  {act}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Landmark Precedents */}
-                        {term.related_case_law_ids && term.related_case_law_ids.length > 0 && (
-                          <div style={{ marginTop: '10px' }}>
-                            <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                              <Award size={12} color="#f59e0b" />
-                              {isHindi ? 'प्रमुख न्यायिक दृष्टांत:' : 'Landmark Case Law:'}
-                            </span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                              {term.related_case_law_ids.map((c, idx) => (
-                                <span key={idx} className="badge badge-warning" style={{ fontSize: '11px' }}>
-                                  {c}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Aliases */}
-                        {term.aliases_synonyms && term.aliases_synonyms.length > 0 && (
-                          <div style={{ marginTop: '8px' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                              {isHindi ? 'अन्य नाम: ' : 'Aliases: '}
-                              {term.aliases_synonyms.join(', ')}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Footer */}
-                    <div className="legal-library__card-footer" style={{ marginTop: 'auto', paddingTop: '10px' }}>
-                      <button
-                        onClick={() => setExpandedGlossaryId(prev => prev === term.id ? null : term.id)}
-                        className="legal-library__expand-btn"
-                        type="button"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <span>{isHindi ? 'संक्षेप में' : 'Show Less'}</span>
-                            <ChevronUp size={16} />
-                          </>
-                        ) : (
-                          <>
-                            <span>{isHindi ? 'विधिक संदर्भ व धाराएं' : 'View Legal Context'}</span>
-                            <ChevronDown size={16} />
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleAskGlossary(term)}
-                        className="btn-ghost legal-library__ask-btn"
-                        type="button"
-                        title={isHindi ? 'AI से परामर्श करें' : 'Ask AI about this term'}
-                      >
-                        <Sparkles size={14} />
-                        <span>{isHindi ? 'AI से पूछें' : 'Ask AI'}</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
+      {activeTab === 'statutes' ? (
+        <StatutesTab
+          isHindi={isHindi}
+          isPro={isPro}
+          statuteSearch={statuteSearch}
+          setStatuteSearch={setStatuteSearch}
+          statuteCategories={statuteCategories}
+          selectedStatuteCategory={selectedStatuteCategory}
+          setSelectedStatuteCategory={setSelectedStatuteCategory}
+          filteredStatutes={filteredStatutes}
+          expandedStatuteId={expandedStatuteId}
+          setExpandedStatuteId={setExpandedStatuteId}
+          handleAskSection={handleAskSection}
+          onOpenUpgradeModal={onOpenUpgradeModal}
+          onNavigateTab={onNavigateTab}
+        />
+      ) : (
+        <GlossaryTab
+          isHindi={isHindi}
+          glossarySearch={glossarySearch}
+          setGlossarySearch={setGlossarySearch}
+          glossaryCategories={glossaryCategories}
+          selectedGlossaryCategory={selectedGlossaryCategory}
+          setSelectedGlossaryCategory={setSelectedGlossaryCategory}
+          filteredGlossary={filteredGlossary}
+          expandedGlossaryId={expandedGlossaryId}
+          setExpandedGlossaryId={setExpandedGlossaryId}
+          handleAskGlossary={handleAskGlossary}
+        />
       )}
     </div>
   );
